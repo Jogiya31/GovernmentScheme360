@@ -11,8 +11,157 @@ import Alert from '../components/Common/Alert';
 import Card from '../components/Common/Card';
 import Modal from '../components/Common/Modal';
 import Dropdown from '../components/Common/Dropdown';
+import {
+  useGetAgeGroupMutation,
+  useGetBeneficiaryCategoryMutation,
+  useGetBeneficiaryTypeMutation,
+  useGetBenefitFrequencyMutation,
+  useGetBenefitTypeMutation,
+  useGetDeliveryMechanismMutation,
+  useGetDepartmentMutation,
+  useGetDistrictMutation,
+  useGetDocumentMutation,
+  useGetFinancialAssistanceTypeMutation,
+  useGetFundSharingPatternMutation,
+  useGetGenderMutation,
+  useGetGeographicCoverageMutation,
+  useGetImplementingAgencyMutation,
+  useGetIncomeCriteriaMutation,
+  useGetInsuranceTypeMutation,
+  useGetLocalBodyMutation,
+  useGetMinistryMutation,
+  useGetMissionMutation,
+  useGetMonitoringAgencyMutation,
+  useGetNationalPriorityMutation,
+  useGetOccupationMutation,
+  useGetOutcomeIndicatorMutation,
+  useGetReviewFrequencyMutation,
+  useGetSchemeMutation,
+  useGetSchemePhaseMutation,
+  useGetSchemeStatusMutation,
+  useGetSchemeTypeMutation,
+  useGetSDGMutation,
+  useGetSectorMutation,
+  useGetServiceModeMutation,
+  useGetSocialCategoryMutation,
+  useGetStakeholderTypeMutation,
+  useGetStateMutation,
+  useGetSubSectorMutation,
+  useGetTargetGroupMutation,
+  useGetThemeMutation,
+  useGetUrbanRuralMutation,
+} from '../app/api';
 
 export default function NewScheme() {
+  const [getAgeGroup, { data: ageGroupRes }] = useGetAgeGroupMutation();
+  const [getBeneficiaryCategory, { data: beneficiaryCategories }] =
+    useGetBeneficiaryCategoryMutation();
+  const [getBeneficiaryType, { data: beneficiaryTypes }] = useGetBeneficiaryTypeMutation();
+  const [getBenefitFrequency, { data: benefitFrequencies }] = useGetBenefitFrequencyMutation();
+  const [getBenefitType, { data: benefitTypes }] = useGetBenefitTypeMutation();
+  const [getDeliveryMechanism, { data: deliveryMechanisms }] = useGetDeliveryMechanismMutation();
+  const [getDepartment, { data: departments }] = useGetDepartmentMutation();
+  const [getDistrict, { data: districts }] = useGetDistrictMutation();
+  const [getDocument, { data: documents }] = useGetDocumentMutation();
+  const [getFinancialAssistanceType, { data: financialAssistanceTypes }] =
+    useGetFinancialAssistanceTypeMutation();
+  const [getFundSharingPattern, { data: fundSharingPatterns }] = useGetFundSharingPatternMutation();
+  const [getGender, { data: genders }] = useGetGenderMutation();
+  const [getGeographicCoverage, { data: geographicCoverages }] = useGetGeographicCoverageMutation();
+  const [getImplementingAgency, { data: implementingAgencies }] =
+    useGetImplementingAgencyMutation();
+  const [getIncomeCriteria, { data: incomeCriteria }] = useGetIncomeCriteriaMutation();
+  const [getInsuranceType, { data: insuranceTypes }] = useGetInsuranceTypeMutation();
+  const [getLocalBody, { data: localBodies }] = useGetLocalBodyMutation();
+  const [getMinistry, { data: ministries }] = useGetMinistryMutation();
+  const [getMission, { data: missions }] = useGetMissionMutation();
+  const [getMonitoringAgency, { data: monitoringAgencies }] = useGetMonitoringAgencyMutation();
+  const [getNationalPriority, { data: nationalPriorities }] = useGetNationalPriorityMutation();
+  const [getOccupation, { data: occupations }] = useGetOccupationMutation();
+  const [getOutcomeIndicator, { data: outcomeIndicators }] = useGetOutcomeIndicatorMutation();
+  const [getReviewFrequency, { data: reviewFrequencies }] = useGetReviewFrequencyMutation();
+  const [getScheme, { data: schemes }] = useGetSchemeMutation();
+  const [getSchemePhase, { data: schemePhases }] = useGetSchemePhaseMutation();
+  const [getSchemeStatus, { data: schemeStatuses }] = useGetSchemeStatusMutation();
+  const [getSchemeType, { data: schemeTypes }] = useGetSchemeTypeMutation();
+  const [getSDG, { data: sdgs }] = useGetSDGMutation();
+  const [getSector, { data: sectors }] = useGetSectorMutation();
+  const [getServiceMode, { data: serviceModes }] = useGetServiceModeMutation();
+  const [getSocialCategory, { data: socialCategories }] = useGetSocialCategoryMutation();
+  const [getStakeholderType, { data: stakeholderTypes }] = useGetStakeholderTypeMutation();
+  const [getState, { data: states }] = useGetStateMutation();
+  const [getSubSector, { data: subSectors }] = useGetSubSectorMutation();
+  const [getTargetGroup, { data: targetGroups }] = useGetTargetGroupMutation();
+  const [getTheme, { data: themes }] = useGetThemeMutation();
+  const [getUrbanRural, { data: urbanRural }] = useGetUrbanRuralMutation();
+
+  useEffect(() => {
+    getAgeGroup({ Action: 'AgeGroup' });
+    getBeneficiaryCategory({ Action: 'BeneficiaryCategory' });
+    getBeneficiaryType({ Action: 'BeneficiaryType' });
+    getBenefitFrequency({ Action: 'BenefitFrequency' });
+    getBenefitType({ Action: 'BenefitType' });
+    getDeliveryMechanism({ Action: 'DeliveryMechanism' });
+    getDepartment({ Action: 'Department' });
+    getDistrict({ Action: 'District' });
+    getDocument({ Action: 'Document' });
+    getFinancialAssistanceType({ Action: 'FinancialAssistanceType' });
+    getFundSharingPattern({ Action: 'FundSharingPattern' });
+    getGender({ Action: 'Gender' });
+    getGeographicCoverage({ Action: 'GeographicCoverage' });
+    getImplementingAgency({ Action: 'ImplementingAgency' });
+    getIncomeCriteria({ Action: 'IncomeCriteria' });
+    getInsuranceType({ Action: 'InsuranceType' });
+    getLocalBody({ Action: 'LocalBody' });
+    getMinistry({ Action: 'Ministry' });
+    getMission({ Action: 'Mission' });
+    getMonitoringAgency({ Action: 'MonitoringAgency' });
+    getNationalPriority({ Action: 'NationalPriority' });
+    getOccupation({ Action: 'Occupation' });
+    getOutcomeIndicator({ Action: 'OutcomeIndicator' });
+    getReviewFrequency({ Action: 'ReviewFrequency' });
+    getScheme({ Action: 'Scheme' });
+    getSchemePhase({ Action: 'SchemePhase' });
+    getSchemeStatus({ Action: 'SchemeStatus' });
+    getSchemeType({ Action: 'SchemeType' });
+    getSDG({ Action: 'SDG' });
+    getSector({ Action: 'Sector' });
+    getServiceMode({ Action: 'ServiceMode' });
+    getSocialCategory({ Action: 'SocialCategory' });
+    getStakeholderType({ Action: 'StakeholderType' });
+    getState({ Action: 'State' });
+    getSubSector({ Action: 'SubSector' });
+    getTargetGroup({ Action: 'TargetGroup' });
+    getTheme({ Action: 'Theme' });
+    getUrbanRural({ Action: 'UrbanRural' });
+  }, []);
+
+  const backendOptionsMap = {
+    ministry: ministryRes?.data,
+    schemeType: schemeTypeRes?.data,
+    status: schemeStatusRes?.data,
+    sector: sectorRes?.data,
+    subSector: subSectorRes?.data,
+    gender: genderRes?.data,
+    urbanRural: urbanRuralRes?.data,
+    assistanceType: financialAssistanceTypeRes?.data,
+    deliveryMechanism: deliveryMechanismRes?.data,
+    reviewFrequency: reviewFrequencyRes?.data,
+    benefitType: benefitTypeRes?.data,
+    frequency: benefitFrequencyRes?.data,
+    sharingPattern: fundSharingPatternRes?.data,
+    ageGroup: ageGroupRes?.data,
+    category: beneficiaryCategoryRes?.data,
+    targetGroup: targetGroupRes?.data,
+    socialCategory: socialCategoryRes?.data,
+    occupation: occupationRes?.data,
+    implementingAgency: implementingAgencyRes?.data,
+    monitoringAgency: monitoringAgencyRes?.data,
+    state: stateRes?.data,
+    district: districtRes?.data,
+    department: departmentRes?.data,
+  };
+
   // Page core states
   const [formData, setFormData] = useState(getInitialSchemeState());
   const [currentTab, setCurrentTab] = useState(0);
@@ -224,11 +373,14 @@ export default function NewScheme() {
     ...submittedSchemes.map((s) => ({ value: `sub_${s.id}`, label: `Submitted: ${s.name}` })),
   ];
 
-  const selectedDropdownValue = loadedRecordId === 'demo_pmay' || loadedRecordId === 'demo'
-    ? 'demo'
-    : loadedRecordId
-      ? (drafts.some(d => d.id === loadedRecordId) ? `draft_${loadedRecordId}` : `sub_${loadedRecordId}`)
-      : '';
+  const selectedDropdownValue =
+    loadedRecordId === 'demo_pmay' || loadedRecordId === 'demo'
+      ? 'demo'
+      : loadedRecordId
+        ? drafts.some((d) => d.id === loadedRecordId)
+          ? `draft_${loadedRecordId}`
+          : `sub_${loadedRecordId}`
+        : '';
 
   const handleDropdownChange = (val) => {
     if (!val) {
@@ -644,8 +796,6 @@ export default function NewScheme() {
             />
           </div>
 
-
-
           {/* Quick Dropdown Picker of 23 tabs */}
           <div className="d-flex align-items-center gap-2">
             <span className="text-muted d-none d-sm-inline" style={{ fontSize: '0.8rem' }}>
@@ -760,6 +910,21 @@ export default function NewScheme() {
                     },
                   }));
                 };
+
+                // Resolve options array from backend map or static configs
+                const backendOpts = backendOptionsMap[field.key];
+                const hasBackendOpts = Array.isArray(backendOpts) && backendOpts.length > 0;
+
+                let optionsList = [];
+                if (hasBackendOpts) {
+                  optionsList = backendOpts.map((item) => getOptionName(item)).filter(Boolean);
+                  // Remove duplicates if any
+                  optionsList = Array.from(new Set(optionsList));
+                } else if (field.options) {
+                  optionsList = field.options;
+                }
+
+                const isSelect = field.type === 'select' || hasBackendOpts;
 
                 return (
                   <div key={field.key} className={`col-12 col-md-${field.col || 6}`}>

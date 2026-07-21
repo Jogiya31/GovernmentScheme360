@@ -4,6 +4,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { toggleTheme } from '../../features/theme/themeSlice';
 import { logout } from '../../features/auth/authSlice';
 import { markAllAsRead } from '../../features/notifications/notificationsSlice';
+import scheme360 from '../../assets/scheme360.png';
 
 export default function Header({ sidebarCollapsed, toggleSidebar }) {
   const dispatch = useDispatch();
@@ -53,16 +54,16 @@ export default function Header({ sidebarCollapsed, toggleSidebar }) {
             onClick={toggleSidebar}
             aria-label="Toggle Sidebar"
           >
-            <i className="bi bi-list fs-3"></i>
+            <img src={scheme360} alt="Scheme360 Logo" style={{ height: '30px', width: 'auto', objectFit: 'contain' }} />
           </button>
 
           {/* Logo brand */}
           <div className="navbar-brand py-0">
             <Link to="/dashboard" className="d-flex align-items-center text-decoration-none">
-              <i className="bi bi-cpu-fill text-primary fs-3 me-2"></i>
+              <img src={scheme360} alt="Scheme360 Logo" className="me-2" style={{ height: '32px', width: 'auto', objectFit: 'contain' }} />
               {!sidebarCollapsed && (
                 <span className="h4 mb-0 fw-bold text-dark-emphasis tracking-tight" style={{ letterSpacing: '-0.02em' }}>
-                  Free<span className="text-primary">Dash</span>
+                  Scheme<span className="text-primary"> 360</span>
                 </span>
               )}
             </Link>
@@ -130,76 +131,6 @@ export default function Header({ sidebarCollapsed, toggleSidebar }) {
               </button>
             </li>
 
-            {/* Notifications Dropdown */}
-            <li className="nav-item position-relative" ref={notifRef}>
-              <button
-                onClick={() => {
-                  setShowNotif(!showNotif);
-                  setShowProfile(false);
-                }}
-                className="btn btn-outline-secondary btn-sm border-0 rounded-circle d-flex align-items-center justify-content-center position-relative"
-                style={{ width: '38px', height: '38px' }}
-                id="notifications-dropdown-btn"
-              >
-                <i className="bi bi-bell fs-5 text-muted"></i>
-                {unreadCount > 0 && (
-                  <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style={{ fontSize: '0.65rem' }}>
-                    {unreadCount}
-                  </span>
-                )}
-              </button>
-
-              {showNotif && (
-                <div
-                  className="position-absolute end-0 mt-2 bg-body border rounded shadow-lg p-0"
-                  style={{ width: '320px', zIndex: 1050 }}
-                  id="notifications-dropdown-menu"
-                >
-                  <div className="d-flex justify-content-between align-items-center p-3 border-bottom">
-                    <span className="fw-semibold">Notifications</span>
-                    {unreadCount > 0 && (
-                      <button
-                        onClick={() => dispatch(markAllAsRead())}
-                        className="btn btn-link btn-sm p-0 text-decoration-none"
-                        style={{ fontSize: '0.8rem' }}
-                      >
-                        Mark all as read
-                      </button>
-                    )}
-                  </div>
-                  <div className="overflow-auto" style={{ maxHeight: '250px' }}>
-                    {notifications.length === 0 ? (
-                      <div className="text-center py-4 text-muted" style={{ fontSize: '0.9rem' }}>
-                        No notifications
-                      </div>
-                    ) : (
-                      notifications.map((n) => (
-                        <div key={n.id} className={`p-3 border-bottom hover-bg ${n.read ? 'opacity-75' : 'bg-primary-subtle'}`}>
-                          <div className="d-flex justify-content-between mb-1" style={{ fontSize: '0.8rem' }}>
-                            <span className={`fw-semibold text-${n.type === 'danger' ? 'danger' : n.type === 'success' ? 'success' : 'primary'}`}>
-                              {n.type.toUpperCase()}
-                            </span>
-                            <span className="text-muted">{n.time}</span>
-                          </div>
-                          <p className="mb-0 text-dark-emphasis" style={{ fontSize: '0.85rem' }}>
-                            {n.message}
-                          </p>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                  <div className="p-2 border-top text-center bg-light">
-                    <button
-                      onClick={() => setShowNotif(false)}
-                      className="btn btn-sm btn-link text-decoration-none w-100"
-                    >
-                      Close Panel
-                    </button>
-                  </div>
-                </div>
-              )}
-            </li>
-
             {/* User Profile Dropdown */}
             <li className="nav-item position-relative ms-2" ref={profileRef}>
               <button
@@ -238,13 +169,6 @@ export default function Header({ sidebarCollapsed, toggleSidebar }) {
                     onClick={() => setShowProfile(false)}
                   >
                     <i className="bi bi-person text-muted"></i> My Profile
-                  </Link>
-                  <Link
-                    to="/settings"
-                    className="dropdown-item py-2 d-flex align-items-center gap-2"
-                    onClick={() => setShowProfile(false)}
-                  >
-                    <i className="bi bi-gear text-muted"></i> Account Settings
                   </Link>
                   <hr className="my-2" />
                   <button

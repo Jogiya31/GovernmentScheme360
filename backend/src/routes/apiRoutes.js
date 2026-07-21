@@ -1,53 +1,66 @@
 const express = require("express");
+const sql = require("mssql");
+
 const router = express.Router();
 
 const { connectDB } = require("../db/connection");
 const spMap = require("../config/spMap");
 
 router.post("/", async (req, res) => {
-
     try {
 
         const { Action, ...params } = req.body;
 
+        if (!Action) {
+            return res.status(400).json({
+                success: false,
+                message: "Action is required."
+            });
+        }
+
         const procedure = spMap[Action];
 
         if (!procedure) {
-
-            return res.status(400).json({
+            return res.status(404).json({
                 success: false,
-                message: "Invalid Action"
+                message: `No stored procedure found for '${Action}'.`
             });
-
         }
 
         const pool = await connectDB();
 
         const request = pool.request();
 
-        // Add all parameters automatically
-        Object.entries(params).forEach(([key, value]) => {
+        // Add parameters automatically
+        for (const [key, value] of Object.entries(params)) {
+
+            if (value === undefined || value === null) continue;
+
             request.input(key, value);
-        });
+
+            // If you want explicit SQL types:
+            // request.input(key, sql.VarChar, value);
+        }
 
         const result = await request.execute(procedure);
 
-        res.status(200).json({
+        return res.status(200).json({
             success: true,
-            data: result.recordset
+            message: "Success",
+            data: result.recordset || [],
+            rowsAffected: result.rowsAffected?.[0] || 0
         });
 
-    } catch (err) {
+    } catch (error) {
 
-        console.error(err);
+        console.error(error);
 
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
-            message: err.message
+            message: error.message
         });
 
     }
-
 });
 
 module.exports = router;
