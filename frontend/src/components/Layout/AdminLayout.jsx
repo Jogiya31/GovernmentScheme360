@@ -40,7 +40,7 @@ export default function AdminLayout() {
       {/* Main page content wrapper */}
       <div className="page-wrapper" style={{ display: 'block' }}>
         {/* Dynamic page content container */}
-        <div className="container-fluid container-height">
+        <div className="container-fluid">
           <Outlet />
         </div>
 

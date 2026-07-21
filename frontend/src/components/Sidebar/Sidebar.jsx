@@ -15,14 +15,14 @@ export default function Sidebar() {
       title: 'Workspace',
       items: [
         // { path: '/users', label: 'Users Database', icon: 'bi bi-people' },
-        { path: '/new-scheme', label: 'New Scheme', icon: 'bi bi-file-earmark-plus' }
+        { path: '/scheme', label: 'View/Edit Scheme', icon: 'bi bi-file-earmark-plus' }
       ]
     },
     {
       title: 'Account & Settings',
       items: [
         { path: '/profile', label: 'My Profile', icon: 'bi bi-person-circle' },
-        { path: '/settings', label: 'System Settings', icon: 'bi bi-gear' }
+        // { path: '/settings', label: 'System Settings', icon: 'bi bi-gear' }
       ]
     }
   ];

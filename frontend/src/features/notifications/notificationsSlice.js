@@ -1,9 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const DEFAULT_NOTIFICATIONS = [
-  // { id: 1, type: 'info', message: 'Welcome to FreeDash Admin Dashboard template.', read: false, time: 'Just now' },
-  // { id: 2, type: 'success', message: 'System updated to the latest version.', read: false, time: '2 mins ago' },
-  // { id: 3, type: 'warning', message: 'New login attempt from location: Tokyo.', read: true, time: '1 hour ago' }
+  { id: 1, type: 'info', message: 'Welcome to FreeDash Admin Dashboard template.', read: false, time: 'Just now' },
+  { id: 2, type: 'success', message: 'System updated to the latest version.', read: false, time: '2 mins ago' },
+  { id: 3, type: 'warning', message: 'New login attempt from location: Tokyo.', read: true, time: '1 hour ago' }
 ];
 
 const getInitialNotifications = () => {

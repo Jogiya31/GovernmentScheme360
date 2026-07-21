@@ -10,6 +10,7 @@ import {
 import Alert from '../components/Common/Alert';
 import Card from '../components/Common/Card';
 import Modal from '../components/Common/Modal';
+import Dropdown from '../components/Common/Dropdown';
 
 export default function NewScheme() {
   // Page core states
@@ -214,6 +215,48 @@ export default function NewScheme() {
     setDraftName(isDraft ? record.name : '');
     setCurrentTab(0);
     showAlert(`Loaded "${record.name}" into the 23-tab workspace!`, 'info');
+  };
+
+  // Dropdown options representing all schemes available to select
+  const dropdownOptions = [
+    { value: 'demo', label: 'Demo: PM Awas Yojana (Urban)' },
+    ...drafts.map((d) => ({ value: `draft_${d.id}`, label: `Draft: ${d.name}` })),
+    ...submittedSchemes.map((s) => ({ value: `sub_${s.id}`, label: `Submitted: ${s.name}` })),
+  ];
+
+  const selectedDropdownValue = loadedRecordId === 'demo_pmay' || loadedRecordId === 'demo'
+    ? 'demo'
+    : loadedRecordId
+      ? (drafts.some(d => d.id === loadedRecordId) ? `draft_${loadedRecordId}` : `sub_${loadedRecordId}`)
+      : '';
+
+  const handleDropdownChange = (val) => {
+    if (!val) {
+      setFormData(getInitialSchemeState());
+      setLoadedRecordId(null);
+      setDraftName('');
+      setCurrentTab(0);
+      return;
+    }
+    if (val === 'demo') {
+      setFormData(JSON.parse(JSON.stringify(PM_AWAS_YOJANA_DEMO)));
+      setLoadedRecordId('demo_pmay');
+      setDraftName('PM Awas Yojana (Urban) Demo');
+      setCurrentTab(0);
+      showAlert('Loaded "PM Awas Yojana (Urban)" Demo Scheme!', 'info');
+    } else if (val.startsWith('draft_')) {
+      const id = val.replace('draft_', '');
+      const draft = drafts.find((d) => d.id === id);
+      if (draft) {
+        handleLoadRecord(draft, true);
+      }
+    } else if (val.startsWith('sub_')) {
+      const id = val.replace('sub_', '');
+      const scheme = submittedSchemes.find((s) => s.id === id);
+      if (scheme) {
+        handleLoadRecord(scheme, false);
+      }
+    }
   };
 
   // Delete a Saved Record
@@ -591,18 +634,17 @@ export default function NewScheme() {
         {/* Tab Controls Bar */}
         <div className="p-3 border-bottom bg-light-subtle d-flex flex-wrap align-items-center justify-content-between gap-3">
           {/* Quick tab keyword search filter */}
-          <div className="input-group input-group-sm" style={{ maxWidth: '240px' }}>
-            <span className="input-group-text bg-white border-end-0">
-              <i className="bi bi-funnel text-muted"></i>
-            </span>
-            <input
-              type="text"
-              className="form-control border-start-0"
-              placeholder="Search forms..."
-              value={tabSearchTerm}
-              onChange={(e) => setTabSearchTerm(e.target.value)}
+          <div style={{ minWidth: '240px' }}>
+            <Dropdown
+              options={dropdownOptions}
+              value={selectedDropdownValue}
+              onChange={handleDropdownChange}
+              placeholder="Select scheme..."
+              searchable={true}
             />
           </div>
+
+
 
           {/* Quick Dropdown Picker of 23 tabs */}
           <div className="d-flex align-items-center gap-2">
@@ -702,12 +744,6 @@ export default function NewScheme() {
                 {' '}
                 {activeTabConfig.title}{' '}
               </h5>
-              <small className="text-muted d-block" style={{ fontSize: '0.75rem' }}>
-                Relational Table Key:{' '}
-                <code className="text-danger fw-normal">
-                  Scheme{activeTabConfig.id.charAt(0).toUpperCase() + activeTabConfig.id.slice(1)}
-                </code>
-              </small>
             </div>
           </div>
 

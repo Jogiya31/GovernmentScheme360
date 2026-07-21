@@ -25,10 +25,93 @@ const saveStoredUsers = (users) => {
   localStorage.setItem('gov_scheme_users', JSON.stringify(users));
 };
 
+const DEFAULT_ROLES = [
+  { id: 1, title: 'Admin', status: true },
+  { id: 2, title: 'Manager', status: true },
+  { id: 3, title: 'Developer', status: true },
+  { id: 4, title: 'Designer', status: true },
+  { id: 5, title: 'Support', status: true }
+];
+
+const DEFAULT_DEPARTMENTS = [
+  { id: 1, title: 'Technology', status: true },
+  { id: 2, title: 'Marketing', status: true },
+  { id: 3, title: 'Customer Success', status: true },
+  { id: 4, title: 'Design', status: true },
+  { id: 5, title: 'Human Resources', status: true },
+  { id: 6, title: 'Finance', status: true }
+];
+
+const DEFAULT_MINISTRIES = [
+  { id: 1, title: 'Ministry of Agriculture & Farmers Welfare', status: true },
+  { id: 2, title: 'Ministry of Health & Family Welfare', status: true },
+  { id: 3, title: 'Ministry of Education', status: true },
+  { id: 4, title: 'Ministry of Rural Development', status: true },
+  { id: 5, title: 'Ministry of Housing & Urban Affairs', status: true },
+  { id: 6, title: 'Ministry of Finance', status: true },
+  { id: 7, title: 'Ministry of Skill Development & Entrepreneurship', status: true },
+  { id: 8, title: 'Ministry of Electronics & Information Technology', status: true },
+  { id: 9, title: 'Ministry of Women & Child Development', status: true },
+  { id: 10, title: 'Ministry of Jal Shakti', status: true },
+  { id: 11, title: 'Ministry of Power', status: true },
+  { id: 12, title: 'Ministry of New & Renewable Energy', status: true }
+];
+
+const getStoredRoles = () => {
+  const saved = localStorage.getItem('gov_scheme_roles');
+  if (saved) {
+    try {
+      return JSON.parse(saved);
+    } catch {
+      return DEFAULT_ROLES;
+    }
+  }
+  localStorage.setItem('gov_scheme_roles', JSON.stringify(DEFAULT_ROLES));
+  return DEFAULT_ROLES;
+};
+
+const saveStoredRoles = (roles) => {
+  localStorage.setItem('gov_scheme_roles', JSON.stringify(roles));
+};
+
+const getStoredDepartments = () => {
+  const saved = localStorage.getItem('gov_scheme_departments');
+  if (saved) {
+    try {
+      return JSON.parse(saved);
+    } catch {
+      return DEFAULT_DEPARTMENTS;
+    }
+  }
+  localStorage.setItem('gov_scheme_departments', JSON.stringify(DEFAULT_DEPARTMENTS));
+  return DEFAULT_DEPARTMENTS;
+};
+
+const saveStoredDepartments = (depts) => {
+  localStorage.setItem('gov_scheme_departments', JSON.stringify(depts));
+};
+
+const getStoredMinistries = () => {
+  const saved = localStorage.getItem('gov_scheme_ministries');
+  if (saved) {
+    try {
+      return JSON.parse(saved);
+    } catch {
+      return DEFAULT_MINISTRIES;
+    }
+  }
+  localStorage.setItem('gov_scheme_ministries', JSON.stringify(DEFAULT_MINISTRIES));
+  return DEFAULT_MINISTRIES;
+};
+
+const saveStoredMinistries = (ministries) => {
+  localStorage.setItem('gov_scheme_ministries', JSON.stringify(ministries));
+};
+
 export const api = createApi({
   reducerPath: 'api',
   baseQuery: fakeBaseQuery(),
-  tagTypes: ['Users'],
+  tagTypes: ['Users', 'Roles', 'Departments', 'Ministries'],
   endpoints: (builder) => ({
     getUsers: builder.query({
       async queryFn() {
@@ -135,6 +218,164 @@ export const api = createApi({
       },
       providesTags: ['Users'],
     }),
+    getRoles: builder.query({
+      async queryFn() {
+        try {
+          const data = getStoredRoles();
+          return { data };
+        } catch (error) {
+          return { error: { status: 'CUSTOM_ERROR', error: error.message } };
+        }
+      },
+      providesTags: ['Roles'],
+    }),
+    addRole: builder.mutation({
+      async queryFn(newItem) {
+        try {
+          const roles = getStoredRoles();
+          const added = { id: Date.now(), title: newItem, status: true };
+          const updated = [...roles, added];
+          saveStoredRoles(updated);
+          return { data: added };
+        } catch (error) {
+          return { error: { status: 'CUSTOM_ERROR', error: error.message } };
+        }
+      },
+      invalidatesTags: ['Roles'],
+    }),
+    updateRole: builder.mutation({
+      async queryFn({ id, ...updatedData }) {
+        try {
+          const roles = getStoredRoles();
+          const updated = roles.map(r => r.id === id ? { ...r, ...updatedData } : r);
+          saveStoredRoles(updated);
+          const updatedRole = updated.find(r => r.id === id);
+          return { data: updatedRole };
+        } catch (error) {
+          return { error: { status: 'CUSTOM_ERROR', error: error.message } };
+        }
+      },
+      invalidatesTags: ['Roles'],
+    }),
+    deleteRole: builder.mutation({
+      async queryFn(id) {
+        try {
+          const roles = getStoredRoles();
+          const updated = roles.filter(r => r.id !== id);
+          saveStoredRoles(updated);
+          return { data: { success: true, id } };
+        } catch (error) {
+          return { error: { status: 'CUSTOM_ERROR', error: error.message } };
+        }
+      },
+      invalidatesTags: ['Roles'],
+    }),
+
+    getDepartments: builder.query({
+      async queryFn() {
+        try {
+          const data = getStoredDepartments();
+          return { data };
+        } catch (error) {
+          return { error: { status: 'CUSTOM_ERROR', error: error.message } };
+        }
+      },
+      providesTags: ['Departments'],
+    }),
+    addDepartment: builder.mutation({
+      async queryFn(newItem) {
+        try {
+          const depts = getStoredDepartments();
+          const added = { id: Date.now(), title: newItem, status: true };
+          const updated = [...depts, added];
+          saveStoredDepartments(updated);
+          return { data: added };
+        } catch (error) {
+          return { error: { status: 'CUSTOM_ERROR', error: error.message } };
+        }
+      },
+      invalidatesTags: ['Departments'],
+    }),
+    updateDepartment: builder.mutation({
+      async queryFn({ id, ...updatedData }) {
+        try {
+          const depts = getStoredDepartments();
+          const updated = depts.map(d => d.id === id ? { ...d, ...updatedData } : d);
+          saveStoredDepartments(updated);
+          const updatedDept = updated.find(d => d.id === id);
+          return { data: updatedDept };
+        } catch (error) {
+          return { error: { status: 'CUSTOM_ERROR', error: error.message } };
+        }
+      },
+      invalidatesTags: ['Departments'],
+    }),
+    deleteDepartment: builder.mutation({
+      async queryFn(id) {
+        try {
+          const depts = getStoredDepartments();
+          const updated = depts.filter(d => d.id !== id);
+          saveStoredDepartments(updated);
+          return { data: { success: true, id } };
+        } catch (error) {
+          return { error: { status: 'CUSTOM_ERROR', error: error.message } };
+        }
+      },
+      invalidatesTags: ['Departments'],
+    }),
+
+    getMinistries: builder.query({
+      async queryFn() {
+        try {
+          const data = getStoredMinistries();
+          return { data };
+        } catch (error) {
+          return { error: { status: 'CUSTOM_ERROR', error: error.message } };
+        }
+      },
+      providesTags: ['Ministries'],
+    }),
+    addMinistry: builder.mutation({
+      async queryFn(newItem) {
+        try {
+          const ministries = getStoredMinistries();
+          const added = { id: Date.now(), title: newItem, status: true };
+          const updated = [...ministries, added];
+          saveStoredMinistries(updated);
+          return { data: added };
+        } catch (error) {
+          return { error: { status: 'CUSTOM_ERROR', error: error.message } };
+        }
+      },
+      invalidatesTags: ['Ministries'],
+    }),
+    updateMinistry: builder.mutation({
+      async queryFn({ id, ...updatedData }) {
+        try {
+          const ministries = getStoredMinistries();
+          const updated = ministries.map(m => m.id === id ? { ...m, ...updatedData } : m);
+          saveStoredMinistries(updated);
+          const updatedMin = updated.find(m => m.id === id);
+          return { data: updatedMin };
+        } catch (error) {
+          return { error: { status: 'CUSTOM_ERROR', error: error.message } };
+        }
+      },
+      invalidatesTags: ['Ministries'],
+    }),
+    deleteMinistry: builder.mutation({
+      async queryFn(id) {
+        try {
+          const ministries = getStoredMinistries();
+          const updated = ministries.filter(m => m.id !== id);
+          saveStoredMinistries(updated);
+          return { data: { success: true, id } };
+        } catch (error) {
+          return { error: { status: 'CUSTOM_ERROR', error: error.message } };
+        }
+      },
+      invalidatesTags: ['Ministries'],
+    }),
   }),
 });
 
@@ -145,4 +386,16 @@ export const {
   useDeleteUserMutation,
   useLoginMutation,
   useGetDashboardSummaryQuery,
+  useGetRolesQuery,
+  useAddRoleMutation,
+  useUpdateRoleMutation,
+  useDeleteRoleMutation,
+  useGetDepartmentsQuery,
+  useAddDepartmentMutation,
+  useUpdateDepartmentMutation,
+  useDeleteDepartmentMutation,
+  useGetMinistriesQuery,
+  useAddMinistryMutation,
+  useUpdateMinistryMutation,
+  useDeleteMinistryMutation,
 } = api;

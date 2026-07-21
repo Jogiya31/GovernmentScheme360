@@ -95,7 +95,7 @@ export default function Modal({
             <>
               <button 
                 type="button" 
-                className={`btn btn-sm px-3.5 py-2 fw-medium  mx-1 ${cancelClass}`}
+                className={`btn btn-sm px-3.5 py-2 fw-medium ${cancelClass}`}
                 style={{ fontSize: '0.825rem', borderRadius: '8px' }}
                 onClick={onClose}
               >
@@ -103,7 +103,7 @@ export default function Modal({
               </button>
               <button 
                 type="button" 
-                className={`btn btn-sm px-4 py-2 fw-semibold mx-1 text-white ${confirmClass}`}
+                className={`btn btn-sm px-4 py-2 fw-semibold text-white ${confirmClass}`}
                 style={{ fontSize: '0.825rem', borderRadius: '8px' }}
                 onClick={() => {
                   if (onConfirm) onConfirm();
@@ -115,7 +115,7 @@ export default function Modal({
           ) : type === 'alert' ? (
             <button 
               type="button" 
-              className={`btn btn-sm px-4 py-2 fw-semibold mx-1 text-white ${confirmClass}`}
+              className={`btn btn-sm px-4 py-2 fw-semibold text-white ${confirmClass}`}
               style={{ fontSize: '0.825rem', borderRadius: '8px' }}
               onClick={onClose}
             >

@@ -46,7 +46,7 @@ export default function App() {
             {/* Application modules */}
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="users" element={<Users />} />
-            <Route path="new-scheme" element={<NewScheme />} />
+            <Route path="scheme" element={<NewScheme />} />
             <Route path="profile" element={<Profile />} />
             <Route path="settings" element={<Settings />} />
           </Route>

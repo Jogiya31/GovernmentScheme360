@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
 import { toggleTheme } from '../../features/theme/themeSlice';
@@ -14,6 +14,25 @@ export default function Header({ sidebarCollapsed, toggleSidebar }) {
 
   const [showNotif, setShowNotif] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
+
+  const profileRef = useRef(null);
+  const notifRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (profileRef.current && !profileRef.current.contains(event.target)) {
+        setShowProfile(false);
+      }
+      if (notifRef.current && !notifRef.current.contains(event.target)) {
+        setShowNotif(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -112,7 +131,7 @@ export default function Header({ sidebarCollapsed, toggleSidebar }) {
             </li>
 
             {/* Notifications Dropdown */}
-            <li className="nav-item position-relative">
+            <li className="nav-item position-relative" ref={notifRef}>
               <button
                 onClick={() => {
                   setShowNotif(!showNotif);
@@ -182,7 +201,7 @@ export default function Header({ sidebarCollapsed, toggleSidebar }) {
             </li>
 
             {/* User Profile Dropdown */}
-            <li className="nav-item position-relative ms-2">
+            <li className="nav-item position-relative ms-2" ref={profileRef}>
               <button
                 onClick={() => {
                   setShowProfile(!showProfile);
@@ -192,9 +211,10 @@ export default function Header({ sidebarCollapsed, toggleSidebar }) {
                 id="user-profile-dropdown-btn"
               >
                 <img
-                  src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200"
+                  src={user?.avatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200"}
                   alt="Avatar"
                   className="avatar-img border border-primary border-2"
+                  referrerPolicy="no-referrer"
                 />
                 <span className="d-none d-lg-inline text-dark-emphasis fw-medium" style={{ fontSize: '0.9rem' }}>
                   {user?.name || 'Administrator'}
