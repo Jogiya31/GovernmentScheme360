@@ -14,6 +14,7 @@ export default function Sidebar() {
     {
       title: 'Workspace',
       items: [
+        // { path: '/users', label: 'Users Database', icon: 'bi bi-people' },
         { path: '/scheme', label: 'View/Edit Scheme', icon: 'bi bi-file-earmark-plus' }
       ]
     },
@@ -21,6 +22,7 @@ export default function Sidebar() {
       title: 'Account & Settings',
       items: [
         { path: '/profile', label: 'My Profile', icon: 'bi bi-person-circle' },
+        // { path: '/settings', label: 'System Settings', icon: 'bi bi-gear' }
       ]
     }
   ];

@@ -1,61 +1,411 @@
 // Scheme Fields Specification for Government Scheme 360° Portal
 // Organizes the form structure across 23 tabs
 
-export const SDG_OPTIONS = [
-  { value: 'SDG 1', label: 'SDG 1: No Poverty' },
-  { value: 'SDG 2', label: 'SDG 2: Zero Hunger' },
-  { value: 'SDG 3', label: 'SDG 3: Good Health and Well-being' },
-  { value: 'SDG 4', label: 'SDG 4: Quality Education' },
-  { value: 'SDG 5', label: 'SDG 5: Gender Equality' },
-  { value: 'SDG 6', label: 'SDG 6: Clean Water and Sanitation' },
-  { value: 'SDG 7', label: 'SDG 7: Affordable and Clean Energy' },
-  { value: 'SDG 8', label: 'SDG 8: Decent Work and Economic Growth' },
-  { value: 'SDG 9', label: 'SDG 9: Industry, Innovation and Infrastructure' },
-  { value: 'SDG 10', label: 'SDG 10: Reduced Inequalities' },
-  { value: 'SDG 11', label: 'SDG 11: Sustainable Cities and Communities' },
-  { value: 'SDG 12', label: 'SDG 12: Responsible Consumption and Production' },
-  { value: 'SDG 13', label: 'SDG 13: Climate Action' },
-  { value: 'SDG 14', label: 'SDG 14: Life Below Water' },
-  { value: 'SDG 15', label: 'SDG 15: Life on Land' },
-  { value: 'SDG 16', label: 'SDG 16: Peace, Justice and Strong Institutions' },
-  { value: 'SDG 17', label: 'SDG 17: Partnerships for the Goals' }
-];
+export const DEFAULT_FALLBACK_OPTIONS = {
+  ministry: [
+    'Ministry of Agriculture and Farmers Welfare',
+    'Ministry of Housing and Urban Affairs',
+    'Ministry of Rural Development',
+    'Ministry of Health and Family Welfare',
+    'Ministry of Education',
+    'Ministry of Finance',
+    'Ministry of Social Justice and Empowerment',
+    'Ministry of Women and Child Development',
+    'Ministry of Micro, Small and Medium Enterprises',
+    'Ministry of Electronics and Information Technology',
+    'Ministry of Jal Shakti',
+    'Ministry of Power',
+    'Ministry of New and Renewable Energy',
+    'Ministry of Labour and Employment',
+    'Ministry of Commerce and Industry',
+    'Ministry of Road Transport and Highways',
+    'Ministry of Tribal Affairs',
+    'Ministry of Skill Development and Entrepreneurship',
+    'Ministry of Heavy Industries',
+    'Ministry of Youth Affairs and Sports',
+    'Ministry of Environment, Forest and Climate Change',
+    'Ministry of Consumer Affairs, Food and Public Distribution',
+    'Ministry of Food Processing Industries',
+    'Ministry of Petroleum and Natural Gas',
+    'NITI Aayog',
+  ],
+  nodalMinistry: [
+    'Ministry of Agriculture and Farmers Welfare',
+    'Ministry of Housing and Urban Affairs',
+    'Ministry of Rural Development',
+    'Ministry of Health and Family Welfare',
+    'Ministry of Education',
+    'Ministry of Finance',
+    'Ministry of Social Justice and Empowerment',
+    'Ministry of Women and Child Development',
+    'Ministry of Micro, Small and Medium Enterprises',
+    'Ministry of Electronics and Information Technology',
+    'Ministry of Jal Shakti',
+    'Ministry of Power',
+    'Ministry of New and Renewable Energy',
+    'Ministry of Labour and Employment',
+    'Ministry of Commerce and Industry',
+    'Ministry of Road Transport and Highways',
+    'Ministry of Tribal Affairs',
+    'Ministry of Skill Development and Entrepreneurship',
+  ],
+  department: [
+    'Department of Agriculture and Farmers Welfare',
+    'Department of Agricultural Research and Education (DARE)',
+    'Department of Land Resources',
+    'Department of Rural Development',
+    'Department of School Education and Literacy',
+    'Department of Higher Education',
+    'Department of Health and Family Welfare',
+    'Department of Health Research',
+    'Department of Financial Services',
+    'Department of Expenditure',
+    'Department of Economic Affairs',
+    'Department of Revenue',
+    'Department of Social Justice and Empowerment',
+    'Department of Empowerment of Persons with Disabilities',
+    'Department of Drinking Water and Sanitation',
+    'Department of Water Resources, River Development and Ganga Rejuvenation',
+    'Department of Telecommunications',
+    'Department of Posts',
+  ],
+  schemeType: [
+    'Central Sector Scheme (100% Centrally Funded)',
+    'Centrally Sponsored Scheme (Core)',
+    'Centrally Sponsored Scheme (Core of the Core)',
+    'Centrally Sponsored Scheme (Optional)',
+    'State Sector Scheme',
+    'Joint Venture / Public-Private Partnership (PPP)',
+    'Special Central Assistance Scheme',
+  ],
+  status: [
+    'Active / Operational',
+    'Under Formulation / Proposed',
+    'Under Revision / Restructuring',
+    'Approved - Pending Launch',
+    'Phased Out / Sunset',
+    'Merged / Integrated',
+  ],
+  schemeStatus: [
+    'Active / Operational',
+    'Under Formulation / Proposed',
+    'Under Revision / Restructuring',
+    'Approved - Pending Launch',
+    'Phased Out / Sunset',
+    'Merged / Integrated',
+  ],
+  sector: [
+    'Agriculture & Farmers Welfare',
+    'Rural Development & Infrastructure',
+    'Housing & Urban Poverty Alleviation',
+    'Health, Family Welfare & Nutrition',
+    'Education, Literacy & Skill Development',
+    'Social Justice, Welfare & Inclusion',
+    'Financial Services, Banking & Insurance',
+    'Energy, Power & Renewable Resources',
+    'Water Resources, Drinking Water & Sanitation',
+    'Industry, Micro Enterprises & Trade',
+    'Science, Electronics & Digital Infrastructure',
+    'Transportation & Road Infrastructure',
+    'Environment, Forests & Climate Action',
+    'Women & Child Development',
+    'Tribal Development & Upliftment',
+  ],
+  subSector: [
+    'Rainfed & Dryland Farming',
+    'Horticulture & Organic Farming',
+    'Rural Roads & Connectivity',
+    'Affordable Housing & Shelter',
+    'Primary Healthcare & Maternal Health',
+    'Secondary & Technical Education',
+    'Financial Inclusion & Micro-credit',
+    'Solar & Clean Energy',
+    'Clean Water Supply & Sanitation',
+    'Skill Training & Employment',
+  ],
+  gender: [
+    'All Genders / Inclusive',
+    'Women Focus / Female Only',
+    'Men / Male Focus',
+    'Transgender / Gender Non-binary',
+  ],
+  urbanRural: [
+    'Urban Areas',
+    'Rural Areas',
+    'Pan-India (Urban & Rural)',
+    'Peri-Urban / Semi-Urban',
+  ],
+  assistanceType: [
+    'Direct Benefit Transfer (DBT) Cash',
+    'In-kind Assistance / Material Distribution',
+    'Interest Subvention / Loan Interest Subsidy',
+    'Grant-in-Aid / Capital Subsidy',
+    'Insurance Cover / Risk Protection',
+    'Voucher / Token / Credit Scheme',
+  ],
+  financialAssistanceType: [
+    'Direct Benefit Transfer (DBT) Cash',
+    'In-kind Assistance / Material Distribution',
+    'Interest Subvention / Loan Interest Subsidy',
+    'Grant-in-Aid / Capital Subsidy',
+    'Insurance Cover / Risk Protection',
+    'Voucher / Token / Credit Scheme',
+  ],
+  deliveryMechanism: [
+    'Direct Bank Transfer (PFMS / Aadhaar Seeded)',
+    'Single Window Portal / Online Workflow',
+    'District Administration / Local Body',
+    'Partner Banks / NBFCs / Microfinance Institutions',
+    'Panchayati Raj Institutions (PRIs) / Gram Sabha',
+    'Authorized Fair Price Shops / PDS Network',
+  ],
+  reviewFrequency: [
+    'Monthly',
+    'Quarterly',
+    'Bi-Annually',
+    'Annually',
+    'Real-Time / Dashboard Monitoring',
+  ],
+  sharingPattern: [
+    '100:0 (100% Central Government Funded)',
+    '60:40 (Central:State General Category)',
+    '90:10 (Central:State North-East & Himalayan States)',
+    '50:50 (Equal Sharing Ratio)',
+    '0:100 (100% State Government Funded)',
+  ],
+  fundSharingPattern: [
+    '100:0 (100% Central Government Funded)',
+    '60:40 (Central:State General Category)',
+    '90:10 (Central:State North-East & Himalayan States)',
+    '50:50 (Equal Sharing Ratio)',
+    '0:100 (100% State Government Funded)',
+  ],
+  ageGroup: [
+    'All Age Groups',
+    'Infants & Toddlers (0 - 6 Years)',
+    'Children & Adolescents (6 - 18 Years)',
+    'Youth & Adults (18 - 35 Years)',
+    'Working Age Adults (18 - 59 Years)',
+    'Senior Citizens (60+ Years)',
+  ],
+  category: [
+    'Small and Marginal Farmers',
+    'Below Poverty Line (BPL) Households',
+    'Micro and Small Entrepreneurs',
+    'Unorganized Sector Workers',
+    'Women and Single Mothers',
+    'Persons with Disabilities (PwD)',
+    'Students and Youth',
+  ],
+  beneficiaryCategory: [
+    'Small and Marginal Farmers',
+    'Below Poverty Line (BPL) Households',
+    'Micro and Small Entrepreneurs',
+    'Unorganized Sector Workers',
+    'Women and Single Mothers',
+    'Persons with Disabilities (PwD)',
+    'Students and Youth',
+  ],
+  beneficiaryType: [
+    'Individual Citizen',
+    'Family / Household',
+    'Community Group / Self Help Group (SHG)',
+    'Cooperative Society / FPO',
+    'Gram Panchayat / Village Committee',
+    'Institutional Body / MSME Unit',
+  ],
+  targetGroup: [
+    'Landless Agriculture Laborers',
+    'Street Vendors & Artisans',
+    'Pregnant Women & Lactating Mothers',
+    'School Dropouts & Unemployed Youth',
+    'Scavengers & Vulnerable Groups',
+    'Senior Citizens Without Support',
+  ],
+  socialCategory: [
+    'All Categories (General / Open)',
+    'Scheduled Castes (SC)',
+    'Scheduled Tribes (ST)',
+    'Other Backward Classes (OBC)',
+    'Economically Weaker Section (EWS)',
+    'Minority Communities',
+  ],
+  occupation: [
+    'Farmers & Agriculture Workers',
+    'Construction & Manual Laborers',
+    'Artisans, Weavers & Craftsmen',
+    'Fishermen & Animal Husbandry Workers',
+    'Street Vendors & Small Retailers',
+    'Domestic Workers & Caregivers',
+    'Students & Trainees',
+  ],
+  implementingAgency: [
+    'State Nodal Department',
+    'District Rural Development Agency (DRDA)',
+    'State Urban Development Agency (SUDA)',
+    'National Housing Bank (NHB) / HUDCO',
+    'NABARD / SIDBI',
+    'State Agro / Micro Industries Corporation',
+    'Registered Non-Governmental Organization (NGO)',
+  ],
+  monitoringAgency: [
+    'NITI Aayog DMEO',
+    'State Level Steering Committee (SLSC)',
+    'District Level Monitoring Committee (DLMC)',
+    'Third Party Audit / Independent Evaluation Agency',
+    'Public Financial Management System (PFMS) Portal',
+  ],
+  state: [
+    'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh',
+    'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka',
+    'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram',
+    'Nagaland', 'Odisha', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu',
+    'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal',
+    'Andaman and Nicobar Islands', 'Chandigarh', 'Dadra and Nagar Haveli and Daman and Diu',
+    'Delhi (NCT)', 'Jammu and Kashmir', 'Ladakh', 'Lakshadweep', 'Puducherry',
+  ],
+  aspirationalDistrictScheme: ['Yes', 'No', 'Partial / Selected Districts'],
+  flagshipScheme: ['Yes', 'No'],
+  categoryTag: ['Welfare Scheme', 'Infrastructure Scheme', 'Capacity Building', 'Subsidy Scheme', 'Credit Guarantee'],
+  aadhaarRequired: ['Yes', 'No', 'Optional / Alternative ID Allowed'],
+  bankAccountRequired: ['Yes', 'No'],
+  dbtEnabled: ['Yes', 'No', 'Partial / In-kind Mix'],
+  individualInstitution: ['Individual', 'Institution / Group', 'Both Individual & Institution'],
+  theme: [
+    'Financial Inclusion & Credit Access',
+    'Affordable Shelter & Urban Renewal',
+    'Universal Health Coverage & Wellness',
+    'Quality Education & Digital Literacy',
+    'Sustainable Agriculture & Water Security',
+    'Women Empowerment & Child Rights',
+    'Skill India & Employment Generation',
+  ],
+  nationalPriority: [
+    'Atmanirbhar Bharat Abhiyan',
+    'Viksit Bharat @2047',
+    'Digital India Initiative',
+    'Make in India',
+    'PM Gati Shakti Master Plan',
+    'Swachh Bharat Abhiyan',
+    'Aspirational Districts Programme',
+  ],
+  geographicCoverage: [
+    'Pan-India Coverage',
+    'Selected States / UTs',
+    'Aspirational Districts Only',
+    'North-Eastern and Himalayan States',
+    'Drought Prone / Tribal Belts',
+    'Coastal and Border Areas',
+  ],
+  localBody: [
+    'Gram Panchayat / Village Level',
+    'Block Panchayat / Panchayat Samiti',
+    'Zilla Parishad / District Level',
+    'Municipal Corporation (Nagar Nigam)',
+    'Municipality (Nagar Palika)',
+    'Town Panchayat (Nagar Panchayat)',
+  ],
+  mission: [
+    'National Health Mission (NHM)',
+    'National Rural Livelihood Mission (NRLM)',
+    'National Urban Livelihood Mission (NULM)',
+    'Jal Jeevan Mission (JJM)',
+    'Digital India Mission',
+    'Atal Innovation Mission (AIM)',
+    'National Skill Development Mission',
+  ],
+  schemePhase: [
+    'Phase I (Initial Pilot / Rollout)',
+    'Phase II (Scale-up & Expansion)',
+    'Phase III (Consolidation & Modernization)',
+    'Ongoing Continuous Phase',
+  ],
+  sdg: [
+    'SDG 1: No Poverty',
+    'SDG 2: Zero Hunger',
+    'SDG 3: Good Health and Well-being',
+    'SDG 4: Quality Education',
+    'SDG 5: Gender Equality',
+    'SDG 6: Clean Water and Sanitation',
+    'SDG 7: Affordable and Clean Energy',
+    'SDG 8: Decent Work and Economic Growth',
+    'SDG 9: Industry, Innovation and Infrastructure',
+    'SDG 10: Reduced Inequalities',
+    'SDG 11: Sustainable Cities and Communities',
+    'SDG 13: Climate Action',
+  ],
+  serviceMode: [
+    'Online Digital Portal / Mobile App',
+    'Common Service Centre (CSC) / Seva Kendra',
+    'Over-the-Counter / Office Counter',
+    'Direct Doorstep Delivery / Field Staff',
+    'Hybrid (Online Application + Offline Verification)',
+  ],
+  stakeholderType: [
+    'Central Government Nodal Officers',
+    'State Implementing Officials',
+    'District Collectors / Magistrates',
+    'Gram Pradhan / Panchayat Secretaries',
+    'Grassroot Workers (ASHA, Anganwadi, Krishi Mitra)',
+    'Civil Society & NGO Partners',
+  ],
+  document: [
+    'Aadhaar Card / VID',
+    'Income Certificate from Competent Authority',
+    'Caste / Social Category Certificate',
+    'Bank Account Passbook / Cancelled Cheque',
+    'Domicile / Residence Certificate',
+    'Land Records / RoR / Khatauni',
+    'Disability Certificate (if applicable)',
+    'Ration Card / BPL Card',
+  ],
+  insuranceType: [
+    'Life Insurance Cover',
+    'Accidental Death & Disability Cover',
+    'Health & Hospitalization Cover',
+    'Crop & Weather Risk Insurance',
+    'Livestock & Cattle Insurance',
+  ],
+  outcomeIndicator: [
+    'Number of Beneficiaries Enrolled & Disbursed',
+    'Total Funds Disbursed via Direct Benefit Transfer (Cr.)',
+    'Percentage Reduction in Target Indicator Level',
+    'Number of Households Provided Concrete Houses / Amenities',
+    'Employment Days Generated / Jobs Created',
+  ],
+  incomeCriteria: [
+    'Below ₹ 1,00,000 per annum',
+    'Below ₹ 1,80,000 per annum',
+    'Below ₹ 2,50,000 per annum',
+    'Below ₹ 3,00,000 per annum (EWS Upper Limit)',
+    'Below ₹ 6,00,000 per annum (LIG Category)',
+    'Below ₹ 8,00,000 per annum (Non-Creamy Layer)',
+    'No Income Ceiling (Universal Coverage)',
+  ],
+};
 
 export const SCHEME_TABS_CONFIG = [
   {
-    id: 'basicInfo',
+    id: 'SchemeMaster',
     title: '1. Basic Info',
     icon: 'bi-info-circle-fill',
     fields: [
       { key: 'schemeId', label: 'Scheme ID', type: 'text', placeholder: 'Unique Identifier, e.g. SCH-PMAY-2026', col: 4 },
       { key: 'schemeName', label: 'Official Scheme Name', type: 'text', placeholder: 'Full official name of the scheme', col: 8 },
       { key: 'alternateName', label: 'Alternate Name / Acronym', type: 'text', placeholder: 'e.g. PMAY-U / PMAY-G', col: 4 },
-      { key: 'ministry', label: 'Nodal Ministry', type: 'select', options: [
-        'Ministry of Agriculture & Farmers Welfare',
-        'Ministry of Health & Family Welfare',
-        'Ministry of Education',
-        'Ministry of Rural Development',
-        'Ministry of Housing & Urban Affairs',
-        'Ministry of Finance',
-        'Ministry of Skill Development & Entrepreneurship',
-        'Ministry of Electronics & Information Technology',
-        'Ministry of Women & Child Development',
-        'Ministry of Jal Shakti',
-        'Ministry of Power',
-        'Ministry of New & Renewable Energy'
-      ], col: 4 },
+      { key: 'ministry', label: 'Nodal Ministry', type: 'select', options: [], col: 4 },
       { key: 'department', label: 'Implementing Department', type: 'text', placeholder: 'e.g. Department of Land Resources', col: 4 },
-      { key: 'schemeType', label: 'Scheme Type', type: 'select', options: ['Central Sector Scheme', 'Centrally Sponsored Scheme (CSS)', 'State Sponsored Scheme'], col: 4 },
+      { key: 'schemeType', label: 'Scheme Type', type: 'select', options: [], col: 4 },
       { key: 'launchDate', label: 'Launch Date', type: 'date', col: 4 },
       { key: 'fyStarted', label: 'Financial Year Started', type: 'text', placeholder: 'e.g. FY 2024-25', col: 4 },
-      { key: 'status', label: 'Current Status', type: 'select', options: ['Active', 'Closed', 'Merged', 'Suspended'], col: 4 },
+      { key: 'status', label: 'Current Status', type: 'select', options: [], col: 4 },
       { key: 'website', label: 'Official Website / Portal', type: 'text', placeholder: 'https://...', col: 4 },
       { key: 'notification', label: 'Gazette / Notification Reference', type: 'text', placeholder: 'e.g. Notification No. 10/2026', col: 4 },
-      { key: 'logoUrl', label: 'Scheme Logo Image URL', type: 'text', placeholder: 'https://images.unsplash.com/... or upload link', col: 12 }
+      { key: 'logoUrl', label: 'Scheme Logo Image URL', type: 'text', placeholder: 'https://...', col: 12 }
     ]
   },
   {
-    id: 'objective',
+    id: 'SchemeObjectives',
     title: '2. Scheme Objectives',
     icon: 'bi-bullseye',
     fields: [
@@ -69,43 +419,39 @@ export const SCHEME_TABS_CONFIG = [
     ]
   },
   {
-    id: 'classification',
+    id: 'SchemeClassification',
     title: '3. Scheme Classification',
     icon: 'bi-bookmark-star-fill',
     fields: [
-      { key: 'sector', label: 'Primary Sector', type: 'select', options: [
-        'Agriculture', 'Health', 'Education', 'Rural Development', 'Urban Development',
-        'Employment', 'MSME', 'Women & Child', 'Skill Development', 'Digital India',
-        'Housing', 'Environment', 'Water & Sanitation', 'Energy', 'Other'
-      ], col: 4 },
+      { key: 'sector', label: 'Primary Sector', type: 'select', options: [], col: 4 },
       { key: 'subSector', label: 'Sub-Sector', type: 'text', placeholder: 'e.g. Rainfed Agriculture', col: 4 },
       { key: 'theme', label: 'Substantive Theme', type: 'text', placeholder: 'e.g. Financial Inclusion', col: 4 },
       { key: 'nationalPriority', label: 'National Priority Mapping', type: 'text', placeholder: 'e.g. Atmanirbhar Bharat', col: 4 },
-      { key: 'aspirationalDistrictScheme', label: 'Aspirational District Scheme', type: 'select', options: ['No', 'Yes'], col: 4 },
-      { key: 'flagshipScheme', label: 'Is Flagship Scheme?', type: 'select', options: ['No', 'Yes'], col: 4 },
-      { key: 'categoryTag', label: 'Welfare / Infrastructure Category', type: 'select', options: ['Welfare', 'Infrastructure', 'Digital Enablement', 'Direct Subsidy', 'Credit Linked'], col: 4 }
+      { key: 'aspirationalDistrictScheme', label: 'Aspirational District Scheme', type: 'select', options: [], col: 4 },
+      { key: 'flagshipScheme', label: 'Is Flagship Scheme?', type: 'select', options: [], col: 4 },
+      { key: 'categoryTag', label: 'Welfare / Infrastructure Category', type: 'select', options: [], col: 4 }
     ]
   },
   {
-    id: 'beneficiaries',
+    id: 'SchemeBeneficiaries',
     title: '4. Beneficiary Details',
     icon: 'bi-people-fill',
     fields: [
       { key: 'category', label: 'Beneficiary Category', type: 'text', placeholder: 'e.g. Small & Marginal Farmers', col: 4 },
       { key: 'targetGroup', label: 'Primary Target Group', type: 'text', placeholder: 'e.g. Below Poverty Line (BPL)', col: 4 },
-      { key: 'gender', label: 'Gender focus', type: 'select', options: ['All Genders', 'Female Only', 'Male Only', 'Transgender Focus'], col: 4 },
+      { key: 'gender', label: 'Gender focus', type: 'select', options: [], col: 4 },
       { key: 'ageGroup', label: 'Target Age Group', type: 'text', placeholder: 'e.g. 18-50 years', col: 4 },
       { key: 'incomeCriteria', label: 'Income Criteria Limits', type: 'text', placeholder: 'e.g. Household income < 3 Lakh per annum', col: 4 },
       { key: 'socialCategory', label: 'Social Category Emphasis', type: 'text', placeholder: 'e.g. SC, ST, Minorities, General', col: 4 },
       { key: 'occupation', label: 'Target Occupation', type: 'text', placeholder: 'e.g. Construction Workers / Artisans', col: 4 },
       { key: 'geographicCoverage', label: 'Beneficiary Geographic Area', type: 'text', placeholder: 'e.g. Drought-prone blocks', col: 4 },
-      { key: 'urbanRural', label: 'Urban / Rural Segment', type: 'select', options: ['Both Urban & Rural', 'Rural Only', 'Urban Only'], col: 4 },
-      { key: 'individualInstitution', label: 'Entity Type', type: 'select', options: ['Individual', 'Institution / Self-Help Group (SHG)', 'Both'], col: 4 },
+      { key: 'urbanRural', label: 'Urban / Rural Segment', type: 'select', options: [], col: 4 },
+      { key: 'individualInstitution', label: 'Entity Type', type: 'select', options: [], col: 4 },
       { key: 'estimatedBeneficiaries', label: 'Estimated Total Beneficiaries', type: 'number', placeholder: 'e.g. 5000000', col: 4 }
     ]
   },
   {
-    id: 'eligibility',
+    id: 'SchemeEligibility',
     title: '5. Eligibility Rules',
     icon: 'bi-shield-check',
     fields: [
@@ -113,13 +459,13 @@ export const SCHEME_TABS_CONFIG = [
       { key: 'documentsRequired', label: 'Documents Required for Registration', type: 'textarea', placeholder: 'e.g. Aadhaar, Income Certificate, Bank Passbook, Land ownership proof...', col: 12 },
       { key: 'incomeLimit', label: 'Explicit Annual Income Limit', type: 'text', placeholder: 'e.g. Max ₹ 1,80,000 per year', col: 4 },
       { key: 'ageLimit', label: 'Explicit Age Limit Limits', type: 'text', placeholder: 'e.g. 18 - 40 Years old', col: 4 },
-      { key: 'aadhaarRequired', label: 'Is Aadhaar Compulsory?', type: 'select', options: ['Yes', 'No'], col: 4 },
-      { key: 'bankAccountRequired', label: 'Is Bank Account Compulsory?', type: 'select', options: ['Yes', 'No'], col: 4 },
+      { key: 'aadhaarRequired', label: 'Is Aadhaar Compulsory?', type: 'select', options: [], col: 4 },
+      { key: 'bankAccountRequired', label: 'Is Bank Account Compulsory?', type: 'select', options: [], col: 4 },
       { key: 'otherConditions', label: 'Other Regulatory Conditions', type: 'textarea', placeholder: 'e.g. Must not own a concrete house or a 4-wheeler...', col: 12 }
     ]
   },
   {
-    id: 'financials',
+    id: 'SchemeFinancials',
     title: '6. Financial Details',
     icon: 'bi-cash-coin',
     fields: [
@@ -131,12 +477,12 @@ export const SCHEME_TABS_CONFIG = [
       { key: 'centralShare', label: 'Central Government Share (Cr.)', type: 'number', placeholder: 'Central share', col: 4 },
       { key: 'stateShare', label: 'State Government Share (Cr.)', type: 'number', placeholder: 'State share', col: 4 },
       { key: 'beneficiaryContribution', label: 'Beneficiary Contribution (if any)', type: 'number', placeholder: 'e.g. ₹ 20,000', col: 4 },
-      { key: 'assistanceType', label: 'Financial Assistance Type', type: 'select', options: ['Subsidy', 'Direct Grant', 'Collateral-free Loan', 'Insurance Scheme', 'Hybrid'], col: 4 },
-      { key: 'dbtEnabled', label: 'Direct Benefit Transfer (DBT) Enabled?', type: 'select', options: ['Yes', 'No'], col: 4 }
+      { key: 'assistanceType', label: 'Financial Assistance Type', type: 'select', options: [], col: 4 },
+      { key: 'dbtEnabled', label: 'Direct Benefit Transfer (DBT) Enabled?', type: 'select', options: [], col: 4 }
     ]
   },
   {
-    id: 'implementation',
+    id: 'SchemeImplementation',
     title: '7. Implementation Model',
     icon: 'bi-diagram-3-fill',
     fields: [
@@ -144,28 +490,28 @@ export const SCHEME_TABS_CONFIG = [
       { key: 'stateAgencies', label: 'State-level Implementing Agencies', type: 'text', placeholder: 'e.g. State Housing Boards', col: 6 },
       { key: 'districtAgencies', label: 'District-level Nodal Agencies', type: 'text', placeholder: 'e.g. DRDA / District Collectorate', col: 6 },
       { key: 'localBodies', label: 'Involved Local Bodies', type: 'text', placeholder: 'e.g. Gram Panchayats / Municipal Corporations', col: 6 },
-      { key: 'deliveryMechanism', label: 'Delivery Mechanism Channel', type: 'select', options: ['Online Portal Only', 'Offline Counters Only', 'Hybrid (Online + CSC + Offline)'], col: 4 },
+      { key: 'deliveryMechanism', label: 'Delivery Mechanism Channel', type: 'select', options: [], col: 4 },
       { key: 'mobileApp', label: 'Official Mobile App Name', type: 'text', placeholder: 'e.g. AwasApp', col: 4 },
       { key: 'portalName', label: 'Central Portal Domain Name', type: 'text', placeholder: 'e.g. pmaymis.gov.in', col: 4 },
       { key: 'monitoringAgency', label: 'Independent Monitoring Authority', type: 'text', placeholder: 'e.g. Third-party Evaluators', col: 12 }
     ]
   },
   {
-    id: 'geography',
+    id: 'SchemeGeography',
     title: '8. Geographic Coverage',
     icon: 'bi-geo-alt-fill',
     fields: [
-      { key: 'national', label: 'Is Nationally Applicable?', type: 'select', options: ['Yes', 'No'], col: 4 },
+      { key: 'national', label: 'Is Nationally Applicable?', type: 'select', options: [], col: 4 },
       { key: 'stateWise', label: 'State-wise Exceptions / Details', type: 'textarea', placeholder: 'Details of implementation status across specific States...', col: 12 },
       { key: 'districtWise', label: 'District-wise Coverage Strategy', type: 'textarea', placeholder: 'Particular target districts...', col: 12 },
-      { key: 'aspirationalDistrictsOnly', label: 'Focuses on Aspirational Districts?', type: 'select', options: ['No', 'Yes'], col: 4 },
-      { key: 'tribalArea', label: 'Special Tribal Area Coverage', type: 'select', options: ['No', 'Yes'], col: 4 },
-      { key: 'northEast', label: 'Special North East Allocation / Relaxations', type: 'select', options: ['Yes', 'No'], col: 4 },
+      { key: 'aspirationalDistrictsOnly', label: 'Focuses on Aspirational Districts?', type: 'select', options: [], col: 4 },
+      { key: 'tribalArea', label: 'Special Tribal Area Coverage', type: 'select', options: [], col: 4 },
+      { key: 'northEast', label: 'Special North East Allocation / Relaxations', type: 'select', options: [], col: 4 },
       { key: 'utCoverage', label: 'UT Coverage status', type: 'text', placeholder: 'Details for Union Territories', col: 12 }
     ]
   },
   {
-    id: 'timeline',
+    id: 'SchemeTimeline',
     title: '9. Scheme Timeline',
     icon: 'bi-calendar-range',
     fields: [
@@ -174,22 +520,22 @@ export const SCHEME_TABS_CONFIG = [
       { key: 'firstDisbursement', label: 'First Disbursement Date', type: 'date', col: 4 },
       { key: 'currentPhase', label: 'Current Operational Phase', type: 'text', placeholder: 'e.g. Phase III Extension', col: 4 },
       { key: 'endDate', label: 'End / Review Date', type: 'date', col: 4 },
-      { key: 'reviewFrequency', label: 'Scheduled Review Frequency', type: 'select', options: ['Quarterly', 'Half-Yearly', 'Annually', 'Bi-annually'], col: 4 }
+      { key: 'reviewFrequency', label: 'Scheduled Review Frequency', type: 'select', options: [], col: 4 }
     ]
   },
   {
-    id: 'benefits',
+    id: 'SchemeBenefits',
     title: '10. Benefit Packages',
     icon: 'bi-gift-fill',
     fields: [
-      { key: 'benefitType', label: 'Main Benefit Category', type: 'select', options: ['Monetary / Financial Transfer', 'Non-Monetary (Goods/Services)', 'In-kind Subsidy', 'Hybrid Assistance'], col: 4 },
+      { key: 'benefitType', label: 'Main Benefit Category', type: 'select', options: [], col: 4 },
       { key: 'monetaryBenefit', label: 'Details of Monetary Benefit', type: 'text', placeholder: 'e.g. Direct cash subsidy of ₹ 1.2 Lakhs', col: 4 },
       { key: 'nonMonetaryBenefit', label: 'Details of Non-Monetary Benefit', type: 'text', placeholder: 'e.g. Free electricity connections, toilets', col: 4 },
       { key: 'subsidyAmount', label: 'Explicit Subsidy Amount (₹)', type: 'number', placeholder: 'e.g. 120000', col: 4 },
       { key: 'maxAssistance', label: 'Maximum Assistance per Beneficiary (₹)', type: 'number', placeholder: 'e.g. 150000', col: 4 },
-      { key: 'frequency', label: 'Disbursement Frequency', type: 'select', options: ['One-time', 'Installment Based', 'Monthly Recurring', 'Annual Recurring'], col: 4 },
-      { key: 'directBenefit', label: 'Direct Beneficiary Transfer (DBT)?', type: 'select', options: ['Yes', 'No'], col: 4 },
-      { key: 'indirectBenefit', label: 'Indirect Community Benefit?', type: 'select', options: ['No', 'Yes'], col: 4 }
+      { key: 'frequency', label: 'Disbursement Frequency', type: 'select', options: [], col: 4 },
+      { key: 'directBenefit', label: 'Direct Beneficiary Transfer (DBT)?', type: 'select', options: [], col: 4 },
+      { key: 'indirectBenefit', label: 'Indirect Community Benefit?', type: 'select', options: [], col: 4 }
     ]
   },
   {
@@ -197,9 +543,9 @@ export const SCHEME_TABS_CONFIG = [
     title: '11. Application Process',
     icon: 'bi-file-earmark-text-fill',
     fields: [
-      { key: 'onlineApp', label: 'Is Online Application Available?', type: 'select', options: ['Yes', 'No'], col: 4 },
-      { key: 'offlineApp', label: 'Is Offline Application Available?', type: 'select', options: ['Yes', 'No'], col: 4 },
-      { key: 'cscAvailable', label: 'Common Service Centre (CSC) Available?', type: 'select', options: ['Yes', 'No'], col: 4 },
+      { key: 'onlineApp', label: 'Is Online Application Available?', type: 'select', options: [], col: 4 },
+      { key: 'offlineApp', label: 'Is Offline Application Available?', type: 'select', options: [], col: 4 },
+      { key: 'cscAvailable', label: 'Common Service Centre (CSC) Available?', type: 'select', options: [], col: 4 },
       { key: 'applicationUrl', label: 'Direct Registration Portal URL', type: 'text', placeholder: 'https://...', col: 12 },
       { key: 'processingTime', label: 'Average Processing Time / SLA', type: 'text', placeholder: 'e.g. 45 Business Days', col: 4 },
       { key: 'approvalAuthority', label: 'Final Verification / Approving Authority', type: 'text', placeholder: 'e.g. Block Development Officer (BDO)', col: 4 },
@@ -227,7 +573,7 @@ export const SCHEME_TABS_CONFIG = [
     ]
   },
   {
-    id: 'outcomes',
+    id: 'SchemeOutcomes',
     title: '13. Outcome Indicators',
     icon: 'bi-clipboard-data-fill',
     fields: [
@@ -249,12 +595,12 @@ export const SCHEME_TABS_CONFIG = [
     icon: 'bi-eye-fill',
     fields: [
       { key: 'kpiDefinitions', label: 'Monitoring KPI Definitions', type: 'textarea', placeholder: 'List the defined indicators of success...', col: 12 },
-      { key: 'monitoringFrequency', label: 'Audit / Monitoring Frequency', type: 'select', options: ['Monthly', 'Quarterly', 'Semi-Annually', 'Annually'], col: 4 },
+      { key: 'monitoringFrequency', label: 'Audit / Monitoring Frequency', type: 'select', options: [], col: 4 },
       { key: 'thirdPartyEvaluation', label: 'Third-party Evaluation Agency', type: 'text', placeholder: 'e.g. NITIE / IIT Kanpur', col: 4 },
-      { key: 'socialAudit', label: 'Is Social Audit Compulsory?', type: 'select', options: ['Yes', 'No'], col: 4 },
+      { key: 'socialAudit', label: 'Is Social Audit Compulsory?', type: 'select', options: [], col: 4 },
       { key: 'auditReports', label: 'Audit Reports & Guidelines References', type: 'textarea', placeholder: 'Upload link or manual reference...', col: 12 },
       { key: 'impactAssessment', label: 'Latest Impact Assessment Findings', type: 'textarea', placeholder: 'Key conclusions from recent evaluations...', col: 12 },
-      { key: 'dashboardAvailable', label: 'Public Analytics Dashboard Available?', type: 'select', options: ['Yes', 'No'], col: 4 }
+      { key: 'dashboardAvailable', label: 'Public Analytics Dashboard Available?', type: 'select', options: [], col: 4 }
     ]
   },
   {
@@ -265,17 +611,17 @@ export const SCHEME_TABS_CONFIG = [
       { key: 'portal', label: 'Portal Hosting Details', type: 'text', placeholder: 'e.g. NIC Cloud Server (Meghraj)', col: 4 },
       { key: 'mobileAppTech', label: 'Mobile App Technologies', type: 'text', placeholder: 'e.g. Android Native (Java/Kotlin)', col: 4 },
       { key: 'apiAvailable', label: 'Are Open APIs Available?', type: 'select', options: ['No', 'Yes'], col: 4 },
-      { key: 'aadhaarIntegration', label: 'Aadhaar UIDAI eKYC Integrated?', type: 'select', options: ['Yes', 'No'], col: 4 },
-      { key: 'digilocker', label: 'DigiLocker Document Pull Integrated?', type: 'select', options: ['Yes', 'No'], col: 4 },
-      { key: 'eKyc', label: 'Biometric / OTP e-KYC Enabled?', type: 'select', options: ['Yes', 'No'], col: 4 },
-      { key: 'pfms', label: 'PFMS (Public Financial Management System) Integrated?', type: 'select', options: ['Yes', 'No'], col: 4 },
-      { key: 'dbtTech', label: 'Direct Benefit Transfer (DBT) Pipeline?', type: 'select', options: ['Yes', 'No'], col: 4 },
-      { key: 'gis', label: 'GIS Mapping & Geo-tagging Enabled?', type: 'select', options: ['Yes', 'No'], col: 4 },
+      { key: 'aadhaarIntegration', label: 'Aadhaar UIDAI eKYC Integrated?', type: 'select', options: [], col: 4 },
+      { key: 'digilocker', label: 'DigiLocker Document Pull Integrated?', type: 'select', options: [], col: 4 },
+      { key: 'eKyc', label: 'Biometric / OTP e-KYC Enabled?', type: 'select', options: [], col: 4 },
+      { key: 'pfms', label: 'PFMS (Public Financial Management System) Integrated?', type: 'select', options: [], col: 4 },
+      { key: 'dbtTech', label: 'Direct Benefit Transfer (DBT) Pipeline?', type: 'select', options: [], col: 4 },
+      { key: 'gis', label: 'GIS Mapping & Geo-tagging Enabled?', type: 'select', options: [], col: 4 },
       { key: 'aiMlUsed', label: 'AI/ML Technologies (e.g. Fraud detection)?', type: 'select', options: ['No', 'Yes'], col: 4 }
     ]
   },
   {
-    id: 'stakeholders',
+    id: 'SchemeStakeholders',
     title: '16. Stakeholders',
     icon: 'bi-diagram-3',
     fields: [
@@ -304,7 +650,7 @@ export const SCHEME_TABS_CONFIG = [
     ]
   },
   {
-    id: 'risks',
+    id: 'SchemeRisks',
     title: '18. Risks & Challenges',
     icon: 'bi-exclamation-octagon-fill',
     fields: [
@@ -327,7 +673,7 @@ export const SCHEME_TABS_CONFIG = [
     ]
   },
   {
-    id: 'relationships',
+    id: 'SchemeRelationships',
     title: '20. Scheme Relationships',
     icon: 'bi-share-fill',
     fields: [
@@ -337,7 +683,7 @@ export const SCHEME_TABS_CONFIG = [
       { key: 'duplicateSchemes', label: 'Duplicate / Overlapping Schemes To Avoid', type: 'text', placeholder: 'e.g. Old regional housing subsidy programs', col: 6 },
       { key: 'replacedScheme', label: 'Preceding Replaced Scheme Name', type: 'text', placeholder: 'e.g. Indira Awaas Yojana (IAY)', col: 6 },
       { key: 'convergedWith', label: 'Converged Schemes under same umbrella', type: 'text', placeholder: 'e.g. Swajaldhara converged with Jal Jeevan', col: 6 },
-      { key: 'linkedSdgId', label: 'Linked Sustainable Development Goal (SDG)', type: 'select', options: SDG_OPTIONS.map(opt => opt.value), col: 6 },
+      { key: 'linkedSdgId', label: 'Linked Sustainable Development Goal (SDG)', type: 'select', options: [], col: 6 },
       { key: 'linkedMissions', label: 'Linked National Missions', type: 'text', placeholder: 'e.g. National Urban Livelihoods Mission', col: 6 }
     ]
   },
@@ -389,7 +735,7 @@ export const SCHEME_TABS_CONFIG = [
       { key: 'lastUpdated', label: 'Last System Update Date', type: 'date', col: 4 },
       { key: 'verifiedBy', label: 'Nodal Verification Authority', type: 'text', placeholder: 'e.g. Joint Secretary, MoHUA', col: 4 },
       { key: 'source', label: 'Official Information Source / PDF Guide Link', type: 'text', placeholder: 'https://mohua.gov.in/guidelines.pdf', col: 4 },
-      { key: 'dataConfidence', label: 'Information Confidence Score', type: 'select', options: ['High (Official Gazette Verified)', 'Medium (Self-Reported Government Site)', 'Low (Press Release Draft)'], col: 4 },
+      { key: 'dataConfidence', label: 'Information Confidence Score', type: 'select', options: [], col: 4 },
       { key: 'version', label: 'Registry Record Version', type: 'text', placeholder: 'e.g. v3.1', col: 4 },
       { key: 'remarks', label: 'Nodal Remarks / Registry Notes', type: 'textarea', placeholder: 'Special system notes on this revision...', col: 12 }
     ]
@@ -417,7 +763,7 @@ export const getInitialSchemeState = () => {
 
 // Extremely detailed Demo template data (PM Awas Yojana)
 export const PM_AWAS_YOJANA_DEMO = {
-  basicInfo: {
+  SchemeMaster: {
     schemeId: 'SCH-PMAY-U-2015',
     schemeName: 'Pradhan Mantri Awas Yojana (Urban)',
     alternateName: 'PMAY-U',
@@ -431,7 +777,7 @@ export const PM_AWAS_YOJANA_DEMO = {
     notification: 'Gazette Extra Ordinary Part-II Section 3(ii)',
     logoUrl: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=600&q=80'
   },
-  objective: {
+  SchemeObjectives: {
     vision: 'Ensuring every citizen in urban India has access to a dignified concrete house with basic amenities like toilet, power, and water.',
     mission: 'To construct over 1.2 Crore concrete houses in notified urban regions by the end of extended timeline 2024-2026, facilitating credit linked interest subsidies.',
     primaryObj: 'Provide all-weather pucca houses to all eligible urban households including slum dwellers, EWS, and LIG categories by leveraging multiple financial models.',
@@ -440,7 +786,7 @@ export const PM_AWAS_YOJANA_DEMO = {
     needAssessment: 'National surveys revealed an urban housing shortage of approximately 11.2 million units, particularly among the economically weaker segments of urban society.',
     expectedOutcomes: 'Slum eradication, massive boost in formal construction sector employment, increased women homeownership, and dignified living conditions for 5 Crore citizens.'
   },
-  classification: {
+  SchemeClassification: {
     sector: 'Housing',
     subSector: 'Urban Affordable Housing',
     theme: 'Social Infrastructure & Welfare',
@@ -449,7 +795,7 @@ export const PM_AWAS_YOJANA_DEMO = {
     flagshipScheme: 'Yes',
     categoryTag: 'Infrastructure'
   },
-  beneficiaries: {
+  SchemeBeneficiaries: {
     category: 'Economically Weaker Section (EWS) & LIG',
     targetGroup: 'Urban Poor, Slum Dwellers, Women, SC/ST, and Divyangjan',
     gender: 'All Genders',
@@ -462,7 +808,7 @@ export const PM_AWAS_YOJANA_DEMO = {
     individualInstitution: 'Individual',
     estimatedBeneficiaries: '12000000'
   },
-  eligibility: {
+  SchemeEligibility: {
     eligibilityCriteria: '1. Beneficiary family must not own a concrete (pucca) house in any part of India.\n2. Beneficiary household must fall within EWS/LIG income brackets.\n3. Female head of household must be co-owner or sole owner.',
     documentsRequired: 'Aadhaar Card, Bank Passbook, Self-affidavit of land/housing ownership status, Income Certificate, Address Proof, Voter ID card.',
     incomeLimit: '₹ 3,00,000 (EWS) / ₹ 6,00,000 (LIG) per annum',
@@ -471,7 +817,7 @@ export const PM_AWAS_YOJANA_DEMO = {
     bankAccountRequired: 'Yes',
     otherConditions: 'Beneficiary should not have availed any housing subsidy from the Central Government or State Government in the past.'
   },
-  financials: {
+  SchemeFinancials: {
     totalBudget: '230000',
     annualBudget: '28000',
     allocation: '26400',
@@ -483,7 +829,7 @@ export const PM_AWAS_YOJANA_DEMO = {
     assistanceType: 'Subsidy',
     dbtEnabled: 'Yes'
   },
-  implementation: {
+  SchemeImplementation: {
     implementingAgency: 'Ministry of Housing & Urban Affairs (MoHUA)',
     stateAgencies: 'State Urban Development Agencies (SUDA) / State Housing Boards',
     districtAgencies: 'District Urban Development Agency (DUDA) / Municipal Commissioners',
@@ -493,7 +839,7 @@ export const PM_AWAS_YOJANA_DEMO = {
     portalName: 'pmaymis.gov.in',
     monitoringAgency: 'Central Sanctioning and Monitoring Committee (CSMC)'
   },
-  geography: {
+  SchemeGeography: {
     national: 'Yes',
     stateWise: 'Active in all 28 States and 8 Union Territories with varying targets matching local urbanization metrics.',
     districtWise: 'Implemented across 4,300+ statutory towns and associated urban development authorities globally.',
@@ -502,7 +848,7 @@ export const PM_AWAS_YOJANA_DEMO = {
     northEast: 'Yes',
     utCoverage: 'Fully applicable with 100% central funding models.'
   },
-  timeline: {
+  SchemeTimeline: {
     announcementDate: '2015-06-15',
     launchDateTab: '2015-06-25',
     firstDisbursement: '2015-11-12',
@@ -510,7 +856,7 @@ export const PM_AWAS_YOJANA_DEMO = {
     endDate: '2026-12-31',
     reviewFrequency: 'Quarterly'
   },
-  benefits: {
+  SchemeBenefits: {
     benefitType: 'Monetary / Financial Transfer',
     monetaryBenefit: 'Direct subsidy up to ₹ 2.50 Lakhs split between Credit Linked Subsidy Scheme (CLSS) and Beneficiary Led Construction (BLC).',
     nonMonetaryBenefit: 'Piped water connection, sanitation sewage pipeline access, and electricity connection under national convergence.',
@@ -544,7 +890,7 @@ export const PM_AWAS_YOJANA_DEMO = {
     pendingCases: '1300000',
     avgApprovalTime: '35 days'
   },
-  outcomes: {
+  SchemeOutcomes: {
     jobsCreated: '4200000',
     housesBuilt: '11500000',
     farmersBenefitted: '0',
@@ -577,7 +923,7 @@ export const PM_AWAS_YOJANA_DEMO = {
     gis: 'Yes',
     aiMlUsed: 'No'
   },
-  stakeholders: {
+  SchemeStakeholders: {
     ministryRoles: 'MoHUA (Apex policymaking, fund release, monitoring)',
     stateGovt: 'State Housing Ministries (Executing agencies, targets coordination)',
     district: 'District Collectors (Land allocation, local oversight committees)',
@@ -596,7 +942,7 @@ export const PM_AWAS_YOJANA_DEMO = {
     circulars: 'https://pmaymis.gov.in/circulars_archive',
     notifications: 'https://pmaymis.gov.in/notifications_list'
   },
-  risks: {
+  SchemeRisks: {
     challenges: 'Land acquisition delays in highly congested metropolitan areas like Mumbai; rise in building material costs.',
     risks: 'Wrongful claims by families pretending to have no other concrete house; broker commissions.',
     bottlenecks: 'Slow verification of land deeds by municipal ward staff.',
@@ -609,7 +955,7 @@ export const PM_AWAS_YOJANA_DEMO = {
     testimonials: '"Owning an all-weather concrete house has restored my family dignity. Now my daughter can study safely in light." - Kamla Devi, Indore',
     bestPractices: 'Online single-window clearance for state approvals within 15 days implemented in Gujarat and Madhya Pradesh.'
   },
-  relationships: {
+  SchemeRelationships: {
     parentScheme: 'Urban Infrastructure Development Mission',
     similarSchemes: 'RAY (Rajiv Awas Yojana)',
     complementarySchemes: 'Swachh Bharat Mission (Urban), Atal Mission for Rejuvenation and Urban Transformation (AMRUT), Saubhagya Yojana',

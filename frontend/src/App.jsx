@@ -11,8 +11,10 @@ import PublicRoute from './components/Common/PublicRoute';
 // Pages
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
+import Users from './pages/Users';
 import NewScheme from './pages/NewScheme';
 import Profile from './pages/Profile';
+import Settings from './pages/Settings';
 
 export default function App() {
   return (
@@ -43,8 +45,10 @@ export default function App() {
             
             {/* Application modules */}
             <Route path="dashboard" element={<Dashboard />} />
+            <Route path="users" element={<Users />} />
             <Route path="scheme" element={<NewScheme />} />
             <Route path="profile" element={<Profile />} />
+            <Route path="settings" element={<Settings />} />
           </Route>
 
           {/* Fallback Catch */}

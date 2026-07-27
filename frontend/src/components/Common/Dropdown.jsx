@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
+import Spinner from './Spinner';
 
 /**
  * Dropdown component - Supports both single-select (normal) and multi-select modes,
- * searchable lists, custom badge triggers, and click-outside dismissal.
+ * searchable lists, custom badge triggers, click-outside dismissal, and loading state.
  */
 export default function Dropdown({
   options = [], // Array of strings or { value, label, icon }
@@ -13,6 +14,7 @@ export default function Dropdown({
   isMulti = false, // Set to true for multiselect dropdown
   searchable = false, // Set to true to filter options with a search box
   disabled = false,
+  isLoading = false, // Set to true when fetching options from API
   maxSelectedDisplay = 3, // In multi mode, how many chip tags to show before collapsing to "+X more"
   className = '',
   id,
@@ -133,7 +135,7 @@ export default function Dropdown({
       {/* Select Box Trigger */}
       <div
         className={`form-select d-flex align-items-center justify-content-between cursor-pointer py-2 px-3 border rounded ${
-          disabled ? 'bg-secondary-bg opacity-75' : 'bg-body'
+          disabled ? 'bg-secondary-bg opacity-75' : ''
         }`}
         style={{
           minHeight: '42px',
@@ -180,17 +182,23 @@ export default function Dropdown({
           )}
         </div>
 
-        {/* Clear and Chevron indicators */}
+        {/* Clear and Chevron indicators / Loading Spinner */}
         <div className="d-flex align-items-center gap-2">
-          {((isMulti && selectedMultiOptions.length > 0) || (!isMulti && selectedSingleOption)) && !disabled && (
-            <i
-              className="bi bi-x-lg text-muted cursor-pointer hover-text-danger"
-              style={{ fontSize: '0.85rem' }}
-              onClick={handleClearAll}
-              title="Clear all"
-            ></i>
+          {isLoading ? (
+            <Spinner size="xs" variant="primary" />
+          ) : (
+            <>
+              {((isMulti && selectedMultiOptions.length > 0) || (!isMulti && selectedSingleOption)) && !disabled && (
+                <i
+                  className="bi bi-x-lg text-muted cursor-pointer hover-text-danger"
+                  style={{ fontSize: '0.85rem' }}
+                  onClick={handleClearAll}
+                  title="Clear all"
+                ></i>
+              )}
+              <i className={`bi bi-chevron-${isOpen ? 'up' : 'down'} text-muted`} style={{ fontSize: '0.85rem' }}></i>
+            </>
           )}
-          <i className={`bi bi-chevron-${isOpen ? 'up' : 'down'} text-muted`} style={{ fontSize: '0.85rem' }}></i>
         </div>
       </div>
 
@@ -201,8 +209,8 @@ export default function Dropdown({
           style={{ zIndex: 1100, maxHeight: '320px', display: 'flex', flexDirection: 'column' }}
         >
           {/* Optional search input filter */}
-          {searchable && (
-            <div className="p-2 border-bottom bg-light">
+          {searchable && !isLoading && (
+            <div className="p-2 border-bottom ">
               <div className="input-group input-group-sm">
                 <span className="input-group-text bg-transparent border-end-0">
                   <i className="bi bi-search text-muted"></i>
@@ -221,7 +229,7 @@ export default function Dropdown({
           )}
 
           {/* Quick toggle headers in multi mode */}
-          {isMulti && (
+          {isMulti && !isLoading && (
             <div className="p-2 border-bottom bg-light d-flex justify-content-between align-items-center" style={{ fontSize: '0.75rem' }}>
               <button
                 type="button"
@@ -243,7 +251,11 @@ export default function Dropdown({
 
           {/* Scrollable list options */}
           <div className="overflow-auto flex-grow-1" style={{ maxHeight: '220px' }}>
-            {filteredOptions.length === 0 ? (
+            {isLoading ? (
+              <div className="py-4 text-center">
+                <Spinner size="sm" center text="Fetching options..." />
+              </div>
+            ) : filteredOptions.length === 0 ? (
               <div className="text-center py-3 text-muted" style={{ fontSize: '0.85rem' }}>
                 No matches found
               </div>

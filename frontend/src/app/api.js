@@ -14,12 +14,111 @@ const getStoredUsers = () => {
   return DEFAULT_USERS;
 };
 
+const saveStoredUsers = (users) => {
+  localStorage.setItem('gov_scheme_users', JSON.stringify(users));
+};
+
+const DEFAULT_ROLES = [
+  { id: 1, title: 'Super Admin', status: true },
+  { id: 2, title: 'Ministry Nodal Officer', status: true },
+  { id: 3, title: 'Department Administrator', status: true },
+  { id: 4, title: 'Scheme Evaluator', status: true },
+  { id: 5, title: 'District Nodal Officer', status: true },
+  { id: 6, title: 'Auditor & Field Inspector', status: true },
+];
+
+const DEFAULT_DEPARTMENTS = [
+  { id: 101, title: 'Department of Agriculture and Farmers Welfare', status: true },
+  { id: 102, title: 'Department of Land Resources', status: true },
+  { id: 103, title: 'Department of Rural Development', status: true },
+  { id: 104, title: 'Department of School Education and Literacy', status: true },
+  { id: 105, title: 'Department of Higher Education', status: true },
+  { id: 106, title: 'Department of Health and Family Welfare', status: true },
+  { id: 107, title: 'Department of Financial Services', status: true },
+  { id: 108, title: 'Department of Social Justice and Empowerment', status: true },
+  { id: 109, title: 'Department of Drinking Water and Sanitation', status: true },
+  { id: 110, title: 'Department of Micro, Small and Medium Enterprises', status: true },
+];
+
+const DEFAULT_MINISTRIES = [
+  { id: 201, title: 'Ministry of Agriculture and Farmers Welfare', status: true },
+  { id: 202, title: 'Ministry of Housing and Urban Affairs', status: true },
+  { id: 203, title: 'Ministry of Rural Development', status: true },
+  { id: 204, title: 'Ministry of Health and Family Welfare', status: true },
+  { id: 205, title: 'Ministry of Education', status: true },
+  { id: 206, title: 'Ministry of Finance', status: true },
+  { id: 207, title: 'Ministry of Social Justice and Empowerment', status: true },
+  { id: 208, title: 'Ministry of Women and Child Development', status: true },
+  { id: 209, title: 'Ministry of Micro, Small and Medium Enterprises', status: true },
+  { id: 210, title: 'Ministry of Electronics and Information Technology', status: true },
+  { id: 211, title: 'Ministry of Jal Shakti', status: true },
+  { id: 212, title: 'Ministry of Power', status: true },
+  { id: 213, title: 'Ministry of New and Renewable Energy', status: true },
+  { id: 214, title: 'Ministry of Labour and Employment', status: true },
+  { id: 215, title: 'Ministry of Commerce and Industry', status: true },
+  { id: 216, title: 'Ministry of Road Transport and Highways', status: true },
+  { id: 217, title: 'Ministry of Tribal Affairs', status: true },
+  { id: 218, title: 'Ministry of Skill Development and Entrepreneurship', status: true },
+];
+
+const getStoredRoles = () => {
+  const saved = localStorage.getItem('gov_scheme_roles');
+  if (saved) {
+    try {
+      return JSON.parse(saved);
+    } catch {
+      return DEFAULT_ROLES;
+    }
+  }
+  localStorage.setItem('gov_scheme_roles', JSON.stringify(DEFAULT_ROLES));
+  return DEFAULT_ROLES;
+};
+
+const saveStoredRoles = (roles) => {
+  localStorage.setItem('gov_scheme_roles', JSON.stringify(roles));
+};
+
+const getStoredDepartments = () => {
+  const saved = localStorage.getItem('gov_scheme_departments');
+  if (saved) {
+    try {
+      return JSON.parse(saved);
+    } catch {
+      return DEFAULT_DEPARTMENTS;
+    }
+  }
+  localStorage.setItem('gov_scheme_departments', JSON.stringify(DEFAULT_DEPARTMENTS));
+  return DEFAULT_DEPARTMENTS;
+};
+
+const saveStoredDepartments = (depts) => {
+  localStorage.setItem('gov_scheme_departments', JSON.stringify(depts));
+};
+
+const getStoredMinistries = () => {
+  const saved = localStorage.getItem('gov_scheme_ministries');
+  if (saved) {
+    try {
+      return JSON.parse(saved);
+    } catch {
+      return DEFAULT_MINISTRIES;
+    }
+  }
+  localStorage.setItem('gov_scheme_ministries', JSON.stringify(DEFAULT_MINISTRIES));
+  return DEFAULT_MINISTRIES;
+};
+
+const saveStoredMinistries = (ministries) => {
+  localStorage.setItem('gov_scheme_ministries', JSON.stringify(ministries));
+};
+
 export const api = createApi({
   reducerPath: 'api',
   baseQuery: fetchBaseQuery({
-    baseUrl: import.meta.env.VITE_API_BASE_URL,
+    baseUrl: import.meta.env.VITE_API_BASE_URL || 'https://e78b-164-100-206-129.ngrok-free.app/api',
     prepareHeaders: (headers) => {
       headers.set('Content-Type', 'application/json');
+      headers.set('ngrok-skip-browser-warning', 'true');
       return headers;
     },
   }),
@@ -27,6 +126,10 @@ export const api = createApi({
   tagTypes: [
     'login',
     'getDashboardSummary',
+    'Users',
+    'Roles',
+    'Departments',
+    'Ministries',
     'getAgeGroup',
     'getBeneficiaryCategory',
     'getBeneficiaryType',
@@ -66,7 +169,7 @@ export const api = createApi({
     'getTheme',
     'getUrbanRural',
   ],
-  
+
   endpoints: (builder) => ({
     // 1. Login API
     login: builder.mutation({
@@ -182,314 +285,517 @@ export const api = createApi({
       },
       providesTags: ['Users'],
     }),
-    // 3. Get Age Group API
-    getAgeGroup: builder.mutation({
-      query: (data) => ({
-        url: '',
-        method: 'post',
-        body: data,
-      }),
+
+    getUsers: builder.query({
+      async queryFn() {
+        try {
+          const data = getStoredUsers();
+          return { data };
+        } catch (error) {
+          return { error: { status: 'CUSTOM_ERROR', error: error.message } };
+        }
+      },
+      providesTags: ['Users'],
     }),
-    // 4. Get Beneficiary Category API
+    addUser: builder.mutation({
+      async queryFn(newUser) {
+        try {
+          const users = getStoredUsers();
+          const added = { id: Date.now(), ...newUser };
+          const updated = [...users, added];
+          saveStoredUsers(updated);
+          return { data: added };
+        } catch (error) {
+          return { error: { status: 'CUSTOM_ERROR', error: error.message } };
+        }
+      },
+      invalidatesTags: ['Users'],
+    }),
+    updateUser: builder.mutation({
+      async queryFn({ id, ...updatedData }) {
+        try {
+          const users = getStoredUsers();
+          const updated = users.map((u) => (u.id === id ? { ...u, ...updatedData } : u));
+          saveStoredUsers(updated);
+          const updatedUser = updated.find((u) => u.id === id);
+          return { data: updatedUser };
+        } catch (error) {
+          return { error: { status: 'CUSTOM_ERROR', error: error.message } };
+        }
+      },
+      invalidatesTags: ['Users'],
+    }),
+    deleteUser: builder.mutation({
+      async queryFn(id) {
+        try {
+          const users = getStoredUsers();
+          const updated = users.filter((u) => u.id !== id);
+          saveStoredUsers(updated);
+          return { data: { success: true, id } };
+        } catch (error) {
+          return { error: { status: 'CUSTOM_ERROR', error: error.message } };
+        }
+      },
+      invalidatesTags: ['Users'],
+    }),
+
+    getRoles: builder.query({
+      async queryFn() {
+        try {
+          const data = getStoredRoles();
+          return { data };
+        } catch (error) {
+          return { error: { status: 'CUSTOM_ERROR', error: error.message } };
+        }
+      },
+      providesTags: ['Roles'],
+    }),
+    addRole: builder.mutation({
+      async queryFn(newItem) {
+        try {
+          const roles = getStoredRoles();
+          const added = { id: Date.now(), title: newItem, status: true };
+          const updated = [...roles, added];
+          saveStoredRoles(updated);
+          return { data: added };
+        } catch (error) {
+          return { error: { status: 'CUSTOM_ERROR', error: error.message } };
+        }
+      },
+      invalidatesTags: ['Roles'],
+    }),
+    updateRole: builder.mutation({
+      async queryFn({ id, ...updatedData }) {
+        try {
+          const roles = getStoredRoles();
+          const updated = roles.map((r) => (r.id === id ? { ...r, ...updatedData } : r));
+          saveStoredRoles(updated);
+          const updatedRole = updated.find((r) => r.id === id);
+          return { data: updatedRole };
+        } catch (error) {
+          return { error: { status: 'CUSTOM_ERROR', error: error.message } };
+        }
+      },
+      invalidatesTags: ['Roles'],
+    }),
+    deleteRole: builder.mutation({
+      async queryFn(id) {
+        try {
+          const roles = getStoredRoles();
+          const updated = roles.filter((r) => r.id !== id);
+          saveStoredRoles(updated);
+          return { data: { success: true, id } };
+        } catch (error) {
+          return { error: { status: 'CUSTOM_ERROR', error: error.message } };
+        }
+      },
+      invalidatesTags: ['Roles'],
+    }),
+
+    getDepartments: builder.query({
+      async queryFn() {
+        try {
+          const data = getStoredDepartments();
+          return { data };
+        } catch (error) {
+          return { error: { status: 'CUSTOM_ERROR', error: error.message } };
+        }
+      },
+      providesTags: ['Departments'],
+    }),
+    addDepartment: builder.mutation({
+      async queryFn(newItem) {
+        try {
+          const depts = getStoredDepartments();
+          const added = { id: Date.now(), title: newItem, status: true };
+          const updated = [...depts, added];
+          saveStoredDepartments(updated);
+          return { data: added };
+        } catch (error) {
+          return { error: { status: 'CUSTOM_ERROR', error: error.message } };
+        }
+      },
+      invalidatesTags: ['Departments'],
+    }),
+    updateDepartment: builder.mutation({
+      async queryFn({ id, ...updatedData }) {
+        try {
+          const depts = getStoredDepartments();
+          const updated = depts.map((d) => (d.id === id ? { ...d, ...updatedData } : d));
+          saveStoredDepartments(updated);
+          const updatedDept = updated.find((d) => d.id === id);
+          return { data: updatedDept };
+        } catch (error) {
+          return { error: { status: 'CUSTOM_ERROR', error: error.message } };
+        }
+      },
+      invalidatesTags: ['Departments'],
+    }),
+    deleteDepartment: builder.mutation({
+      async queryFn(id) {
+        try {
+          const depts = getStoredDepartments();
+          const updated = depts.filter((d) => d.id !== id);
+          saveStoredDepartments(updated);
+          return { data: { success: true, id } };
+        } catch (error) {
+          return { error: { status: 'CUSTOM_ERROR', error: error.message } };
+        }
+      },
+      invalidatesTags: ['Departments'],
+    }),
+
+    getMinistries: builder.query({
+      async queryFn() {
+        try {
+          const data = getStoredMinistries();
+          return { data };
+        } catch (error) {
+          return { error: { status: 'CUSTOM_ERROR', error: error.message } };
+        }
+      },
+      providesTags: ['Ministries'],
+    }),
+    addMinistry: builder.mutation({
+      async queryFn(newItem) {
+        try {
+          const ministries = getStoredMinistries();
+          const added = { id: Date.now(), title: newItem, status: true };
+          const updated = [...ministries, added];
+          saveStoredMinistries(updated);
+          return { data: added };
+        } catch (error) {
+          return { error: { status: 'CUSTOM_ERROR', error: error.message } };
+        }
+      },
+      invalidatesTags: ['Ministries'],
+    }),
+    updateMinistry: builder.mutation({
+      async queryFn({ id, ...updatedData }) {
+        try {
+          const ministries = getStoredMinistries();
+          const updated = ministries.map((m) => (m.id === id ? { ...m, ...updatedData } : m));
+          saveStoredMinistries(updated);
+          const updatedMin = updated.find((m) => m.id === id);
+          return { data: updatedMin };
+        } catch (error) {
+          return { error: { status: 'CUSTOM_ERROR', error: error.message } };
+        }
+      },
+      invalidatesTags: ['Ministries'],
+    }),
+    deleteMinistry: builder.mutation({
+      async queryFn(id) {
+        try {
+          const ministries = getStoredMinistries();
+          const updated = ministries.filter((m) => m.id !== id);
+          saveStoredMinistries(updated);
+          return { data: { success: true, id } };
+        } catch (error) {
+          return { error: { status: 'CUSTOM_ERROR', error: error.message } };
+        }
+      },
+      invalidatesTags: ['Ministries'],
+    }),
     getAgeGroup: builder.mutation({
-      query: (data) => ({
-        url: '',
+      query: (data = {}) => ({
+        url: '/AgeGroup',
         method: 'POST',
         body: data,
       }),
     }),
-    // 
+
     getBeneficiaryCategory: builder.mutation({
-      query: (data) => ({
-        url: '',
+      query: (data = {}) => ({
+        url: '/BeneficiaryCategory',
         method: 'POST',
         body: data,
       }),
     }),
 
     getBeneficiaryType: builder.mutation({
-      query: (data) => ({
-        url: '',
+      query: (data = {}) => ({
+        url: '/BeneficiaryType',
         method: 'POST',
         body: data,
       }),
     }),
 
     getBenefitFrequency: builder.mutation({
-      query: (data) => ({
-        url: '',
+      query: (data = {}) => ({
+        url: '/BenefitFrequency',
         method: 'POST',
         body: data,
       }),
     }),
 
     getBenefitType: builder.mutation({
-      query: (data) => ({
-        url: '',
+      query: (data = {}) => ({
+        url: '/BenefitType',
         method: 'POST',
         body: data,
       }),
     }),
 
     getDeliveryMechanism: builder.mutation({
-      query: (data) => ({
-        url: '',
+      query: (data = {}) => ({
+        url: '/DeliveryMechanism',
         method: 'POST',
         body: data,
       }),
     }),
 
     getDepartment: builder.mutation({
-      query: (data) => ({
-        url: '',
+      query: (data = {}) => ({
+        url: '/Department',
         method: 'POST',
         body: data,
       }),
     }),
 
     getDistrict: builder.mutation({
-      query: (data) => ({
-        url: '',
+      query: (data = {}) => ({
+        url: '/District',
         method: 'POST',
         body: data,
       }),
     }),
 
     getDocument: builder.mutation({
-      query: (data) => ({
-        url: '',
+      query: (data = {}) => ({
+        url: '/Document',
         method: 'POST',
         body: data,
       }),
     }),
 
     getFinancialAssistanceType: builder.mutation({
-      query: (data) => ({
-        url: '',
+      query: (data = {}) => ({
+        url: '/FinancialAssistanceType',
         method: 'POST',
         body: data,
       }),
     }),
 
     getFundSharingPattern: builder.mutation({
-      query: (data) => ({
-        url: '',
+      query: (data = {}) => ({
+        url: '/FundSharingPattern',
         method: 'POST',
         body: data,
       }),
     }),
 
     getGender: builder.mutation({
-      query: (data) => ({
-        url: '',
+      query: (data = {}) => ({
+        url: '/Gender',
         method: 'POST',
         body: data,
       }),
     }),
 
     getGeographicCoverage: builder.mutation({
-      query: (data) => ({
-        url: '',
+      query: (data = {}) => ({
+        url: '/GeographicCoverage',
         method: 'POST',
         body: data,
       }),
     }),
 
     getImplementingAgency: builder.mutation({
-      query: (data) => ({
-        url: '',
+      query: (data = {}) => ({
+        url: '/ImplementingAgency',
         method: 'POST',
         body: data,
       }),
     }),
 
     getIncomeCriteria: builder.mutation({
-      query: (data) => ({
-        url: '',
+      query: (data = {}) => ({
+        url: '/IncomeCriteria',
         method: 'POST',
         body: data,
       }),
     }),
 
     getInsuranceType: builder.mutation({
-      query: (data) => ({
-        url: '',
+      query: (data = {}) => ({
+        url: '/InsuranceType',
         method: 'POST',
         body: data,
       }),
     }),
 
     getLocalBody: builder.mutation({
-      query: (data) => ({
-        url: '',
+      query: (data = {}) => ({
+        url: '/LocalBody',
         method: 'POST',
         body: data,
       }),
     }),
 
     getMinistry: builder.mutation({
-      query: (data) => ({
-        url: '',
+      query: (data = {}) => ({
+        url: '/Ministry',
         method: 'POST',
         body: data,
       }),
     }),
 
     getMission: builder.mutation({
-      query: (data) => ({
-        url: '',
+      query: (data = {}) => ({
+        url: '/Mission',
         method: 'POST',
         body: data,
       }),
     }),
 
     getMonitoringAgency: builder.mutation({
-      query: (data) => ({
-        url: '',
+      query: (data = {}) => ({
+        url: '/MonitoringAgency',
         method: 'POST',
         body: data,
       }),
     }),
 
     getNationalPriority: builder.mutation({
-      query: (data) => ({
-        url: '',
+      query: (data = {}) => ({
+        url: '/NationalPriority',
         method: 'POST',
         body: data,
       }),
     }),
 
     getOccupation: builder.mutation({
-      query: (data) => ({
-        url: '',
+      query: (data = {}) => ({
+        url: '/Occupation',
         method: 'POST',
         body: data,
       }),
     }),
 
     getOutcomeIndicator: builder.mutation({
-      query: (data) => ({
-        url: '',
+      query: (data = {}) => ({
+        url: '/OutcomeIndicator',
         method: 'POST',
         body: data,
       }),
     }),
 
     getReviewFrequency: builder.mutation({
-      query: (data) => ({
-        url: '',
+      query: (data = {}) => ({
+        url: '/ReviewFrequency',
         method: 'POST',
         body: data,
       }),
     }),
 
     getScheme: builder.mutation({
-      query: (data) => ({
-        url: '',
+      query: (data = {}) => ({
+        url: '/Scheme',
         method: 'POST',
         body: data,
       }),
     }),
 
     getSchemePhase: builder.mutation({
-      query: (data) => ({
-        url: '',
+      query: (data = {}) => ({
+        url: '/SchemePhase',
         method: 'POST',
         body: data,
       }),
     }),
 
     getSchemeStatus: builder.mutation({
-      query: (data) => ({
-        url: '',
+      query: (data = {}) => ({
+        url: '/SchemeStatus',
         method: 'POST',
         body: data,
       }),
     }),
 
     getSchemeType: builder.mutation({
-      query: (data) => ({
-        url: '',
+      query: (data = {}) => ({
+        url: '/SchemeType',
         method: 'POST',
         body: data,
       }),
     }),
 
     getSDG: builder.mutation({
-      query: (data) => ({
-        url: '',
+      query: (data = {}) => ({
+        url: '/SDG',
         method: 'POST',
         body: data,
       }),
     }),
 
     getSector: builder.mutation({
-      query: (data) => ({
-        url: '',
+      query: (data = {}) => ({
+        url: '/Sector',
         method: 'POST',
         body: data,
       }),
     }),
 
     getServiceMode: builder.mutation({
-      query: (data) => ({
-        url: '',
+      query: (data = {}) => ({
+        url: '/ServiceMode',
         method: 'POST',
         body: data,
       }),
     }),
 
     getSocialCategory: builder.mutation({
-      query: (data) => ({
-        url: '',
+      query: (data = {}) => ({
+        url: '/SocialCategory',
         method: 'POST',
         body: data,
       }),
     }),
 
     getStakeholderType: builder.mutation({
-      query: (data) => ({
-        url: '',
+      query: (data = {}) => ({
+        url: '/StakeholderType',
         method: 'POST',
         body: data,
       }),
     }),
 
     getState: builder.mutation({
-      query: (data) => ({
-        url: '',
+      query: (data = {}) => ({
+        url: '/State',
         method: 'POST',
         body: data,
       }),
     }),
 
     getSubSector: builder.mutation({
-      query: (data) => ({
-        url: '',
+      query: (data = {}) => ({
+        url: '/SubSector',
         method: 'POST',
         body: data,
       }),
     }),
 
     getTargetGroup: builder.mutation({
-      query: (data) => ({
-        url: '',
+      query: (data = {}) => ({
+        url: '/TargetGroup',
         method: 'POST',
         body: data,
       }),
     }),
 
     getTheme: builder.mutation({
-      query: (data) => ({
-        url: '',
+      query: (data = {}) => ({
+        url: '/Theme',
         method: 'POST',
         body: data,
       }),
     }),
 
     getUrbanRural: builder.mutation({
-      query: (data) => ({
-        url: '',
+      query: (data = {}) => ({
+        url: '/UrbanRural',
         method: 'POST',
         body: data,
       }),
@@ -500,6 +806,22 @@ export const api = createApi({
 export const {
   useLoginMutation,
   useGetDashboardSummaryQuery,
+  useGetUsersQuery,
+  useAddUserMutation,
+  useUpdateUserMutation,
+  useDeleteUserMutation,
+  useGetRolesQuery,
+  useAddRoleMutation,
+  useUpdateRoleMutation,
+  useDeleteRoleMutation,
+  useGetDepartmentsQuery,
+  useAddDepartmentMutation,
+  useUpdateDepartmentMutation,
+  useDeleteDepartmentMutation,
+  useGetMinistriesQuery,
+  useAddMinistryMutation,
+  useUpdateMinistryMutation,
+  useDeleteMinistryMutation,
   useGetAgeGroupMutation,
   useGetBeneficiaryCategoryMutation,
   useGetBeneficiaryTypeMutation,

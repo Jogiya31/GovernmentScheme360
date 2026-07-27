@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Spinner from '../components/Common/Spinner';
 import {
   useGetRolesQuery,
   useAddRoleMutation,
@@ -103,9 +104,7 @@ export const RenderList = ({
         {/* List group */}
         <div className="flex-grow-1 overflow-auto pe-1 mb-3" style={{ maxHeight: '280px', minHeight: '200px' }}>
           {isLoading ? (
-            <div className="text-center py-5">
-              <div className="spinner-border spinner-border-sm text-primary" role="status"></div>
-            </div>
+            <Spinner center size="sm" text={`Loading ${fieldName.toLowerCase()}s...`} className="py-4" />
           ) : filteredList.length === 0 ? (
             <div className="text-center py-5 text-muted" style={{ fontSize: '0.85rem' }}>
               No {fieldName.toLowerCase()}s found

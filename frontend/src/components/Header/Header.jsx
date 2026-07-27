@@ -3,7 +3,6 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
 import { toggleTheme } from '../../features/theme/themeSlice';
 import { logout } from '../../features/auth/authSlice';
-import { markAllAsRead } from '../../features/notifications/notificationsSlice';
 import scheme360 from '../../assets/scheme360.png';
 
 export default function Header({ sidebarCollapsed, toggleSidebar }) {
@@ -11,21 +10,15 @@ export default function Header({ sidebarCollapsed, toggleSidebar }) {
   const navigate = useNavigate();
   const { theme } = useSelector((state) => state.theme);
   const { user } = useSelector((state) => state.auth);
-  const { notifications, unreadCount } = useSelector((state) => state.notifications);
 
-  const [showNotif, setShowNotif] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
 
   const profileRef = useRef(null);
-  const notifRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (profileRef.current && !profileRef.current.contains(event.target)) {
         setShowProfile(false);
-      }
-      if (notifRef.current && !notifRef.current.contains(event.target)) {
-        setShowNotif(false);
       }
     };
 
@@ -134,10 +127,7 @@ export default function Header({ sidebarCollapsed, toggleSidebar }) {
             {/* User Profile Dropdown */}
             <li className="nav-item position-relative ms-2" ref={profileRef}>
               <button
-                onClick={() => {
-                  setShowProfile(!showProfile);
-                  setShowNotif(false);
-                }}
+                onClick={() => setShowProfile(!showProfile)}
                 className="btn btn-link p-0 border-0 d-flex align-items-center text-decoration-none gap-2"
                 id="user-profile-dropdown-btn"
               >

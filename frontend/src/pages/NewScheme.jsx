@@ -5,12 +5,14 @@ import {
   SCHEME_TABS_CONFIG,
   getInitialSchemeState,
   PM_AWAS_YOJANA_DEMO,
+  DEFAULT_FALLBACK_OPTIONS,
 } from '../data/schemeFields';
 
 import Alert from '../components/Common/Alert';
 import Card from '../components/Common/Card';
 import Modal from '../components/Common/Modal';
 import Dropdown from '../components/Common/Dropdown';
+import Spinner from '../components/Common/Spinner';
 import {
   useGetAgeGroupMutation,
   useGetBeneficiaryCategoryMutation,
@@ -52,128 +54,236 @@ import {
   useGetUrbanRuralMutation,
 } from '../app/api';
 
+const extractDataArray = (res) => {
+  if (!res) return [];
+  if (Array.isArray(res)) return res;
+  if (Array.isArray(res.data)) return res.data;
+  if (Array.isArray(res.data?.data)) return res.data.data;
+  if (Array.isArray(res.result)) return res.result;
+  if (Array.isArray(res.items)) return res.items;
+  if (Array.isArray(res.data?.result)) return res.data.result;
+  if (Array.isArray(res.data?.items)) return res.data.items;
+  if (Array.isArray(res.content)) return res.content;
+  if (typeof res === 'object') {
+    const keys = Object.keys(res);
+    for (const key of keys) {
+      if (Array.isArray(res[key])) return res[key];
+    }
+  }
+  return [];
+};
+
+const getOptionName = (item) => {
+  if (!item && item !== 0) return '';
+  if (typeof item === 'string') return item;
+  if (typeof item === 'number') return String(item);
+  if (typeof item !== 'object') return String(item);
+
+  const standardKeys = [
+    'name', 'title', 'label', 'value', 'description', 'text', 'categoryName',
+    'typeName', 'groupName', 'departmentName', 'ministryName', 'agencyName',
+    'statusName', 'sectorName', 'modeName', 'priorityName', 'frequencyName',
+    'coverageName', 'bodyName', 'indicatorName', 'schemeName', 'phaseName',
+    'patternName', 'mechanismName', 'criteriaName'
+  ];
+  for (const k of standardKeys) {
+    if (item[k] !== undefined && item[k] !== null && typeof item[k] === 'string' && item[k].trim()) {
+      return item[k].trim();
+    }
+  }
+
+  const keys = Object.keys(item);
+  const nameKey = keys.find(
+    (k) =>
+      k.toLowerCase().endsWith('name') ||
+      k.toLowerCase().endsWith('title') ||
+      k.toLowerCase().endsWith('type') ||
+      k.toLowerCase().endsWith('category') ||
+      k.toLowerCase().endsWith('frequency') ||
+      k.toLowerCase().endsWith('coverage') ||
+      k.toLowerCase().endsWith('priority') ||
+      k.toLowerCase().endsWith('status') ||
+      k.toLowerCase().endsWith('sdg') ||
+      k.toLowerCase().endsWith('sector') ||
+      k.toLowerCase().endsWith('mode') ||
+      k.toLowerCase().endsWith('group') ||
+      k.toLowerCase().endsWith('criteria') ||
+      k.toLowerCase().endsWith('body') ||
+      k.toLowerCase().endsWith('agency') ||
+      k.toLowerCase().endsWith('phase') ||
+      k.toLowerCase().endsWith('pattern') ||
+      k.toLowerCase().endsWith('mechanism') ||
+      k.toLowerCase().endsWith('department') ||
+      k.toLowerCase().endsWith('ministry') ||
+      k.toLowerCase().endsWith('description')
+  );
+  if (nameKey && item[nameKey] !== undefined && item[nameKey] !== null) return String(item[nameKey]).trim();
+
+  const stringKey = keys.find(
+    (k) => typeof item[k] === 'string' && k !== 'id' && k !== '_id' && !k.toLowerCase().includes('id') && item[k].trim()
+  );
+  if (stringKey) return item[stringKey].trim();
+
+  const anyStringKey = keys.find((k) => typeof item[k] === 'string' && item[k].trim());
+  if (anyStringKey) return item[anyStringKey].trim();
+
+  return item[keys[0]] !== undefined ? String(item[keys[0]]) : '';
+};
+
 export default function NewScheme() {
   const [getAgeGroup, { data: ageGroupRes }] = useGetAgeGroupMutation();
-  const [getBeneficiaryCategory, { data: beneficiaryCategories }] =
+  const [getBeneficiaryCategory, { data: beneficiaryCategoriesRes }] =
     useGetBeneficiaryCategoryMutation();
-  const [getBeneficiaryType, { data: beneficiaryTypes }] = useGetBeneficiaryTypeMutation();
-  const [getBenefitFrequency, { data: benefitFrequencies }] = useGetBenefitFrequencyMutation();
-  const [getBenefitType, { data: benefitTypes }] = useGetBenefitTypeMutation();
-  const [getDeliveryMechanism, { data: deliveryMechanisms }] = useGetDeliveryMechanismMutation();
-  const [getDepartment, { data: departments }] = useGetDepartmentMutation();
-  const [getDistrict, { data: districts }] = useGetDistrictMutation();
-  const [getDocument, { data: documents }] = useGetDocumentMutation();
-  const [getFinancialAssistanceType, { data: financialAssistanceTypes }] =
+  const [getBeneficiaryType, { data: beneficiaryTypesRes }] = useGetBeneficiaryTypeMutation();
+  const [getBenefitFrequency, { data: benefitFrequenciesRes }] = useGetBenefitFrequencyMutation();
+  const [getBenefitType, { data: benefitTypesRes }] = useGetBenefitTypeMutation();
+  const [getDeliveryMechanism, { data: deliveryMechanismsRes }] = useGetDeliveryMechanismMutation();
+  const [getDepartment, { data: departmentsRes }] = useGetDepartmentMutation();
+  const [getDistrict, { data: districtsRes }] = useGetDistrictMutation();
+  const [getDocument, { data: documentsRes }] = useGetDocumentMutation();
+  const [getFinancialAssistanceType, { data: financialAssistanceTypesRes }] =
     useGetFinancialAssistanceTypeMutation();
-  const [getFundSharingPattern, { data: fundSharingPatterns }] = useGetFundSharingPatternMutation();
-  const [getGender, { data: genders }] = useGetGenderMutation();
-  const [getGeographicCoverage, { data: geographicCoverages }] = useGetGeographicCoverageMutation();
-  const [getImplementingAgency, { data: implementingAgencies }] =
+  const [getFundSharingPattern, { data: fundSharingPatternsRes }] =
+    useGetFundSharingPatternMutation();
+  const [getGender, { data: gendersRes }] = useGetGenderMutation();
+  const [getGeographicCoverage, { data: geographicCoveragesRes }] =
+    useGetGeographicCoverageMutation();
+  const [getImplementingAgency, { data: implementingAgenciesRes }] =
     useGetImplementingAgencyMutation();
-  const [getIncomeCriteria, { data: incomeCriteria }] = useGetIncomeCriteriaMutation();
-  const [getInsuranceType, { data: insuranceTypes }] = useGetInsuranceTypeMutation();
-  const [getLocalBody, { data: localBodies }] = useGetLocalBodyMutation();
-  const [getMinistry, { data: ministries }] = useGetMinistryMutation();
-  const [getMission, { data: missions }] = useGetMissionMutation();
-  const [getMonitoringAgency, { data: monitoringAgencies }] = useGetMonitoringAgencyMutation();
-  const [getNationalPriority, { data: nationalPriorities }] = useGetNationalPriorityMutation();
-  const [getOccupation, { data: occupations }] = useGetOccupationMutation();
-  const [getOutcomeIndicator, { data: outcomeIndicators }] = useGetOutcomeIndicatorMutation();
-  const [getReviewFrequency, { data: reviewFrequencies }] = useGetReviewFrequencyMutation();
-  const [getScheme, { data: schemes }] = useGetSchemeMutation();
-  const [getSchemePhase, { data: schemePhases }] = useGetSchemePhaseMutation();
-  const [getSchemeStatus, { data: schemeStatuses }] = useGetSchemeStatusMutation();
-  const [getSchemeType, { data: schemeTypes }] = useGetSchemeTypeMutation();
-  const [getSDG, { data: sdgs }] = useGetSDGMutation();
-  const [getSector, { data: sectors }] = useGetSectorMutation();
-  const [getServiceMode, { data: serviceModes }] = useGetServiceModeMutation();
-  const [getSocialCategory, { data: socialCategories }] = useGetSocialCategoryMutation();
-  const [getStakeholderType, { data: stakeholderTypes }] = useGetStakeholderTypeMutation();
-  const [getState, { data: states }] = useGetStateMutation();
-  const [getSubSector, { data: subSectors }] = useGetSubSectorMutation();
-  const [getTargetGroup, { data: targetGroups }] = useGetTargetGroupMutation();
-  const [getTheme, { data: themes }] = useGetThemeMutation();
-  const [getUrbanRural, { data: urbanRural }] = useGetUrbanRuralMutation();
+  const [getIncomeCriteria, { data: incomeCriteriaRes }] = useGetIncomeCriteriaMutation();
+  const [getInsuranceType, { data: insuranceTypesRes }] = useGetInsuranceTypeMutation();
+  const [getLocalBody, { data: localBodiesRes }] = useGetLocalBodyMutation();
+  const [getMinistry, { data: ministriesRes }] = useGetMinistryMutation();
+  const [getMission, { data: missionsRes }] = useGetMissionMutation();
+  const [getMonitoringAgency, { data: monitoringAgenciesRes }] = useGetMonitoringAgencyMutation();
+  const [getNationalPriority, { data: nationalPrioritiesRes }] = useGetNationalPriorityMutation();
+  const [getOccupation, { data: occupationsRes }] = useGetOccupationMutation();
+  const [getOutcomeIndicator, { data: outcomeIndicatorsRes }] = useGetOutcomeIndicatorMutation();
+  const [getReviewFrequency, { data: reviewFrequenciesRes }] = useGetReviewFrequencyMutation();
+  const [getScheme, { data: schemesRes }] = useGetSchemeMutation();
+  const [getSchemePhase, { data: schemePhasesRes }] = useGetSchemePhaseMutation();
+  const [getSchemeStatus, { data: schemeStatusesRes }] = useGetSchemeStatusMutation();
+  const [getSchemeType, { data: schemeTypesRes }] = useGetSchemeTypeMutation();
+  const [getSDG, { data: sdgsRes }] = useGetSDGMutation();
+  const [getSector, { data: sectorsRes }] = useGetSectorMutation();
+  const [getServiceMode, { data: serviceModesRes }] = useGetServiceModeMutation();
+  const [getSocialCategory, { data: socialCategoriesRes }] = useGetSocialCategoryMutation();
+  const [getStakeholderType, { data: stakeholderTypesRes }] = useGetStakeholderTypeMutation();
+  const [getState, { data: statesRes }] = useGetStateMutation();
+  const [getSubSector, { data: subSectorsRes }] = useGetSubSectorMutation();
+  const [getTargetGroup, { data: targetGroupsRes }] = useGetTargetGroupMutation();
+  const [getTheme, { data: themesRes }] = useGetThemeMutation();
+  const [getUrbanRural, { data: urbanRuralRes }] = useGetUrbanRuralMutation();
+
+  const [isFetchingOptions, setIsFetchingOptions] = useState(false);
+
+  const loadDraftsAndSchemes = () => {
+    try {
+      const storedDrafts = JSON.parse(localStorage.getItem('gov_scheme_drafts')) || [];
+      setDrafts(storedDrafts);
+    } catch (e) {
+      console.error('Error reading localStorage logs:', e);
+    }
+  };
 
   useEffect(() => {
-    getAgeGroup({ Action: 'AgeGroup' });
-    getBeneficiaryCategory({ Action: 'BeneficiaryCategory' });
-    getBeneficiaryType({ Action: 'BeneficiaryType' });
-    getBenefitFrequency({ Action: 'BenefitFrequency' });
-    getBenefitType({ Action: 'BenefitType' });
-    getDeliveryMechanism({ Action: 'DeliveryMechanism' });
-    getDepartment({ Action: 'Department' });
-    getDistrict({ Action: 'District' });
-    getDocument({ Action: 'Document' });
-    getFinancialAssistanceType({ Action: 'FinancialAssistanceType' });
-    getFundSharingPattern({ Action: 'FundSharingPattern' });
-    getGender({ Action: 'Gender' });
-    getGeographicCoverage({ Action: 'GeographicCoverage' });
-    getImplementingAgency({ Action: 'ImplementingAgency' });
-    getIncomeCriteria({ Action: 'IncomeCriteria' });
-    getInsuranceType({ Action: 'InsuranceType' });
-    getLocalBody({ Action: 'LocalBody' });
-    getMinistry({ Action: 'Ministry' });
-    getMission({ Action: 'Mission' });
-    getMonitoringAgency({ Action: 'MonitoringAgency' });
-    getNationalPriority({ Action: 'NationalPriority' });
-    getOccupation({ Action: 'Occupation' });
-    getOutcomeIndicator({ Action: 'OutcomeIndicator' });
-    getReviewFrequency({ Action: 'ReviewFrequency' });
-    getScheme({ Action: 'Scheme' });
-    getSchemePhase({ Action: 'SchemePhase' });
-    getSchemeStatus({ Action: 'SchemeStatus' });
-    getSchemeType({ Action: 'SchemeType' });
-    getSDG({ Action: 'SDG' });
-    getSector({ Action: 'Sector' });
-    getServiceMode({ Action: 'ServiceMode' });
-    getSocialCategory({ Action: 'SocialCategory' });
-    getStakeholderType({ Action: 'StakeholderType' });
-    getState({ Action: 'State' });
-    getSubSector({ Action: 'SubSector' });
-    getTargetGroup({ Action: 'TargetGroup' });
-    getTheme({ Action: 'Theme' });
-    getUrbanRural({ Action: 'UrbanRural' });
+    loadDraftsAndSchemes();
+
+    setIsFetchingOptions(true);
+    Promise.allSettled([
+      getAgeGroup({}),
+      getBeneficiaryCategory({}),
+      getBeneficiaryType({}),
+      getBenefitFrequency({}),
+      getBenefitType({}),
+      getDeliveryMechanism({}),
+      getDepartment({}),
+      getDistrict({}),
+      getDocument({}),
+      getFinancialAssistanceType({}),
+      getFundSharingPattern({}),
+      getGender({}),
+      getGeographicCoverage({}),
+      getImplementingAgency({}),
+      getIncomeCriteria({}),
+      getInsuranceType({}),
+      getLocalBody({}),
+      getMinistry({}),
+      getMission({}),
+      getMonitoringAgency({}),
+      getNationalPriority({}),
+      getOccupation({}),
+      getOutcomeIndicator({}),
+      getReviewFrequency({}),
+      getScheme({}),
+      getSchemePhase({}),
+      getSchemeStatus({}),
+      getSchemeType({}),
+      getSDG({}),
+      getSector({}),
+      getServiceMode({}),
+      getSocialCategory({}),
+      getStakeholderType({}),
+      getState({}),
+      getSubSector({}),
+      getTargetGroup({}),
+      getTheme({}),
+      getUrbanRural({}),
+    ]).finally(() => {
+      setIsFetchingOptions(false);
+    });
   }, []);
 
   const backendOptionsMap = {
-    ministry: ministryRes?.data,
-    schemeType: schemeTypeRes?.data,
-    status: schemeStatusRes?.data,
-    sector: sectorRes?.data,
-    subSector: subSectorRes?.data,
-    gender: genderRes?.data,
-    urbanRural: urbanRuralRes?.data,
-    assistanceType: financialAssistanceTypeRes?.data,
-    deliveryMechanism: deliveryMechanismRes?.data,
-    reviewFrequency: reviewFrequencyRes?.data,
-    benefitType: benefitTypeRes?.data,
-    frequency: benefitFrequencyRes?.data,
-    sharingPattern: fundSharingPatternRes?.data,
-    ageGroup: ageGroupRes?.data,
-    category: beneficiaryCategoryRes?.data,
-    targetGroup: targetGroupRes?.data,
-    socialCategory: socialCategoryRes?.data,
-    occupation: occupationRes?.data,
-    implementingAgency: implementingAgencyRes?.data,
-    monitoringAgency: monitoringAgencyRes?.data,
-    state: stateRes?.data,
-    district: districtRes?.data,
-    department: departmentRes?.data,
+    ageGroup: extractDataArray(ageGroupRes),
+    beneficiaryCategories: extractDataArray(beneficiaryCategoriesRes),
+    beneficiaryTypes: extractDataArray(beneficiaryTypesRes),
+    benefitFrequencies: extractDataArray(benefitFrequenciesRes),
+    benefitTypes: extractDataArray(benefitTypesRes),
+    deliveryMechanisms: extractDataArray(deliveryMechanismsRes),
+    departments: extractDataArray(departmentsRes),
+    districts: extractDataArray(districtsRes),
+    documents: extractDataArray(documentsRes),
+    financialAssistanceTypes: extractDataArray(financialAssistanceTypesRes),
+    fundSharingPatterns: extractDataArray(fundSharingPatternsRes),
+    genders: extractDataArray(gendersRes),
+    geographicCoverages: extractDataArray(geographicCoveragesRes),
+    implementingAgencies: extractDataArray(implementingAgenciesRes),
+    incomeCriteria: extractDataArray(incomeCriteriaRes),
+    insuranceTypes: extractDataArray(insuranceTypesRes),
+    localBodies: extractDataArray(localBodiesRes),
+    ministries: extractDataArray(ministriesRes),
+    missions: extractDataArray(missionsRes),
+    monitoringAgencies: extractDataArray(monitoringAgenciesRes),
+    nationalPriorities: extractDataArray(nationalPrioritiesRes),
+    occupations: extractDataArray(occupationsRes),
+    outcomeIndicators: extractDataArray(outcomeIndicatorsRes),
+    reviewFrequencies: extractDataArray(reviewFrequenciesRes),
+    schemes: extractDataArray(schemesRes),
+    schemePhases: extractDataArray(schemePhasesRes),
+    schemeStatuses: extractDataArray(schemeStatusesRes),
+    schemeTypes: extractDataArray(schemeTypesRes),
+    sdgs: extractDataArray(sdgsRes),
+    sectors: extractDataArray(sectorsRes),
+    serviceModes: extractDataArray(serviceModesRes),
+    socialCategories: extractDataArray(socialCategoriesRes),
+    stakeholderTypes: extractDataArray(stakeholderTypesRes),
+    states: extractDataArray(statesRes),
+    subSectors: extractDataArray(subSectorsRes),
+    targetGroups: extractDataArray(targetGroupsRes),
+    themes: extractDataArray(themesRes),
+    urbanRural: extractDataArray(urbanRuralRes),
   };
 
   // Page core states
   const [formData, setFormData] = useState(getInitialSchemeState());
   const [currentTab, setCurrentTab] = useState(0);
-  const [tabSearchTerm, setTabSearchTerm] = useState('');
 
   // Persistence state
   const [drafts, setDrafts] = useState([]);
-  const [submittedSchemes, setSubmittedSchemes] = useState([]);
   const [alertInfo, setAlertInfo] = useState(null);
 
-  // Custom draft name / active registry track
-  const [draftName, setDraftName] = useState('');
+  // Active registry track
   const [loadedRecordId, setLoadedRecordId] = useState(null);
 
   // Custom Confirmation Modal state
@@ -208,21 +318,19 @@ export default function NewScheme() {
 
   const tabsContainerRef = useRef(null);
 
-  // Sync draft list on load
+  // Scroll active tab into view when currentTab changes
   useEffect(() => {
-    loadDraftsAndSchemes();
-  }, []);
-
-  const loadDraftsAndSchemes = () => {
-    try {
-      const storedDrafts = JSON.parse(localStorage.getItem('gov_scheme_drafts')) || [];
-      const storedSubmitted = JSON.parse(localStorage.getItem('gov_scheme_submitted')) || [];
-      setDrafts(storedDrafts);
-      setSubmittedSchemes(storedSubmitted);
-    } catch (e) {
-      console.error('Error reading localStorage logs:', e);
+    if (tabsContainerRef.current) {
+      const activeEl = tabsContainerRef.current.querySelector('.bg-primary');
+      if (activeEl) {
+        activeEl.scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest',
+          inline: 'center',
+        });
+      }
     }
-  };
+  }, [currentTab]);
 
   const showAlert = (message, type = 'success') => {
     setAlertInfo({ message, type });
@@ -239,11 +347,19 @@ export default function NewScheme() {
       onConfirm: () => {
         setFormData(getInitialSchemeState());
         setLoadedRecordId(null);
-        setDraftName('');
         setCurrentTab(0);
         showAlert('Scheme form has been fully reset.', 'info');
       },
     });
+  };
+
+  // Extract scheme name from formData
+  const getSchemeName = () => {
+    return (
+      formData.SchemeMaster?.schemeName ||
+      formData.basicInfo?.schemeName ||
+      'Unnamed Government Scheme'
+    );
   };
 
   // Check how many fields in each tab are filled out to calculate progress metrics
@@ -277,36 +393,61 @@ export default function NewScheme() {
   };
 
   // Save as Draft
-  const handleSaveDraft = () => {
-    const schemeName = formData.basicInfo?.schemeName || 'Unnamed Scheme Draft';
-    const draftLabel = draftName || schemeName;
+  const handleSaveDraft = (customName = null) => {
+    const schemeName = getSchemeName();
+    const draftLabel = customName || schemeName;
 
+    const cleanId =
+      loadedRecordId && String(loadedRecordId).startsWith('DRAFT_')
+        ? loadedRecordId
+        : 'DRAFT_' + Date.now();
+
+    const currentProgress = getOverallProgress();
+
+    const newDraft = {
+      id: cleanId,
+      name: draftLabel,
+      lastUpdated: new Date().toLocaleString(),
+      progress: currentProgress,
+      data: formData,
+    };
+
+    let updatedDrafts = [...drafts];
+    const existingIdx = drafts.findIndex((d) => d.id === cleanId);
+    if (existingIdx > -1) {
+      updatedDrafts[existingIdx] = newDraft;
+    } else {
+      updatedDrafts.unshift(newDraft);
+    }
+
+    localStorage.setItem('gov_scheme_drafts', JSON.stringify(updatedDrafts));
+    setDrafts(updatedDrafts);
+    setLoadedRecordId(cleanId);
+    showAlert(
+      `Draft "${newDraft.name}" saved successfully (${currentProgress}% complete)! You can reload it anytime.`,
+      'success',
+    );
+  };
+
+  // Delete a Saved Record
+  const handleDeleteRecord = (id, isDraft = true) => {
+    const recordType = isDraft ? 'draft' : 'submitted record';
     triggerConfirmation({
-      title: 'Save Draft Record',
-      message: `Are you sure you want to save the draft as "${draftLabel}"? This stores the current active session in local cache memory.`,
-      confirmText: 'Save Draft',
-      confirmClass: 'btn-primary',
+      title: `Delete ${isDraft ? 'Draft' : 'Submitted'} Record`,
+      message: `Are you sure you want to permanently delete this ${recordType}? This action is irreversible.`,
+      confirmText: 'Delete',
+      confirmClass: 'btn-danger',
       onConfirm: () => {
-        const cleanId = loadedRecordId || 'DRAFT_' + Date.now();
-        const newDraft = {
-          id: cleanId,
-          name: draftLabel,
-          lastUpdated: new Date().toLocaleString(),
-          data: formData,
-        };
-
-        let updatedDrafts = [...drafts];
-        const existingIdx = drafts.findIndex((d) => d.id === cleanId);
-        if (existingIdx > -1) {
-          updatedDrafts[existingIdx] = newDraft;
-        } else {
-          updatedDrafts.unshift(newDraft);
+        if (isDraft) {
+          const filtered = drafts.filter((d) => d.id !== id);
+          localStorage.setItem('gov_scheme_drafts', JSON.stringify(filtered));
+          setDrafts(filtered);
         }
-
-        localStorage.setItem('gov_scheme_drafts', JSON.stringify(updatedDrafts));
-        setDrafts(updatedDrafts);
-        setLoadedRecordId(cleanId);
-        showAlert(`Draft "${newDraft.name}" saved successfully in local storage.`, 'success');
+        if (loadedRecordId === id) {
+          setFormData(getInitialSchemeState());
+          setLoadedRecordId(null);
+        }
+        showAlert('Record deleted successfully.', 'info');
       },
     });
   };
@@ -314,7 +455,7 @@ export default function NewScheme() {
   // Submit form (without validation as requested)
   const handleSubmitScheme = (e) => {
     if (e && e.preventDefault) e.preventDefault();
-    const schemeName = formData.basicInfo?.schemeName || 'Unnamed Government Scheme';
+    const schemeName = getSchemeName();
 
     triggerConfirmation({
       title: 'Register & Authorize Scheme',
@@ -322,24 +463,16 @@ export default function NewScheme() {
       confirmText: 'Submit & Authorize',
       confirmClass: 'btn-success',
       onConfirm: () => {
-        const schemeId = formData.basicInfo?.schemeId || 'SCH_' + Date.now();
+        const schemeId =
+          formData.SchemeMaster?.schemeId ||
+          formData.basicInfo?.schemeId ||
+          'SCH_' + Date.now();
         const newSubmission = {
           id: schemeId,
           name: schemeName,
           submittedDate: new Date().toLocaleString(),
           data: formData,
         };
-
-        let updatedSubmitted = [...submittedSchemes];
-        const existingIdx = submittedSchemes.findIndex((s) => s.id === schemeId);
-        if (existingIdx > -1) {
-          updatedSubmitted[existingIdx] = newSubmission;
-        } else {
-          updatedSubmitted.unshift(newSubmission);
-        }
-
-        localStorage.setItem('gov_scheme_submitted', JSON.stringify(updatedSubmitted));
-        setSubmittedSchemes(updatedSubmitted);
 
         // Also remove from drafts if present
         if (loadedRecordId) {
@@ -358,10 +491,9 @@ export default function NewScheme() {
   };
 
   // Load a Draft or Submitted record
-  const handleLoadRecord = (record, isDraft = true) => {
+  const handleLoadRecord = (record) => {
     setFormData(JSON.parse(JSON.stringify(record.data)));
     setLoadedRecordId(record.id);
-    setDraftName(isDraft ? record.name : '');
     setCurrentTab(0);
     showAlert(`Loaded "${record.name}" into the 23-tab workspace!`, 'info');
   };
@@ -370,7 +502,6 @@ export default function NewScheme() {
   const dropdownOptions = [
     { value: 'demo', label: 'Demo: PM Awas Yojana (Urban)' },
     ...drafts.map((d) => ({ value: `draft_${d.id}`, label: `Draft: ${d.name}` })),
-    ...submittedSchemes.map((s) => ({ value: `sub_${s.id}`, label: `Submitted: ${s.name}` })),
   ];
 
   const selectedDropdownValue =
@@ -386,97 +517,21 @@ export default function NewScheme() {
     if (!val) {
       setFormData(getInitialSchemeState());
       setLoadedRecordId(null);
-      setDraftName('');
       setCurrentTab(0);
       return;
     }
     if (val === 'demo') {
       setFormData(JSON.parse(JSON.stringify(PM_AWAS_YOJANA_DEMO)));
       setLoadedRecordId('demo_pmay');
-      setDraftName('PM Awas Yojana (Urban) Demo');
       setCurrentTab(0);
       showAlert('Loaded "PM Awas Yojana (Urban)" Demo Scheme!', 'info');
     } else if (val.startsWith('draft_')) {
       const id = val.replace('draft_', '');
       const draft = drafts.find((d) => d.id === id);
       if (draft) {
-        handleLoadRecord(draft, true);
-      }
-    } else if (val.startsWith('sub_')) {
-      const id = val.replace('sub_', '');
-      const scheme = submittedSchemes.find((s) => s.id === id);
-      if (scheme) {
-        handleLoadRecord(scheme, false);
+        handleLoadRecord(draft);
       }
     }
-  };
-
-  // Delete a Saved Record
-  const handleDeleteRecord = (id, isDraft = true) => {
-    const recordType = isDraft ? 'draft revision' : 'authorized registry';
-    triggerConfirmation({
-      title: `Delete ${isDraft ? 'Draft' : 'Finalized'} Record`,
-      message: `Are you sure you want to permanently delete this ${recordType}? This action is irreversible and cannot be recovered.`,
-      confirmText: 'Delete',
-      confirmClass: 'btn-danger',
-      onConfirm: () => {
-        if (isDraft) {
-          const filtered = drafts.filter((d) => d.id !== id);
-          localStorage.setItem('gov_scheme_drafts', JSON.stringify(filtered));
-          setDrafts(filtered);
-        } else {
-          const filtered = submittedSchemes.filter((s) => s.id !== id);
-          localStorage.setItem('gov_scheme_submitted', JSON.stringify(filtered));
-          setSubmittedSchemes(filtered);
-        }
-        if (loadedRecordId === id) {
-          setFormData(getInitialSchemeState());
-          setLoadedRecordId(null);
-          setDraftName('');
-        }
-        showAlert('Record deleted successfully.', 'info');
-      },
-    });
-  };
-
-  // Clear all drafts
-  const handleClearAllDrafts = () => {
-    if (drafts.length === 0) {
-      showAlert('No drafts to remove.', 'info');
-      return;
-    }
-    triggerConfirmation({
-      title: 'Remove All Drafts',
-      message:
-        'Are you sure you want to permanently remove ALL saved drafts from local storage? This action cannot be undone.',
-      confirmText: 'Remove All',
-      confirmClass: 'btn-danger',
-      onConfirm: () => {
-        localStorage.removeItem('gov_scheme_drafts');
-        setDrafts([]);
-        const wasDraftLoaded = drafts.some((d) => d.id === loadedRecordId);
-        if (wasDraftLoaded) {
-          setFormData(getInitialSchemeState());
-          setLoadedRecordId(null);
-          setDraftName('');
-        }
-        showAlert('All local draft records have been removed successfully.', 'success');
-      },
-    });
-  };
-
-  // Export full form configuration as JSON file
-  const handleExportJSON = () => {
-    const dataStr =
-      'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(formData, null, 2));
-    const downloadAnchor = document.createElement('a');
-    downloadAnchor.setAttribute('href', dataStr);
-    const fileName = `scheme-360-${formData.basicInfo?.schemeId || 'export'}.json`;
-    downloadAnchor.setAttribute('download', fileName);
-    document.body.appendChild(downloadAnchor);
-    downloadAnchor.click();
-    downloadAnchor.remove();
-    showAlert('Form data exported successfully as structured JSON!', 'success');
   };
 
   // Export full 23-tab scheme structure into a majestic PDF report
@@ -566,12 +621,7 @@ export default function NewScheme() {
     }
   };
 
-  // Search filter for tabs
-  const filteredTabs = SCHEME_TABS_CONFIG.map((tab, idx) => ({ ...tab, originalIdx: idx })).filter(
-    (tab) =>
-      tab.title.toLowerCase().includes(tabSearchTerm.toLowerCase()) ||
-      tab.id.toLowerCase().includes(tabSearchTerm.toLowerCase()),
-  );
+  const filteredTabs = SCHEME_TABS_CONFIG.map((tab, idx) => ({ ...tab, originalIdx: idx }));
 
   const activeTabConfig = SCHEME_TABS_CONFIG[currentTab];
 
@@ -581,24 +631,37 @@ export default function NewScheme() {
       <div className="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3  mt-2">
         <div>
           <h4 className="mb-1 text-dark-emphasis fw-bold">Government Scheme 360° Portal</h4>
-          <p className="text-muted mb-0" style={{ fontSize: '0.85rem' }}>
-            Authoritative multi-tier relational schema engine. Input, customize, and persist fully
-            comprehensive scheme files.
-          </p>
         </div>
         <div className="d-flex gap-2 flex-wrap">
+          {loadedRecordId && String(loadedRecordId).startsWith('DRAFT_') && (
+            <button
+              type="button"
+              className="btn btn-outline-danger btn-sm px-3 shadow-sm d-flex align-items-center gap-1.5"
+              onClick={() => handleDeleteRecord(loadedRecordId, true)}
+            >
+              <i className="bi bi-trash me-1"></i>
+              <span>Delete Draft</span>
+            </button>
+          )}
           <button
             type="button"
             className="btn btn-light btn-sm border px-3 shadow-sm d-flex align-items-center gap-1.5"
             onClick={handleResetForm}
           >
-            <i className="bi bi-trash"></i>
+            <i className="bi bi-arrow-counterclockwise me-1"></i>
             <span>Reset Workspace</span>
           </button>
         </div>
       </div>
 
-      {/* Alert Banner */}
+      {/* Alert Banner & API Data Loading Spinner Banner */}
+      {isFetchingOptions && (
+        <div className="alert alert-info py-2 px-3 mb-3 d-flex align-items-center gap-2 rounded border-info-subtle bg-info-subtle text-info-emphasis shadow-sm" style={{ fontSize: '0.85rem' }}>
+          <Spinner size="xs" variant="info" />
+          <span>Fetching master dropdown options from API endpoints...</span>
+        </div>
+      )}
+
       {alertInfo && (
         <Alert
           type={alertInfo.type}
@@ -611,180 +674,10 @@ export default function NewScheme() {
         />
       )}
 
-      {/* Workspace Persistence Summary Row */}
-      <div className="row g-4 mb-4">
-        {/* Left Column: Drafts & Active Management */}
-        {/* <div className="col-12 col-md-4">
-          <Card 
-            title="Local Draft Registries" 
-            subtitle="Pick an existing revision draft to edit instantly" 
-            className="h-100 shadow-sm"
-            headerAction={
-              drafts.length > 0 && (
-                <button 
-                  type="button" 
-                  className="btn btn-outline-danger btn-sm py-1 px-2.5 text-xs d-flex align-items-center gap-1 border-0"
-                  onClick={handleClearAllDrafts}
-                  style={{ fontSize: '0.75rem', fontWeight: 500 }}
-                  title="Remove all drafts"
-                >
-                  <i className="bi bi-trash-fill"></i>
-                  <span>Remove All</span>
-                </button>
-              )
-            }
-          >
-            <div className="mb-3">
-              <label className="form-label fw-semibold text-dark-emphasis mb-1" style={{ fontSize: '0.8rem' }}>
-                Draft Label / Version Stamp
-              </label>
-              <div className="input-group input-group-sm">
-                <input 
-                  type="text" 
-                  className="form-control" 
-                  placeholder="e.g. Phase III draft" 
-                  value={draftName} 
-                  onChange={(e) => setDraftName(e.target.value)}
-                />
-                <button 
-                  className="btn btn-primary d-flex align-items-center gap-1" 
-                  type="button" 
-                  onClick={handleSaveDraft}
-                >
-                  <i className="bi bi-bookmark-plus-fill"></i>
-                  <span>Save Draft</span>
-                </button>
-              </div>
-            </div>
-
-            <div className="border rounded overflow-hidden" style={{ maxHeight: '180px', overflowY: 'auto' }}>
-              {drafts.length === 0 ? (
-                <div className="text-center p-3 text-muted" style={{ fontSize: '0.8rem' }}>
-                  No drafts saved in cache.
-                </div>
-              ) : (
-                <div className="list-group list-group-flush">
-                  {drafts.map(d => (
-                    <div 
-                      key={d.id} 
-                      className={`list-group-item d-flex justify-content-between align-items-center p-2.5 hover-bg cursor-pointer ${loadedRecordId === d.id ? 'bg-light border-start border-primary border-3' : ''}`}
-                      onClick={() => handleLoadRecord(d, true)}
-                    >
-                      <div className="text-truncate me-2" style={{ maxWidth: '180px' }}>
-                        <div className="fw-semibold text-dark text-truncate" style={{ fontSize: '0.8rem' }}>{d.name}</div>
-                        <small className="text-muted d-block" style={{ fontSize: '0.65rem' }}>{d.lastUpdated}</small>
-                      </div>
-                      <button 
-                        type="button" 
-                        className="btn btn-link text-danger p-1 border-0" 
-                        onClick={(e) => { e.stopPropagation(); handleDeleteRecord(d.id, true); }}
-                        title="Delete draft"
-                      >
-                        <i className="bi bi-x-circle-fill"></i>
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </Card>
-        </div> */}
-
-        {/* Middle Column: Authorized Submissions */}
-        {/* <div className="col-12 col-md-4">
-          <Card 
-            title="Registered Authorized Schemes" 
-            subtitle="Authoritative records finalized in portal" 
-            className="h-100 shadow-sm"
-          >
-            <div className="border rounded overflow-hidden" style={{ height: '235px', overflowY: 'auto' }}>
-              {submittedSchemes.length === 0 ? (
-                <div className="text-center p-4 text-muted d-flex flex-column align-items-center justify-content-center h-100" style={{ fontSize: '0.8rem' }}>
-                  <i className="bi bi-file-earmark-lock text-muted fs-3 mb-2"></i>
-                  <span>No completed schemes registered yet. Close forms & hit Submit below.</span>
-                </div>
-              ) : (
-                <div className="list-group list-group-flush">
-                  {submittedSchemes.map(s => (
-                    <div 
-                      key={s.id} 
-                      className={`list-group-item d-flex justify-content-between align-items-center p-2.5 hover-bg cursor-pointer ${loadedRecordId === s.id ? 'bg-light border-start border-success border-3' : ''}`}
-                      onClick={() => handleLoadRecord(s, false)}
-                    >
-                      <div className="text-truncate me-2" style={{ maxWidth: '185px' }}>
-                        <div className="fw-semibold text-success text-truncate" style={{ fontSize: '0.8rem' }}>{s.name}</div>
-                        <small className="text-muted d-block" style={{ fontSize: '0.65rem' }}>ID: {s.id} | {s.submittedDate}</small>
-                      </div>
-                      <button 
-                        type="button" 
-                        className="btn btn-link text-danger p-1 border-0" 
-                        onClick={(e) => { e.stopPropagation(); handleDeleteRecord(s.id, false); }}
-                        title="Delete registry"
-                      >
-                        <i className="bi bi-trash text-muted"></i>
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </Card>
-        </div> */}
-
-        {/* Right Column: Schema Statistics & Data Integrity */}
-        {/* <div className="col-12 col-md-4">
-          <Card 
-            title="Schema Metrics & Integrity" 
-            subtitle="Automatic database compliance analysis" 
-            className="h-100 shadow-sm"
-          >
-            <div className="d-flex align-items-center gap-3 mb-3">
-              <div className="position-relative d-flex align-items-center justify-content-center" style={{ width: '65px', height: '65px' }}>
-                <svg width="65" height="65" viewBox="0 0 36 36" className="circular-chart">
-                  <path className="circle-bg"
-                    stroke="#e8eaec"
-                    strokeWidth="3.5"
-                    fill="none"
-                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  />
-                  <path className="circle"
-                    stroke="#5f76e8"
-                    strokeWidth="3.5"
-                    strokeDasharray={`${getOverallProgress()}, 100`}
-                    strokeLinecap="round"
-                    fill="none"
-                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  />
-                </svg>
-                <div className="position-absolute text-dark fw-bold" style={{ fontSize: '0.9rem' }}>
-                  {getOverallProgress()}%
-                </div>
-              </div>
-              <div>
-                <h6 className="mb-1 text-darkfw-semibold" style={{ fontSize: '0.85rem' }}>Global Registration Completion</h6>
-                <small className="text-muted d-block" style={{ fontSize: '0.75rem' }}>
-                  Based on content mapping across all 23 tables.
-                </small>
-              </div>
-            </div>
-
-            <div className="p-2.5 bg-light rounded d-flex justify-content-between align-items-center mb-2" style={{ fontSize: '0.8rem' }}>
-              <span className="text-muted">Total Active Tables:</span>
-              <strong className="text-dark">23 Relational Models</strong>
-            </div>
-
-            <div className="p-2.5 bg-light rounded d-flex justify-content-between align-items-center" style={{ fontSize: '0.8rem' }}>
-              <span className="text-muted">Selected Sector:</span>
-              <strong className="text-primary">{formData.classification?.sector || 'Not Specified'}</strong>
-            </div>
-          </Card>
-        </div> */}
-      </div>
-
       {/* Main Tabbed Workspace */}
       <Card noBodyPadding={true} className="shadow">
         {/* Tab Controls Bar */}
-        <div className="p-3 border-bottom bg-light-subtle d-flex flex-wrap align-items-center justify-content-between gap-3">
+        <div className="p-3 border-bottom d-flex flex-wrap align-items-center justify-content-between gap-3">
           {/* Quick tab keyword search filter */}
           <div style={{ minWidth: '240px' }}>
             <Dropdown
@@ -793,6 +686,7 @@ export default function NewScheme() {
               onChange={handleDropdownChange}
               placeholder="Select scheme..."
               searchable={true}
+              isLoading={isFetchingOptions}
             />
           </div>
 
@@ -801,18 +695,17 @@ export default function NewScheme() {
             <span className="text-muted d-none d-sm-inline" style={{ fontSize: '0.8rem' }}>
               Jump to:
             </span>
-            <select
-              className="form-select form-select-sm"
-              style={{ width: '220px' }}
+            <Dropdown
+              options={SCHEME_TABS_CONFIG.map((tab, idx) => ({
+                value: idx,
+                label: `${tab.title} (${getTabProgress(tab.id)}% full)`,
+              }))}
               value={currentTab}
-              onChange={(e) => setCurrentTab(Number(e.target.value))}
-            >
-              {SCHEME_TABS_CONFIG.map((tab, idx) => (
-                <option key={tab.id} value={idx}>
-                  {tab.title} ({getTabProgress(tab.id)}% full)
-                </option>
-              ))}
-            </select>
+              onChange={(val) => setCurrentTab(Number(val))}
+              searchable={true}
+              placeholder="Jump to tab..."
+              style={{minWidth: '240px' }}
+            />
           </div>
         </div>
 
@@ -912,19 +805,88 @@ export default function NewScheme() {
                 };
 
                 // Resolve options array from backend map or static configs
-                const backendOpts = backendOptionsMap[field.key];
-                const hasBackendOpts = Array.isArray(backendOpts) && backendOpts.length > 0;
+                const keyMap = {
+                  ministry: 'ministries',
+                  schemeType: 'schemeTypes',
+                  status: 'schemeStatuses',
+                  schemeStatus: 'schemeStatuses',
+                  sector: 'sectors',
+                  subSector: 'subSectors',
+                  gender: 'genders',
+                  urbanRural: 'urbanRural',
+                  assistanceType: 'financialAssistanceTypes',
+                  financialAssistanceType: 'financialAssistanceTypes',
+                  deliveryMechanism: 'deliveryMechanisms',
+                  reviewFrequency: 'reviewFrequencies',
+                  benefitType: 'benefitTypes',
+                  frequency: 'benefitFrequencies',
+                  benefitFrequency: 'benefitFrequencies',
+                  sharingPattern: 'fundSharingPatterns',
+                  fundSharingPattern: 'fundSharingPatterns',
+                  ageGroup: 'ageGroup',
+                  category: 'beneficiaryCategories',
+                  beneficiaryCategory: 'beneficiaryCategories',
+                  beneficiaryType: 'beneficiaryTypes',
+                  targetGroup: 'targetGroups',
+                  socialCategory: 'socialCategories',
+                  occupation: 'occupations',
+                  implementingAgency: 'implementingAgencies',
+                  monitoringAgency: 'monitoringAgencies',
+                  state: 'states',
+                  district: 'districts',
+                  department: 'departments',
+                  theme: 'themes',
+                  nationalPriority: 'nationalPriorities',
+                  geographicCoverage: 'geographicCoverages',
+                  localBody: 'localBodies',
+                  mission: 'missions',
+                  schemePhase: 'schemePhases',
+                  sdg: 'sdgs',
+                  serviceMode: 'serviceModes',
+                  stakeholderType: 'stakeholderTypes',
+                  document: 'documents',
+                  insuranceType: 'insuranceTypes',
+                  outcomeIndicator: 'outcomeIndicators',
+                  incomeCriteria: 'incomeCriteria',
+                };
 
-                let optionsList = [];
-                if (hasBackendOpts) {
-                  optionsList = backendOpts.map((item) => getOptionName(item)).filter(Boolean);
-                  // Remove duplicates if any
-                  optionsList = Array.from(new Set(optionsList));
-                } else if (field.options) {
-                  optionsList = field.options;
+                const backendKey = keyMap[field.key] || field.key;
+                const backendOpts =
+                  backendOptionsMap[backendKey] ||
+                  backendOptionsMap[field.key] ||
+                  backendOptionsMap[field.key + 's'];
+
+                const apiOpts = (Array.isArray(backendOpts) ? backendOpts : [])
+                  .map((item) => getOptionName(item))
+                  .filter(Boolean);
+
+                const staticOpts = Array.isArray(field.options) ? field.options : [];
+                const fallbackOpts =
+                  DEFAULT_FALLBACK_OPTIONS[field.key] ||
+                  DEFAULT_FALLBACK_OPTIONS[backendKey] ||
+                  [];
+
+                // Priority resolution: Live API data > Static field config > Initial Fallback defaults
+                let rawOptions = [];
+                if (apiOpts.length > 0) {
+                  rawOptions = apiOpts;
+                } else if (staticOpts.length > 0) {
+                  rawOptions = staticOpts;
+                } else {
+                  rawOptions = fallbackOpts;
                 }
 
-                const isSelect = field.type === 'select' || hasBackendOpts;
+                // Remove duplicate trimmed values
+                let optionsList = Array.from(
+                  new Set(rawOptions.map((opt) => String(opt).trim()).filter(Boolean))
+                );
+
+                // Ensure the current selected value is always present in the options list so it doesn't show as blank/select...
+                if (value && !optionsList.includes(value)) {
+                  optionsList = [value, ...optionsList];
+                }
+
+                const isSelect = field.type === 'select' || optionsList.length > 0;
 
                 return (
                   <div key={field.key} className={`col-12 col-md-${field.col || 6}`}>
@@ -936,22 +898,20 @@ export default function NewScheme() {
                     </label>
 
                     {/* SELECT DROPDOWNS */}
-                    {field.type === 'select' ? (
-                      <select
-                        className="form-select py-2"
-                        style={{ height: '40px', fontSize: '0.85rem' }}
-                        value={value}
-                        onChange={(e) => handleFieldChange(e.target.value)}
-                      >
-                        {field.options.map((opt) => (
-                          <option key={opt} value={opt}>
-                            {opt}
-                          </option>
-                        ))}
-                      </select>
+                    {isSelect ? (
+                      <Dropdown
+                        options={optionsList}
+                        value={value || ''}
+                        onChange={(val) => handleFieldChange(val)}
+                        placeholder={`Select ${field.label.toLowerCase()}...`}
+                        searchable={true}
+                        isLoading={isFetchingOptions}
+                        style={{ minWidth: '100%' }}
+                      />
                     ) : /* TEXTAREAS */
                     field.type === 'textarea' ? (
                       <textarea
+                        name={field.key}
                         className="form-control py-2"
                         rows={3}
                         style={{ fontSize: '0.85rem' }}
@@ -962,6 +922,7 @@ export default function NewScheme() {
                     ) : (
                       /* GENERAL INPUTS */
                       <input
+                        name={field.key}
                         type={field.type}
                         className="form-control py-2"
                         style={{ height: '40px', fontSize: '0.85rem' }}
@@ -1001,16 +962,16 @@ export default function NewScheme() {
                 </button>
               </div>
 
-              {/* PDF & JSON Exporter */}
+              {/* Actions & Exporters */}
               <div className="d-flex gap-2 flex-wrap">
-                {/* <button
+                <button
                   type="button"
-                  className="btn btn-outline-success btn-sm px-3 d-flex align-items-center gap-1.5"
-                  onClick={handleExportJSON}
+                  className="btn btn-outline-primary btn-sm px-3 shadow-sm d-flex align-items-center gap-1.5"
+                  onClick={() => handleSaveDraft()}
                 >
-                  <i className="bi bi-filetype-json"></i>
-                  <span>Export JSON</span>
-                </button> */}
+                  <i className="bi bi-floppy-fill me-1"></i>
+                  <span>Save Draft</span>
+                </button>
                 <button
                   type="button"
                   className="btn btn-outline-danger btn-sm px-3 d-flex align-items-center gap-1.5"
