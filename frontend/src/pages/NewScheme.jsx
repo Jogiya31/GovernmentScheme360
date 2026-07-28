@@ -4,8 +4,6 @@ import autoTable from 'jspdf-autotable';
 import {
   SCHEME_TABS_CONFIG,
   getInitialSchemeState,
-  PM_AWAS_YOJANA_DEMO,
-  DEFAULT_FALLBACK_OPTIONS,
 } from '../data/schemeFields';
 
 import Alert from '../components/Common/Alert';
@@ -22,7 +20,7 @@ import {
   useGetDeliveryMechanismMutation,
   useGetDepartmentMutation,
   useGetDistrictMutation,
-  useGetDocumentMutation,
+  useGetDocumentRequiredMutation,
   useGetFinancialAssistanceTypeMutation,
   useGetFundSharingPatternMutation,
   useGetGenderMutation,
@@ -64,7 +62,8 @@ const extractDataArray = (res) => {
   if (Array.isArray(res.data?.result)) return res.data.result;
   if (Array.isArray(res.data?.items)) return res.data.items;
   if (Array.isArray(res.content)) return res.content;
-  if (typeof res === 'object') {
+
+  if (typeof res === 'object' && res !== null) {
     const keys = Object.keys(res);
     for (const key of keys) {
       if (Array.isArray(res[key])) return res[key];
@@ -140,7 +139,7 @@ export default function NewScheme() {
   const [getDeliveryMechanism, { data: deliveryMechanismsRes }] = useGetDeliveryMechanismMutation();
   const [getDepartment, { data: departmentsRes }] = useGetDepartmentMutation();
   const [getDistrict, { data: districtsRes }] = useGetDistrictMutation();
-  const [getDocument, { data: documentsRes }] = useGetDocumentMutation();
+  const [getDocumentsRequired, { data: documentsRequiredRes }] = useGetDocumentRequiredMutation();
   const [getFinancialAssistanceType, { data: financialAssistanceTypesRes }] =
     useGetFinancialAssistanceTypeMutation();
   const [getFundSharingPattern, { data: fundSharingPatternsRes }] =
@@ -176,103 +175,122 @@ export default function NewScheme() {
   const [getUrbanRural, { data: urbanRuralRes }] = useGetUrbanRuralMutation();
 
   const [isFetchingOptions, setIsFetchingOptions] = useState(false);
-
-  const loadDraftsAndSchemes = () => {
-    try {
-      const storedDrafts = JSON.parse(localStorage.getItem('gov_scheme_drafts')) || [];
-      setDrafts(storedDrafts);
-    } catch (e) {
-      console.error('Error reading localStorage logs:', e);
-    }
-  };
+  const [apiSchemes, setApiSchemes] = useState([]);
+  const [apiOptionsMap, setApiOptionsMap] = useState({});
 
   useEffect(() => {
-    loadDraftsAndSchemes();
-
     setIsFetchingOptions(true);
-    Promise.allSettled([
-      getAgeGroup({}),
-      getBeneficiaryCategory({}),
-      getBeneficiaryType({}),
-      getBenefitFrequency({}),
-      getBenefitType({}),
-      getDeliveryMechanism({}),
-      getDepartment({}),
-      getDistrict({}),
-      getDocument({}),
-      getFinancialAssistanceType({}),
-      getFundSharingPattern({}),
-      getGender({}),
-      getGeographicCoverage({}),
-      getImplementingAgency({}),
-      getIncomeCriteria({}),
-      getInsuranceType({}),
-      getLocalBody({}),
-      getMinistry({}),
-      getMission({}),
-      getMonitoringAgency({}),
-      getNationalPriority({}),
-      getOccupation({}),
-      getOutcomeIndicator({}),
-      getReviewFrequency({}),
-      getScheme({}),
-      getSchemePhase({}),
-      getSchemeStatus({}),
-      getSchemeType({}),
-      getSDG({}),
-      getSector({}),
-      getServiceMode({}),
-      getSocialCategory({}),
-      getStakeholderType({}),
-      getState({}),
-      getSubSector({}),
-      getTargetGroup({}),
-      getTheme({}),
-      getUrbanRural({}),
-    ]).finally(() => {
+
+    const calls = [
+      { key: 'ageGroup', fn: getAgeGroup },
+      { key: 'beneficiaryCategories', fn: getBeneficiaryCategory },
+      { key: 'beneficiaryTypes', fn: getBeneficiaryType },
+      { key: 'benefitFrequencies', fn: getBenefitFrequency },
+      { key: 'benefitTypes', fn: getBenefitType },
+      { key: 'deliveryMechanisms', fn: getDeliveryMechanism },
+      { key: 'departments', fn: getDepartment },
+      { key: 'districts', fn: getDistrict },
+      { key: 'documentsRequired', fn: getDocumentsRequired },
+      { key: 'financialAssistanceTypes', fn: getFinancialAssistanceType },
+      { key: 'fundSharingPatterns', fn: getFundSharingPattern },
+      { key: 'genders', fn: getGender },
+      { key: 'geographicCoverages', fn: getGeographicCoverage },
+      { key: 'implementingAgencies', fn: getImplementingAgency },
+      { key: 'incomeLimit', fn: getIncomeCriteria },
+      { key: 'insuranceTypes', fn: getInsuranceType },
+      { key: 'localBodies', fn: getLocalBody },
+      { key: 'ministries', fn: getMinistry },
+      { key: 'missions', fn: getMission },
+      { key: 'monitoringAgencies', fn: getMonitoringAgency },
+      { key: 'nationalPriorities', fn: getNationalPriority },
+      { key: 'occupations', fn: getOccupation },
+      { key: 'outcomeIndicators', fn: getOutcomeIndicator },
+      { key: 'reviewFrequencies', fn: getReviewFrequency },
+      { key: 'schemePhases', fn: getSchemePhase },
+      { key: 'schemeStatuses', fn: getSchemeStatus },
+      { key: 'schemeTypes', fn: getSchemeType },
+      { key: 'sdgs', fn: getSDG },
+      { key: 'sectors', fn: getSector },
+      { key: 'serviceModes', fn: getServiceMode },
+      { key: 'socialCategories', fn: getSocialCategory },
+      { key: 'stakeholderTypes', fn: getStakeholderType },
+      { key: 'states', fn: getState },
+      { key: 'subSectors', fn: getSubSector },
+      { key: 'targetGroups', fn: getTargetGroup },
+      { key: 'themes', fn: getTheme },
+      { key: 'urbanRural', fn: getUrbanRural },
+      { key: 'schemes', fn: getScheme },
+    ];
+
+    Promise.allSettled(
+      calls.map(({ key, fn }) =>
+        fn({})
+          .then((res) => {
+            const list = extractDataArray(res?.data || res);
+            return { key, list };
+          })
+          .catch((err) => {
+            console.warn(`Error fetching ${key}:`, err);
+            return { key, list: [] };
+          })
+      )
+    ).then((results) => {
+      const fetchedMap = {};
+      results.forEach((r) => {
+        if (r.status === 'fulfilled' && r.value) {
+          const { key, list } = r.value;
+          if (Array.isArray(list) && list.length > 0) {
+            fetchedMap[key] = list;
+          }
+        }
+      });
+      setApiOptionsMap((prev) => ({ ...prev, ...fetchedMap }));
+      if (fetchedMap.schemes && fetchedMap.schemes.length > 0) {
+        setApiSchemes(fetchedMap.schemes);
+      }
       setIsFetchingOptions(false);
     });
   }, []);
 
   const backendOptionsMap = {
-    ageGroup: extractDataArray(ageGroupRes),
-    beneficiaryCategories: extractDataArray(beneficiaryCategoriesRes),
-    beneficiaryTypes: extractDataArray(beneficiaryTypesRes),
-    benefitFrequencies: extractDataArray(benefitFrequenciesRes),
-    benefitTypes: extractDataArray(benefitTypesRes),
-    deliveryMechanisms: extractDataArray(deliveryMechanismsRes),
-    departments: extractDataArray(departmentsRes),
-    districts: extractDataArray(districtsRes),
-    documents: extractDataArray(documentsRes),
-    financialAssistanceTypes: extractDataArray(financialAssistanceTypesRes),
-    fundSharingPatterns: extractDataArray(fundSharingPatternsRes),
-    genders: extractDataArray(gendersRes),
-    geographicCoverages: extractDataArray(geographicCoveragesRes),
-    implementingAgencies: extractDataArray(implementingAgenciesRes),
-    incomeCriteria: extractDataArray(incomeCriteriaRes),
-    insuranceTypes: extractDataArray(insuranceTypesRes),
-    localBodies: extractDataArray(localBodiesRes),
-    ministries: extractDataArray(ministriesRes),
-    missions: extractDataArray(missionsRes),
-    monitoringAgencies: extractDataArray(monitoringAgenciesRes),
-    nationalPriorities: extractDataArray(nationalPrioritiesRes),
-    occupations: extractDataArray(occupationsRes),
-    outcomeIndicators: extractDataArray(outcomeIndicatorsRes),
-    reviewFrequencies: extractDataArray(reviewFrequenciesRes),
-    schemes: extractDataArray(schemesRes),
-    schemePhases: extractDataArray(schemePhasesRes),
-    schemeStatuses: extractDataArray(schemeStatusesRes),
-    schemeTypes: extractDataArray(schemeTypesRes),
-    sdgs: extractDataArray(sdgsRes),
-    sectors: extractDataArray(sectorsRes),
-    serviceModes: extractDataArray(serviceModesRes),
-    socialCategories: extractDataArray(socialCategoriesRes),
-    stakeholderTypes: extractDataArray(stakeholderTypesRes),
-    states: extractDataArray(statesRes),
-    subSectors: extractDataArray(subSectorsRes),
-    targetGroups: extractDataArray(targetGroupsRes),
-    themes: extractDataArray(themesRes),
-    urbanRural: extractDataArray(urbanRuralRes),
+    ageGroup: apiOptionsMap.ageGroup || extractDataArray(ageGroupRes),
+    beneficiaryCategories: apiOptionsMap.beneficiaryCategories || extractDataArray(beneficiaryCategoriesRes),
+    beneficiaryTypes: apiOptionsMap.beneficiaryTypes || extractDataArray(beneficiaryTypesRes),
+    benefitFrequencies: apiOptionsMap.benefitFrequencies || extractDataArray(benefitFrequenciesRes),
+    benefitTypes: apiOptionsMap.benefitTypes || extractDataArray(benefitTypesRes),
+    deliveryMechanisms: apiOptionsMap.deliveryMechanisms || extractDataArray(deliveryMechanismsRes),
+    departments: apiOptionsMap.departments || extractDataArray(departmentsRes),
+    districts: apiOptionsMap.districts || extractDataArray(districtsRes),
+    documentsRequired: apiOptionsMap.documentsRequired || extractDataArray(documentsRequiredRes),
+    financialAssistanceTypes: apiOptionsMap.financialAssistanceTypes || extractDataArray(financialAssistanceTypesRes),
+    fundSharingPatterns: apiOptionsMap.fundSharingPatterns || extractDataArray(fundSharingPatternsRes),
+    genders: apiOptionsMap.genders || extractDataArray(gendersRes),
+    geographicCoverages: apiOptionsMap.geographicCoverages || extractDataArray(geographicCoveragesRes),
+    implementingAgencies: apiOptionsMap.implementingAgencies || extractDataArray(implementingAgenciesRes),
+    incomeLimit: apiOptionsMap.incomeCriteria || extractDataArray(incomeCriteriaRes),
+    insurance: apiOptionsMap.insuranceTypes || extractDataArray(insuranceTypesRes),
+    localBodies: apiOptionsMap.localBodies || extractDataArray(localBodiesRes),
+    ministries: apiOptionsMap.ministries || extractDataArray(ministriesRes),
+    missions: apiOptionsMap.missions || extractDataArray(missionsRes),
+    monitoringFrequency: apiOptionsMap.monitoringAgencies || extractDataArray(monitoringAgenciesRes),
+    nationalPriorities: apiOptionsMap.nationalPriorities || extractDataArray(nationalPrioritiesRes),
+    occupations: apiOptionsMap.occupations || extractDataArray(occupationsRes),
+    outcomeIndicators: apiOptionsMap.outcomeIndicators || extractDataArray(outcomeIndicatorsRes),
+    reviewFrequencies: apiOptionsMap.reviewFrequencies || extractDataArray(reviewFrequenciesRes),
+    schemes: apiSchemes.length > 0 ? apiSchemes : (apiOptionsMap.schemes || extractDataArray(schemesRes)),
+    schemePhases: apiOptionsMap.schemePhases || extractDataArray(schemePhasesRes),
+    schemeStatuses: apiOptionsMap.schemeStatuses || extractDataArray(schemeStatusesRes),
+    schemeTypes: apiOptionsMap.schemeTypes || extractDataArray(schemeTypesRes),
+    sdgs: apiOptionsMap.sdgs || extractDataArray(sdgsRes),
+    sectors: apiOptionsMap.sectors || extractDataArray(sectorsRes),
+    serviceModes: apiOptionsMap.serviceModes || extractDataArray(serviceModesRes),
+    socialCategories: apiOptionsMap.socialCategories || extractDataArray(socialCategoriesRes),
+    stakeholderTypes: apiOptionsMap.stakeholderTypes || extractDataArray(stakeholderTypesRes),
+    states: apiOptionsMap.states || extractDataArray(statesRes),
+    subSectors: apiOptionsMap.subSectors || extractDataArray(subSectorsRes),
+    targetGroups: apiOptionsMap.targetGroups || extractDataArray(targetGroupsRes),
+    themes: apiOptionsMap.themes || extractDataArray(themesRes),
+    urbanRural: apiOptionsMap.urbanRural || extractDataArray(urbanRuralRes),
   };
 
   // Page core states
@@ -280,7 +298,6 @@ export default function NewScheme() {
   const [currentTab, setCurrentTab] = useState(0);
 
   // Persistence state
-  const [drafts, setDrafts] = useState([]);
   const [alertInfo, setAlertInfo] = useState(null);
 
   // Active registry track
@@ -392,66 +409,6 @@ export default function NewScheme() {
     return Math.round((filledFields / totalFields) * 100) || 0;
   };
 
-  // Save as Draft
-  const handleSaveDraft = (customName = null) => {
-    const schemeName = getSchemeName();
-    const draftLabel = customName || schemeName;
-
-    const cleanId =
-      loadedRecordId && String(loadedRecordId).startsWith('DRAFT_')
-        ? loadedRecordId
-        : 'DRAFT_' + Date.now();
-
-    const currentProgress = getOverallProgress();
-
-    const newDraft = {
-      id: cleanId,
-      name: draftLabel,
-      lastUpdated: new Date().toLocaleString(),
-      progress: currentProgress,
-      data: formData,
-    };
-
-    let updatedDrafts = [...drafts];
-    const existingIdx = drafts.findIndex((d) => d.id === cleanId);
-    if (existingIdx > -1) {
-      updatedDrafts[existingIdx] = newDraft;
-    } else {
-      updatedDrafts.unshift(newDraft);
-    }
-
-    localStorage.setItem('gov_scheme_drafts', JSON.stringify(updatedDrafts));
-    setDrafts(updatedDrafts);
-    setLoadedRecordId(cleanId);
-    showAlert(
-      `Draft "${newDraft.name}" saved successfully (${currentProgress}% complete)! You can reload it anytime.`,
-      'success',
-    );
-  };
-
-  // Delete a Saved Record
-  const handleDeleteRecord = (id, isDraft = true) => {
-    const recordType = isDraft ? 'draft' : 'submitted record';
-    triggerConfirmation({
-      title: `Delete ${isDraft ? 'Draft' : 'Submitted'} Record`,
-      message: `Are you sure you want to permanently delete this ${recordType}? This action is irreversible.`,
-      confirmText: 'Delete',
-      confirmClass: 'btn-danger',
-      onConfirm: () => {
-        if (isDraft) {
-          const filtered = drafts.filter((d) => d.id !== id);
-          localStorage.setItem('gov_scheme_drafts', JSON.stringify(filtered));
-          setDrafts(filtered);
-        }
-        if (loadedRecordId === id) {
-          setFormData(getInitialSchemeState());
-          setLoadedRecordId(null);
-        }
-        showAlert('Record deleted successfully.', 'info');
-      },
-    });
-  };
-
   // Submit form (without validation as requested)
   const handleSubmitScheme = (e) => {
     if (e && e.preventDefault) e.preventDefault();
@@ -463,25 +420,6 @@ export default function NewScheme() {
       confirmText: 'Submit & Authorize',
       confirmClass: 'btn-success',
       onConfirm: () => {
-        const schemeId =
-          formData.SchemeMaster?.schemeId ||
-          formData.basicInfo?.schemeId ||
-          'SCH_' + Date.now();
-        const newSubmission = {
-          id: schemeId,
-          name: schemeName,
-          submittedDate: new Date().toLocaleString(),
-          data: formData,
-        };
-
-        // Also remove from drafts if present
-        if (loadedRecordId) {
-          const updatedDrafts = drafts.filter((d) => d.id !== loadedRecordId);
-          localStorage.setItem('gov_scheme_drafts', JSON.stringify(updatedDrafts));
-          setDrafts(updatedDrafts);
-          setLoadedRecordId(null);
-        }
-
         showAlert(
           `Government Scheme "${schemeName}" has been successfully registered & authorized!`,
           'success',
@@ -490,28 +428,31 @@ export default function NewScheme() {
     });
   };
 
-  // Load a Draft or Submitted record
-  const handleLoadRecord = (record) => {
-    setFormData(JSON.parse(JSON.stringify(record.data)));
-    setLoadedRecordId(record.id);
-    setCurrentTab(0);
-    showAlert(`Loaded "${record.name}" into the 23-tab workspace!`, 'info');
-  };
+  const rawSchemesList = Array.isArray(backendOptionsMap.schemes)
+    ? backendOptionsMap.schemes
+    : [];
 
-  // Dropdown options representing all schemes available to select
-  const dropdownOptions = [
-    { value: 'demo', label: 'Demo: PM Awas Yojana (Urban)' },
-    ...drafts.map((d) => ({ value: `draft_${d.id}`, label: `Draft: ${d.name}` })),
-  ];
+  const schemeOptions = rawSchemesList
+    .map((s) => {
+      if (!s) return null;
+      if (typeof s === 'string' || typeof s === 'number') {
+        return { value: String(s), label: String(s) };
+      }
+      const val =
+        s.SchemeID ?? s.schemeID ?? s.schemeId ?? s.id ?? s.ID ?? getOptionName(s);
+      const lbl =
+        s.SchemeName ?? s.schemeName ?? s.name ?? s.title ?? s.label ?? getOptionName(s);
+      if (!val && !lbl) return null;
+      return {
+        value: String(val || lbl),
+        label: String(lbl || val),
+      };
+    })
+    .filter(Boolean);
 
-  const selectedDropdownValue =
-    loadedRecordId === 'demo_pmay' || loadedRecordId === 'demo'
-      ? 'demo'
-      : loadedRecordId
-        ? drafts.some((d) => d.id === loadedRecordId)
-          ? `draft_${loadedRecordId}`
-          : `sub_${loadedRecordId}`
-        : '';
+  const dropdownOptions = schemeOptions;
+
+  const selectedDropdownValue = loadedRecordId ? String(loadedRecordId) : '';
 
   const handleDropdownChange = (val) => {
     if (!val) {
@@ -520,16 +461,51 @@ export default function NewScheme() {
       setCurrentTab(0);
       return;
     }
-    if (val === 'demo') {
-      setFormData(JSON.parse(JSON.stringify(PM_AWAS_YOJANA_DEMO)));
-      setLoadedRecordId('demo_pmay');
-      setCurrentTab(0);
-      showAlert('Loaded "PM Awas Yojana (Urban)" Demo Scheme!', 'info');
-    } else if (val.startsWith('draft_')) {
-      const id = val.replace('draft_', '');
-      const draft = drafts.find((d) => d.id === id);
-      if (draft) {
-        handleLoadRecord(draft);
+
+    const foundScheme = rawSchemesList.find((s) => {
+      if (!s) return false;
+      if (typeof s === 'string' || typeof s === 'number')
+        return String(s) === String(val);
+      const sVal =
+        s.SchemeID ?? s.schemeID ?? s.schemeId ?? s.id ?? s.ID ?? getOptionName(s);
+      return String(sVal) === String(val);
+    });
+
+    if (foundScheme) {
+      const newForm = getInitialSchemeState();
+      if (typeof foundScheme === 'object') {
+        Object.keys(foundScheme).forEach((key) => {
+          if (newForm[key] && typeof foundScheme[key] === 'object') {
+            newForm[key] = { ...newForm[key], ...foundScheme[key] };
+          }
+        });
+
+        const schemeName =
+          foundScheme.SchemeName ||
+          foundScheme.schemeName ||
+          foundScheme.name ||
+          foundScheme.title ||
+          getOptionName(foundScheme);
+        const schemeId =
+          foundScheme.SchemeID ||
+          foundScheme.schemeID ||
+          foundScheme.schemeId ||
+          foundScheme.id ||
+          val;
+
+        if (newForm.SchemeMaster) {
+          if (schemeName) newForm.SchemeMaster.schemeName = schemeName;
+          if (schemeId) newForm.SchemeMaster.schemeId = String(schemeId);
+        }
+        if (newForm.basicInfo) {
+          if (schemeName) newForm.basicInfo.schemeName = schemeName;
+          if (schemeId) newForm.basicInfo.schemeId = String(schemeId);
+        }
+
+        setFormData(newForm);
+        setLoadedRecordId(String(schemeId));
+        setCurrentTab(0);
+        showAlert(`Loaded scheme "${schemeName || 'Record'}" from API!`, 'info');
       }
     }
   };
@@ -631,18 +607,11 @@ export default function NewScheme() {
       <div className="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3  mt-2">
         <div>
           <h4 className="mb-1 text-dark-emphasis fw-bold">Government Scheme 360° Portal</h4>
+          <span className="badge bg-primary-subtle text-primary border border-primary-subtle px-2.5 py-1 mt-1" style={{ fontSize: '0.75rem' }}>
+            Form Progress: {getOverallProgress()}%
+          </span>
         </div>
         <div className="d-flex gap-2 flex-wrap">
-          {loadedRecordId && String(loadedRecordId).startsWith('DRAFT_') && (
-            <button
-              type="button"
-              className="btn btn-outline-danger btn-sm px-3 shadow-sm d-flex align-items-center gap-1.5"
-              onClick={() => handleDeleteRecord(loadedRecordId, true)}
-            >
-              <i className="bi bi-trash me-1"></i>
-              <span>Delete Draft</span>
-            </button>
-          )}
           <button
             type="button"
             className="btn btn-light btn-sm border px-3 shadow-sm d-flex align-items-center gap-1.5"
@@ -861,32 +830,21 @@ export default function NewScheme() {
                   .filter(Boolean);
 
                 const staticOpts = Array.isArray(field.options) ? field.options : [];
-                const fallbackOpts =
-                  DEFAULT_FALLBACK_OPTIONS[field.key] ||
-                  DEFAULT_FALLBACK_OPTIONS[backendKey] ||
-                  [];
 
-                // Priority resolution: Live API data > Static field config > Initial Fallback defaults
-                let rawOptions = [];
-                if (apiOpts.length > 0) {
-                  rawOptions = apiOpts;
-                } else if (staticOpts.length > 0) {
-                  rawOptions = staticOpts;
-                } else {
-                  rawOptions = fallbackOpts;
-                }
+                // Purely use live API options (or static field options if defined in field schema)
+                let rawOptions = apiOpts.length > 0 ? apiOpts : staticOpts;
 
                 // Remove duplicate trimmed values
                 let optionsList = Array.from(
                   new Set(rawOptions.map((opt) => String(opt).trim()).filter(Boolean))
                 );
 
-                // Ensure the current selected value is always present in the options list so it doesn't show as blank/select...
+                // Ensure the current selected value is always present in the options list
                 if (value && !optionsList.includes(value)) {
                   optionsList = [value, ...optionsList];
                 }
 
-                const isSelect = field.type === 'select' || optionsList.length > 0;
+                const isSelect = field.type === 'select';
 
                 return (
                   <div key={field.key} className={`col-12 col-md-${field.col || 6}`}>
@@ -964,14 +922,6 @@ export default function NewScheme() {
 
               {/* Actions & Exporters */}
               <div className="d-flex gap-2 flex-wrap">
-                <button
-                  type="button"
-                  className="btn btn-outline-primary btn-sm px-3 shadow-sm d-flex align-items-center gap-1.5"
-                  onClick={() => handleSaveDraft()}
-                >
-                  <i className="bi bi-floppy-fill me-1"></i>
-                  <span>Save Draft</span>
-                </button>
                 <button
                   type="button"
                   className="btn btn-outline-danger btn-sm px-3 d-flex align-items-center gap-1.5"

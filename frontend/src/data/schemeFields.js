@@ -1,388 +1,7 @@
 // Scheme Fields Specification for Government Scheme 360° Portal
 // Organizes the form structure across 23 tabs
 
-export const DEFAULT_FALLBACK_OPTIONS = {
-  ministry: [
-    'Ministry of Agriculture and Farmers Welfare',
-    'Ministry of Housing and Urban Affairs',
-    'Ministry of Rural Development',
-    'Ministry of Health and Family Welfare',
-    'Ministry of Education',
-    'Ministry of Finance',
-    'Ministry of Social Justice and Empowerment',
-    'Ministry of Women and Child Development',
-    'Ministry of Micro, Small and Medium Enterprises',
-    'Ministry of Electronics and Information Technology',
-    'Ministry of Jal Shakti',
-    'Ministry of Power',
-    'Ministry of New and Renewable Energy',
-    'Ministry of Labour and Employment',
-    'Ministry of Commerce and Industry',
-    'Ministry of Road Transport and Highways',
-    'Ministry of Tribal Affairs',
-    'Ministry of Skill Development and Entrepreneurship',
-    'Ministry of Heavy Industries',
-    'Ministry of Youth Affairs and Sports',
-    'Ministry of Environment, Forest and Climate Change',
-    'Ministry of Consumer Affairs, Food and Public Distribution',
-    'Ministry of Food Processing Industries',
-    'Ministry of Petroleum and Natural Gas',
-    'NITI Aayog',
-  ],
-  nodalMinistry: [
-    'Ministry of Agriculture and Farmers Welfare',
-    'Ministry of Housing and Urban Affairs',
-    'Ministry of Rural Development',
-    'Ministry of Health and Family Welfare',
-    'Ministry of Education',
-    'Ministry of Finance',
-    'Ministry of Social Justice and Empowerment',
-    'Ministry of Women and Child Development',
-    'Ministry of Micro, Small and Medium Enterprises',
-    'Ministry of Electronics and Information Technology',
-    'Ministry of Jal Shakti',
-    'Ministry of Power',
-    'Ministry of New and Renewable Energy',
-    'Ministry of Labour and Employment',
-    'Ministry of Commerce and Industry',
-    'Ministry of Road Transport and Highways',
-    'Ministry of Tribal Affairs',
-    'Ministry of Skill Development and Entrepreneurship',
-  ],
-  department: [
-    'Department of Agriculture and Farmers Welfare',
-    'Department of Agricultural Research and Education (DARE)',
-    'Department of Land Resources',
-    'Department of Rural Development',
-    'Department of School Education and Literacy',
-    'Department of Higher Education',
-    'Department of Health and Family Welfare',
-    'Department of Health Research',
-    'Department of Financial Services',
-    'Department of Expenditure',
-    'Department of Economic Affairs',
-    'Department of Revenue',
-    'Department of Social Justice and Empowerment',
-    'Department of Empowerment of Persons with Disabilities',
-    'Department of Drinking Water and Sanitation',
-    'Department of Water Resources, River Development and Ganga Rejuvenation',
-    'Department of Telecommunications',
-    'Department of Posts',
-  ],
-  schemeType: [
-    'Central Sector Scheme (100% Centrally Funded)',
-    'Centrally Sponsored Scheme (Core)',
-    'Centrally Sponsored Scheme (Core of the Core)',
-    'Centrally Sponsored Scheme (Optional)',
-    'State Sector Scheme',
-    'Joint Venture / Public-Private Partnership (PPP)',
-    'Special Central Assistance Scheme',
-  ],
-  status: [
-    'Active / Operational',
-    'Under Formulation / Proposed',
-    'Under Revision / Restructuring',
-    'Approved - Pending Launch',
-    'Phased Out / Sunset',
-    'Merged / Integrated',
-  ],
-  schemeStatus: [
-    'Active / Operational',
-    'Under Formulation / Proposed',
-    'Under Revision / Restructuring',
-    'Approved - Pending Launch',
-    'Phased Out / Sunset',
-    'Merged / Integrated',
-  ],
-  sector: [
-    'Agriculture & Farmers Welfare',
-    'Rural Development & Infrastructure',
-    'Housing & Urban Poverty Alleviation',
-    'Health, Family Welfare & Nutrition',
-    'Education, Literacy & Skill Development',
-    'Social Justice, Welfare & Inclusion',
-    'Financial Services, Banking & Insurance',
-    'Energy, Power & Renewable Resources',
-    'Water Resources, Drinking Water & Sanitation',
-    'Industry, Micro Enterprises & Trade',
-    'Science, Electronics & Digital Infrastructure',
-    'Transportation & Road Infrastructure',
-    'Environment, Forests & Climate Action',
-    'Women & Child Development',
-    'Tribal Development & Upliftment',
-  ],
-  subSector: [
-    'Rainfed & Dryland Farming',
-    'Horticulture & Organic Farming',
-    'Rural Roads & Connectivity',
-    'Affordable Housing & Shelter',
-    'Primary Healthcare & Maternal Health',
-    'Secondary & Technical Education',
-    'Financial Inclusion & Micro-credit',
-    'Solar & Clean Energy',
-    'Clean Water Supply & Sanitation',
-    'Skill Training & Employment',
-  ],
-  gender: [
-    'All Genders / Inclusive',
-    'Women Focus / Female Only',
-    'Men / Male Focus',
-    'Transgender / Gender Non-binary',
-  ],
-  urbanRural: [
-    'Urban Areas',
-    'Rural Areas',
-    'Pan-India (Urban & Rural)',
-    'Peri-Urban / Semi-Urban',
-  ],
-  assistanceType: [
-    'Direct Benefit Transfer (DBT) Cash',
-    'In-kind Assistance / Material Distribution',
-    'Interest Subvention / Loan Interest Subsidy',
-    'Grant-in-Aid / Capital Subsidy',
-    'Insurance Cover / Risk Protection',
-    'Voucher / Token / Credit Scheme',
-  ],
-  financialAssistanceType: [
-    'Direct Benefit Transfer (DBT) Cash',
-    'In-kind Assistance / Material Distribution',
-    'Interest Subvention / Loan Interest Subsidy',
-    'Grant-in-Aid / Capital Subsidy',
-    'Insurance Cover / Risk Protection',
-    'Voucher / Token / Credit Scheme',
-  ],
-  deliveryMechanism: [
-    'Direct Bank Transfer (PFMS / Aadhaar Seeded)',
-    'Single Window Portal / Online Workflow',
-    'District Administration / Local Body',
-    'Partner Banks / NBFCs / Microfinance Institutions',
-    'Panchayati Raj Institutions (PRIs) / Gram Sabha',
-    'Authorized Fair Price Shops / PDS Network',
-  ],
-  reviewFrequency: [
-    'Monthly',
-    'Quarterly',
-    'Bi-Annually',
-    'Annually',
-    'Real-Time / Dashboard Monitoring',
-  ],
-  sharingPattern: [
-    '100:0 (100% Central Government Funded)',
-    '60:40 (Central:State General Category)',
-    '90:10 (Central:State North-East & Himalayan States)',
-    '50:50 (Equal Sharing Ratio)',
-    '0:100 (100% State Government Funded)',
-  ],
-  fundSharingPattern: [
-    '100:0 (100% Central Government Funded)',
-    '60:40 (Central:State General Category)',
-    '90:10 (Central:State North-East & Himalayan States)',
-    '50:50 (Equal Sharing Ratio)',
-    '0:100 (100% State Government Funded)',
-  ],
-  ageGroup: [
-    'All Age Groups',
-    'Infants & Toddlers (0 - 6 Years)',
-    'Children & Adolescents (6 - 18 Years)',
-    'Youth & Adults (18 - 35 Years)',
-    'Working Age Adults (18 - 59 Years)',
-    'Senior Citizens (60+ Years)',
-  ],
-  category: [
-    'Small and Marginal Farmers',
-    'Below Poverty Line (BPL) Households',
-    'Micro and Small Entrepreneurs',
-    'Unorganized Sector Workers',
-    'Women and Single Mothers',
-    'Persons with Disabilities (PwD)',
-    'Students and Youth',
-  ],
-  beneficiaryCategory: [
-    'Small and Marginal Farmers',
-    'Below Poverty Line (BPL) Households',
-    'Micro and Small Entrepreneurs',
-    'Unorganized Sector Workers',
-    'Women and Single Mothers',
-    'Persons with Disabilities (PwD)',
-    'Students and Youth',
-  ],
-  beneficiaryType: [
-    'Individual Citizen',
-    'Family / Household',
-    'Community Group / Self Help Group (SHG)',
-    'Cooperative Society / FPO',
-    'Gram Panchayat / Village Committee',
-    'Institutional Body / MSME Unit',
-  ],
-  targetGroup: [
-    'Landless Agriculture Laborers',
-    'Street Vendors & Artisans',
-    'Pregnant Women & Lactating Mothers',
-    'School Dropouts & Unemployed Youth',
-    'Scavengers & Vulnerable Groups',
-    'Senior Citizens Without Support',
-  ],
-  socialCategory: [
-    'All Categories (General / Open)',
-    'Scheduled Castes (SC)',
-    'Scheduled Tribes (ST)',
-    'Other Backward Classes (OBC)',
-    'Economically Weaker Section (EWS)',
-    'Minority Communities',
-  ],
-  occupation: [
-    'Farmers & Agriculture Workers',
-    'Construction & Manual Laborers',
-    'Artisans, Weavers & Craftsmen',
-    'Fishermen & Animal Husbandry Workers',
-    'Street Vendors & Small Retailers',
-    'Domestic Workers & Caregivers',
-    'Students & Trainees',
-  ],
-  implementingAgency: [
-    'State Nodal Department',
-    'District Rural Development Agency (DRDA)',
-    'State Urban Development Agency (SUDA)',
-    'National Housing Bank (NHB) / HUDCO',
-    'NABARD / SIDBI',
-    'State Agro / Micro Industries Corporation',
-    'Registered Non-Governmental Organization (NGO)',
-  ],
-  monitoringAgency: [
-    'NITI Aayog DMEO',
-    'State Level Steering Committee (SLSC)',
-    'District Level Monitoring Committee (DLMC)',
-    'Third Party Audit / Independent Evaluation Agency',
-    'Public Financial Management System (PFMS) Portal',
-  ],
-  state: [
-    'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh',
-    'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka',
-    'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram',
-    'Nagaland', 'Odisha', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu',
-    'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal',
-    'Andaman and Nicobar Islands', 'Chandigarh', 'Dadra and Nagar Haveli and Daman and Diu',
-    'Delhi (NCT)', 'Jammu and Kashmir', 'Ladakh', 'Lakshadweep', 'Puducherry',
-  ],
-  aspirationalDistrictScheme: ['Yes', 'No', 'Partial / Selected Districts'],
-  flagshipScheme: ['Yes', 'No'],
-  categoryTag: ['Welfare Scheme', 'Infrastructure Scheme', 'Capacity Building', 'Subsidy Scheme', 'Credit Guarantee'],
-  aadhaarRequired: ['Yes', 'No', 'Optional / Alternative ID Allowed'],
-  bankAccountRequired: ['Yes', 'No'],
-  dbtEnabled: ['Yes', 'No', 'Partial / In-kind Mix'],
-  individualInstitution: ['Individual', 'Institution / Group', 'Both Individual & Institution'],
-  theme: [
-    'Financial Inclusion & Credit Access',
-    'Affordable Shelter & Urban Renewal',
-    'Universal Health Coverage & Wellness',
-    'Quality Education & Digital Literacy',
-    'Sustainable Agriculture & Water Security',
-    'Women Empowerment & Child Rights',
-    'Skill India & Employment Generation',
-  ],
-  nationalPriority: [
-    'Atmanirbhar Bharat Abhiyan',
-    'Viksit Bharat @2047',
-    'Digital India Initiative',
-    'Make in India',
-    'PM Gati Shakti Master Plan',
-    'Swachh Bharat Abhiyan',
-    'Aspirational Districts Programme',
-  ],
-  geographicCoverage: [
-    'Pan-India Coverage',
-    'Selected States / UTs',
-    'Aspirational Districts Only',
-    'North-Eastern and Himalayan States',
-    'Drought Prone / Tribal Belts',
-    'Coastal and Border Areas',
-  ],
-  localBody: [
-    'Gram Panchayat / Village Level',
-    'Block Panchayat / Panchayat Samiti',
-    'Zilla Parishad / District Level',
-    'Municipal Corporation (Nagar Nigam)',
-    'Municipality (Nagar Palika)',
-    'Town Panchayat (Nagar Panchayat)',
-  ],
-  mission: [
-    'National Health Mission (NHM)',
-    'National Rural Livelihood Mission (NRLM)',
-    'National Urban Livelihood Mission (NULM)',
-    'Jal Jeevan Mission (JJM)',
-    'Digital India Mission',
-    'Atal Innovation Mission (AIM)',
-    'National Skill Development Mission',
-  ],
-  schemePhase: [
-    'Phase I (Initial Pilot / Rollout)',
-    'Phase II (Scale-up & Expansion)',
-    'Phase III (Consolidation & Modernization)',
-    'Ongoing Continuous Phase',
-  ],
-  sdg: [
-    'SDG 1: No Poverty',
-    'SDG 2: Zero Hunger',
-    'SDG 3: Good Health and Well-being',
-    'SDG 4: Quality Education',
-    'SDG 5: Gender Equality',
-    'SDG 6: Clean Water and Sanitation',
-    'SDG 7: Affordable and Clean Energy',
-    'SDG 8: Decent Work and Economic Growth',
-    'SDG 9: Industry, Innovation and Infrastructure',
-    'SDG 10: Reduced Inequalities',
-    'SDG 11: Sustainable Cities and Communities',
-    'SDG 13: Climate Action',
-  ],
-  serviceMode: [
-    'Online Digital Portal / Mobile App',
-    'Common Service Centre (CSC) / Seva Kendra',
-    'Over-the-Counter / Office Counter',
-    'Direct Doorstep Delivery / Field Staff',
-    'Hybrid (Online Application + Offline Verification)',
-  ],
-  stakeholderType: [
-    'Central Government Nodal Officers',
-    'State Implementing Officials',
-    'District Collectors / Magistrates',
-    'Gram Pradhan / Panchayat Secretaries',
-    'Grassroot Workers (ASHA, Anganwadi, Krishi Mitra)',
-    'Civil Society & NGO Partners',
-  ],
-  document: [
-    'Aadhaar Card / VID',
-    'Income Certificate from Competent Authority',
-    'Caste / Social Category Certificate',
-    'Bank Account Passbook / Cancelled Cheque',
-    'Domicile / Residence Certificate',
-    'Land Records / RoR / Khatauni',
-    'Disability Certificate (if applicable)',
-    'Ration Card / BPL Card',
-  ],
-  insuranceType: [
-    'Life Insurance Cover',
-    'Accidental Death & Disability Cover',
-    'Health & Hospitalization Cover',
-    'Crop & Weather Risk Insurance',
-    'Livestock & Cattle Insurance',
-  ],
-  outcomeIndicator: [
-    'Number of Beneficiaries Enrolled & Disbursed',
-    'Total Funds Disbursed via Direct Benefit Transfer (Cr.)',
-    'Percentage Reduction in Target Indicator Level',
-    'Number of Households Provided Concrete Houses / Amenities',
-    'Employment Days Generated / Jobs Created',
-  ],
-  incomeCriteria: [
-    'Below ₹ 1,00,000 per annum',
-    'Below ₹ 1,80,000 per annum',
-    'Below ₹ 2,50,000 per annum',
-    'Below ₹ 3,00,000 per annum (EWS Upper Limit)',
-    'Below ₹ 6,00,000 per annum (LIG Category)',
-    'Below ₹ 8,00,000 per annum (Non-Creamy Layer)',
-    'No Income Ceiling (Universal Coverage)',
-  ],
-};
+export const DEFAULT_FALLBACK_OPTIONS = {};
 
 export const SCHEME_TABS_CONFIG = [
   {
@@ -394,10 +13,10 @@ export const SCHEME_TABS_CONFIG = [
       { key: 'schemeName', label: 'Official Scheme Name', type: 'text', placeholder: 'Full official name of the scheme', col: 8 },
       { key: 'alternateName', label: 'Alternate Name / Acronym', type: 'text', placeholder: 'e.g. PMAY-U / PMAY-G', col: 4 },
       { key: 'ministry', label: 'Nodal Ministry', type: 'select', options: [], col: 4 },
-      { key: 'department', label: 'Implementing Department', type: 'text', placeholder: 'e.g. Department of Land Resources', col: 4 },
+      { key: 'department', label: 'Implementing Department', type: 'select', options: [], col: 4 },
       { key: 'schemeType', label: 'Scheme Type', type: 'select', options: [], col: 4 },
       { key: 'launchDate', label: 'Launch Date', type: 'date', col: 4 },
-      { key: 'fyStarted', label: 'Financial Year Started', type: 'text', placeholder: 'e.g. FY 2024-25', col: 4 },
+      { key: 'fyStarted', label: 'Financial Year Started', type: 'date', col: 4 },
       { key: 'status', label: 'Current Status', type: 'select', options: [], col: 4 },
       { key: 'website', label: 'Official Website / Portal', type: 'text', placeholder: 'https://...', col: 4 },
       { key: 'notification', label: 'Gazette / Notification Reference', type: 'text', placeholder: 'e.g. Notification No. 10/2026', col: 4 },
@@ -409,13 +28,13 @@ export const SCHEME_TABS_CONFIG = [
     title: '2. Scheme Objectives',
     icon: 'bi-bullseye',
     fields: [
-      { key: 'vision', label: 'Vision Statement', type: 'textarea', placeholder: 'Broad long-term vision...', col: 12 },
-      { key: 'mission', label: 'Mission Statement', type: 'textarea', placeholder: 'Core mission boundaries...', col: 12 },
-      { key: 'primaryObj', label: 'Primary Objective', type: 'textarea', placeholder: 'What this scheme seeks to achieve primarily...', col: 12 },
-      { key: 'secondaryObj', label: 'Secondary Objectives', type: 'textarea', placeholder: 'Additional secondary objectives...', col: 12 },
+      { key: 'vision', label: 'Vision Statement', type: 'textarea', placeholder: 'Broad long-term vision...', col: 6 },
+      { key: 'mission', label: 'Mission Statement', type: 'textarea', placeholder: 'Core mission boundaries...', col: 6 },
+      { key: 'primaryObj', label: 'Primary Objective', type: 'textarea', placeholder: 'What this scheme seeks to achieve primarily...', col: 6 },
+      { key: 'secondaryObj', label: 'Secondary Objectives', type: 'textarea', placeholder: 'Additional secondary objectives...', col: 6 },
       { key: 'problemStatement', label: 'Problem Statement', type: 'textarea', placeholder: 'Details of the specific problem this scheme addresses...', col: 6 },
       { key: 'needAssessment', label: 'Need Assessment', type: 'textarea', placeholder: 'Details of findings justifying the launch...', col: 6 },
-      { key: 'expectedOutcomes', label: 'Expected Outcomes', type: 'textarea', placeholder: 'Key measurable impacts targeted...', col: 12 }
+      { key: 'expectedOutcomes', label: 'Expected Outcomes', type: 'textarea', placeholder: 'Key measurable impacts targeted...', col: 6 }
     ]
   },
   {
@@ -424,12 +43,12 @@ export const SCHEME_TABS_CONFIG = [
     icon: 'bi-bookmark-star-fill',
     fields: [
       { key: 'sector', label: 'Primary Sector', type: 'select', options: [], col: 4 },
-      { key: 'subSector', label: 'Sub-Sector', type: 'text', placeholder: 'e.g. Rainfed Agriculture', col: 4 },
-      { key: 'theme', label: 'Substantive Theme', type: 'text', placeholder: 'e.g. Financial Inclusion', col: 4 },
-      { key: 'nationalPriority', label: 'National Priority Mapping', type: 'text', placeholder: 'e.g. Atmanirbhar Bharat', col: 4 },
-      { key: 'aspirationalDistrictScheme', label: 'Aspirational District Scheme', type: 'select', options: [], col: 4 },
-      { key: 'flagshipScheme', label: 'Is Flagship Scheme?', type: 'select', options: [], col: 4 },
-      { key: 'categoryTag', label: 'Welfare / Infrastructure Category', type: 'select', options: [], col: 4 }
+      { key: 'subSector', label: 'Sub-Sector', type: 'select', options: [], col: 4 },
+      { key: 'theme', label: 'Substantive Theme', type: 'select', options: [], col: 4  },
+      { key: 'nationalPriority', label: 'National Priority Mapping', type: 'select', options: [], col: 4 },
+      { key: 'aspirationalDistrictScheme', label: 'Aspirational District Scheme', type: 'select', options: ['','Yes','No'], col: 4 },
+      { key: 'flagshipScheme', label: 'Is Flagship Scheme',  type: 'text', placeholder: 'Enter here...', col: 4 },
+      // { key: 'categoryTag', label: 'Welfare / Infrastructure Category', type: 'select', options: [], col: 4 }
     ]
   },
   {
@@ -437,17 +56,17 @@ export const SCHEME_TABS_CONFIG = [
     title: '4. Beneficiary Details',
     icon: 'bi-people-fill',
     fields: [
-      { key: 'category', label: 'Beneficiary Category', type: 'text', placeholder: 'e.g. Small & Marginal Farmers', col: 4 },
-      { key: 'targetGroup', label: 'Primary Target Group', type: 'text', placeholder: 'e.g. Below Poverty Line (BPL)', col: 4 },
+      { key: 'category', label: 'Beneficiary Category',  type: 'select', options: [], col: 4 },
+      { key: 'targetGroup', label: 'Primary Target Group',  type: 'select', options: [], col: 4 },
       { key: 'gender', label: 'Gender focus', type: 'select', options: [], col: 4 },
-      { key: 'ageGroup', label: 'Target Age Group', type: 'text', placeholder: 'e.g. 18-50 years', col: 4 },
-      { key: 'incomeCriteria', label: 'Income Criteria Limits', type: 'text', placeholder: 'e.g. Household income < 3 Lakh per annum', col: 4 },
-      { key: 'socialCategory', label: 'Social Category Emphasis', type: 'text', placeholder: 'e.g. SC, ST, Minorities, General', col: 4 },
-      { key: 'occupation', label: 'Target Occupation', type: 'text', placeholder: 'e.g. Construction Workers / Artisans', col: 4 },
-      { key: 'geographicCoverage', label: 'Beneficiary Geographic Area', type: 'text', placeholder: 'e.g. Drought-prone blocks', col: 4 },
+      { key: 'ageGroup', label: 'Target Age Group', type: 'select', options: [], col: 4 },
+      { key: 'incomeCriteria', label: 'Income Criteria Limits',type: 'select', options: [], col: 4 },
+      { key: 'socialCategory', label: 'Social Category Emphasis', type: 'select', options: [], col: 4 },
+      { key: 'occupation', label: 'Target Occupation', type: 'select', options: [], col: 4 },
+      { key: 'geographicCoverage', label: 'Beneficiary Geographic Area', type: 'select', options: [], col: 4 },
       { key: 'urbanRural', label: 'Urban / Rural Segment', type: 'select', options: [], col: 4 },
-      { key: 'individualInstitution', label: 'Entity Type', type: 'select', options: [], col: 4 },
-      { key: 'estimatedBeneficiaries', label: 'Estimated Total Beneficiaries', type: 'number', placeholder: 'e.g. 5000000', col: 4 }
+      { key: 'individualInstitution', label: 'Entity Type', type: 'text', placeholder:'Enter here...', col: 4 },
+      { key: 'estimatedBeneficiaries', label: 'Estimated Beneficiaries', type: 'number', placeholder: 'e.g. 5000000', col: 4 }
     ]
   },
   {
@@ -455,13 +74,13 @@ export const SCHEME_TABS_CONFIG = [
     title: '5. Eligibility Rules',
     icon: 'bi-shield-check',
     fields: [
-      { key: 'eligibilityCriteria', label: 'Eligibility Criteria Checklist', type: 'textarea', placeholder: 'Provide list of clear eligibility rules...', col: 12 },
-      { key: 'documentsRequired', label: 'Documents Required for Registration', type: 'textarea', placeholder: 'e.g. Aadhaar, Income Certificate, Bank Passbook, Land ownership proof...', col: 12 },
-      { key: 'incomeLimit', label: 'Explicit Annual Income Limit', type: 'text', placeholder: 'e.g. Max ₹ 1,80,000 per year', col: 4 },
-      { key: 'ageLimit', label: 'Explicit Age Limit Limits', type: 'text', placeholder: 'e.g. 18 - 40 Years old', col: 4 },
-      { key: 'aadhaarRequired', label: 'Is Aadhaar Compulsory?', type: 'select', options: [], col: 4 },
-      { key: 'bankAccountRequired', label: 'Is Bank Account Compulsory?', type: 'select', options: [], col: 4 },
-      { key: 'otherConditions', label: 'Other Regulatory Conditions', type: 'textarea', placeholder: 'e.g. Must not own a concrete house or a 4-wheeler...', col: 12 }
+      { key: 'eligibilityCriteria', label: 'Eligibility Criteria Checklist', type: 'textarea', placeholder: 'Provide list of clear eligibility rules...', col: 6 },
+      { key: 'documentsRequired', label: 'Documents Required for Registration', type: 'select', options: [], col: 6 },
+      { key: 'incomeLimit', label: 'Explicit Annual Income Limit',  type: 'select', options: [], col: 4 },
+      { key: 'ageGroup', label: 'Explicit Age Limit Limits', type: 'select', options: [],  col: 4 },
+      { key: 'aadhaarRequired', label: 'Aadhaar Required', type: 'select', options: ['','Yes','No'], col: 4 },
+      { key: 'bankAccountRequired', label: 'Is Bank Account Compulsory?', type: 'select', options: ['','Yes','No'], col: 4 },
+      { key: 'otherConditions', label: 'Other Regulatory Conditions', type: 'textarea', placeholder: 'e.g. Must not own a concrete house or a 4-wheeler...', col: 8 }
     ]
   },
   {
@@ -473,12 +92,15 @@ export const SCHEME_TABS_CONFIG = [
       { key: 'annualBudget', label: 'Current Annual Budget (Cr.)', type: 'number', placeholder: 'Annual budget in Crores', col: 4 },
       { key: 'allocation', label: 'Budget Allocation (Current FY - Cr.)', type: 'number', placeholder: 'Allocation in Crores', col: 4 },
       { key: 'expenditure', label: 'Cumulative Expenditure (Cr.)', type: 'number', placeholder: 'Expenditure in Crores', col: 4 },
-      { key: 'sharingPattern', label: 'Fund Sharing Pattern (Central:State)', type: 'text', placeholder: 'e.g. 60:40 or 90:10 or 100:0', col: 4 },
+      { key: 'sharingPattern', label: 'Fund Sharing Pattern (Central:State)', type: 'select', options: [],  col: 4 },
       { key: 'centralShare', label: 'Central Government Share (Cr.)', type: 'number', placeholder: 'Central share', col: 4 },
       { key: 'stateShare', label: 'State Government Share (Cr.)', type: 'number', placeholder: 'State share', col: 4 },
       { key: 'beneficiaryContribution', label: 'Beneficiary Contribution (if any)', type: 'number', placeholder: 'e.g. ₹ 20,000', col: 4 },
-      { key: 'assistanceType', label: 'Financial Assistance Type', type: 'select', options: [], col: 4 },
-      { key: 'dbtEnabled', label: 'Direct Benefit Transfer (DBT) Enabled?', type: 'select', options: [], col: 4 }
+      { key: 'subsidy', label: 'Subsidy', type: 'text', placeholder: 'Enter here...', col: 4 },
+      { key: 'grant', label: 'Grant', type: 'text', placeholder: 'Enter here...', col: 4 },
+      { key: 'loan', label: 'Loan', type: 'text', placeholder: 'Enter here...', col: 4 },
+      { key: 'insurance', label: 'Insurance', type: 'select', options: [], col: 4 },
+      { key: 'dbtEnabled', label: 'Direct Benefit Transfer (DBT) Enabled?',  type: 'text', placeholder: 'Enter here...', col: 4 }
     ]
   },
   {
@@ -486,10 +108,10 @@ export const SCHEME_TABS_CONFIG = [
     title: '7. Implementation Model',
     icon: 'bi-diagram-3-fill',
     fields: [
-      { key: 'implementingAgency', label: 'Apex National Implementing Agency', type: 'text', placeholder: 'e.g. National Housing Bank / NABARD', col: 6 },
+      { key: 'implementingAgency', label: 'Apex National Implementing Agency', type: 'select', options: [], col: 6 },
       { key: 'stateAgencies', label: 'State-level Implementing Agencies', type: 'text', placeholder: 'e.g. State Housing Boards', col: 6 },
       { key: 'districtAgencies', label: 'District-level Nodal Agencies', type: 'text', placeholder: 'e.g. DRDA / District Collectorate', col: 6 },
-      { key: 'localBodies', label: 'Involved Local Bodies', type: 'text', placeholder: 'e.g. Gram Panchayats / Municipal Corporations', col: 6 },
+      { key: 'localBodies', label: 'Involved Local Bodies', type: 'select', options: [],col: 6 },
       { key: 'deliveryMechanism', label: 'Delivery Mechanism Channel', type: 'select', options: [], col: 4 },
       { key: 'mobileApp', label: 'Official Mobile App Name', type: 'text', placeholder: 'e.g. AwasApp', col: 4 },
       { key: 'portalName', label: 'Central Portal Domain Name', type: 'text', placeholder: 'e.g. pmaymis.gov.in', col: 4 },
@@ -501,13 +123,13 @@ export const SCHEME_TABS_CONFIG = [
     title: '8. Geographic Coverage',
     icon: 'bi-geo-alt-fill',
     fields: [
-      { key: 'national', label: 'Is Nationally Applicable?', type: 'select', options: [], col: 4 },
-      { key: 'stateWise', label: 'State-wise Exceptions / Details', type: 'textarea', placeholder: 'Details of implementation status across specific States...', col: 12 },
-      { key: 'districtWise', label: 'District-wise Coverage Strategy', type: 'textarea', placeholder: 'Particular target districts...', col: 12 },
-      { key: 'aspirationalDistrictsOnly', label: 'Focuses on Aspirational Districts?', type: 'select', options: [], col: 4 },
-      { key: 'tribalArea', label: 'Special Tribal Area Coverage', type: 'select', options: [], col: 4 },
-      { key: 'northEast', label: 'Special North East Allocation / Relaxations', type: 'select', options: [], col: 4 },
-      { key: 'utCoverage', label: 'UT Coverage status', type: 'text', placeholder: 'Details for Union Territories', col: 12 }
+      { key: 'national', label: 'Is Nationally Applicable?', type: 'select', options: ['','Yes','No'], col: 4 },
+      { key: 'stateWise', label: 'State-wise', type: 'text', placeholder: 'Enter here...', col: 4 },
+      { key: 'districtWise', label: 'District-wise ', type: 'text', placeholder: 'Enter here', col:4 },
+      { key: 'aspirationalDistricts', label: 'Aspirational Districts',type: 'text', placeholder: 'Enter here', col: 4 },
+      { key: 'tribalArea', label: 'Tribal Area ',type: 'text', placeholder: 'Enter here', col: 4 },
+      { key: 'northEast', label: 'North East',type: 'text', placeholder: 'Enter here', col: 4 },
+      { key: 'utCoverage', label: 'UT Coverage',type: 'text', placeholder: 'Enter here',col: 4 }
     ]
   },
   {
@@ -516,11 +138,11 @@ export const SCHEME_TABS_CONFIG = [
     icon: 'bi-calendar-range',
     fields: [
       { key: 'announcementDate', label: 'Announcement Date', type: 'date', col: 4 },
-      { key: 'launchDateTab', label: 'Launch / Operational Date', type: 'date', col: 4 },
-      { key: 'firstDisbursement', label: 'First Disbursement Date', type: 'date', col: 4 },
-      { key: 'currentPhase', label: 'Current Operational Phase', type: 'text', placeholder: 'e.g. Phase III Extension', col: 4 },
-      { key: 'endDate', label: 'End / Review Date', type: 'date', col: 4 },
-      { key: 'reviewFrequency', label: 'Scheduled Review Frequency', type: 'select', options: [], col: 4 }
+      { key: 'launchDateTab', label: 'Launch Date', type: 'date', col: 4 },
+      { key: 'firstDisbursement', label: 'First Disbursement', type: 'text', placeholder:'Enter here...', col: 4 },
+      { key: 'currentPhase', label: 'Current Phase', type: 'text', placeholder: 'e.g. Phase III Extension', col: 4 },
+      { key: 'endDate', label: 'End Date', type: 'date', col: 4 },
+      { key: 'reviewFrequency', label: 'Review Frequency', type: 'select', options: [], col: 4 }
     ]
   },
   {
@@ -534,8 +156,8 @@ export const SCHEME_TABS_CONFIG = [
       { key: 'subsidyAmount', label: 'Explicit Subsidy Amount (₹)', type: 'number', placeholder: 'e.g. 120000', col: 4 },
       { key: 'maxAssistance', label: 'Maximum Assistance per Beneficiary (₹)', type: 'number', placeholder: 'e.g. 150000', col: 4 },
       { key: 'frequency', label: 'Disbursement Frequency', type: 'select', options: [], col: 4 },
-      { key: 'directBenefit', label: 'Direct Beneficiary Transfer (DBT)?', type: 'select', options: [], col: 4 },
-      { key: 'indirectBenefit', label: 'Indirect Community Benefit?', type: 'select', options: [], col: 4 }
+      { key: 'directBenefit', label: 'Direct Beneficiary Transfer (DBT)?', type: 'text', placeholder:'Enter here...', col: 4 },
+      { key: 'indirectBenefit', label: 'Indirect Community Benefit?', type: 'text', placeholder:'Enter here...', col: 4 }
     ]
   },
   {
@@ -543,13 +165,13 @@ export const SCHEME_TABS_CONFIG = [
     title: '11. Application Process',
     icon: 'bi-file-earmark-text-fill',
     fields: [
-      { key: 'onlineApp', label: 'Is Online Application Available?', type: 'select', options: [], col: 4 },
-      { key: 'offlineApp', label: 'Is Offline Application Available?', type: 'select', options: [], col: 4 },
-      { key: 'cscAvailable', label: 'Common Service Centre (CSC) Available?', type: 'select', options: [], col: 4 },
-      { key: 'applicationUrl', label: 'Direct Registration Portal URL', type: 'text', placeholder: 'https://...', col: 12 },
-      { key: 'processingTime', label: 'Average Processing Time / SLA', type: 'text', placeholder: 'e.g. 45 Business Days', col: 4 },
-      { key: 'approvalAuthority', label: 'Final Verification / Approving Authority', type: 'text', placeholder: 'e.g. Block Development Officer (BDO)', col: 4 },
-      { key: 'appealMechanism', label: 'Grievance Redressal / Appeal Mechanism', type: 'textarea', placeholder: 'Details of online grievance filing & nodal officers...', col: 12 }
+      { key: 'onlineApp', label: 'Is Online Application Available?', type: 'select', options: ['','Yes','No'], col: 4 },
+      { key: 'offlineApp', label: 'Is Offline Application Available?', type: 'select', options: ['','Yes','No'], col: 4 },
+      { key: 'cscAvailable', label: 'Common Service Centre (CSC) Available?', type: 'select', options: ['','Yes','No'], col: 4 },
+      { key: 'applicationUrl', label: 'Application URL', type: 'text', placeholder: 'https://...', col: 12 },
+      { key: 'processingTime', label: 'Processing Time / SLA', type: 'text', placeholder: 'e.g. 45 Business Days', col: 4 },
+      { key: 'approvalAuthority', label: 'Approving Authority', type: 'text', placeholder: 'e.g. Block Development Officer (BDO)', col: 4 },
+      { key: 'appealMechanism', label: 'Appeal Mechanism', type: 'textarea', placeholder: 'Details of online grievance filing & nodal officers...', col: 12 }
     ]
   },
   {
@@ -557,19 +179,19 @@ export const SCHEME_TABS_CONFIG = [
     title: '12. Performance KPIs',
     icon: 'bi-bar-chart-line-fill',
     fields: [
-      { key: 'appsReceived', label: 'Applications Received (Total)', type: 'number', placeholder: '0', col: 4 },
-      { key: 'appsApproved', label: 'Applications Approved (Total)', type: 'number', placeholder: '0', col: 4 },
-      { key: 'appsRejected', label: 'Applications Rejected (Total)', type: 'number', placeholder: '0', col: 4 },
-      { key: 'beneficiariesCovered', label: 'Actual Beneficiaries Covered', type: 'number', placeholder: '0', col: 4 },
-      { key: 'womenBeneficiaries', label: 'Women Beneficiaries Enrolled', type: 'number', placeholder: '0', col: 4 },
-      { key: 'scStBeneficiaries', label: 'SC/ST Beneficiaries Enrolled', type: 'number', placeholder: '0', col: 4 },
-      { key: 'minorityBeneficiaries', label: 'Minority Beneficiaries Enrolled', type: 'number', placeholder: '0', col: 4 },
-      { key: 'fundsReleased', label: 'Total Funds Released (Cr.)', type: 'number', placeholder: '0', col: 4 },
-      { key: 'fundsUtilized', label: 'Total Funds Utilized (Cr.)', type: 'number', placeholder: '0', col: 4 },
-      { key: 'utilizationPercent', label: 'Fund Utilization Percentage (%)', type: 'number', placeholder: '0', col: 4 },
-      { key: 'successRate', label: 'Approval Success Rate (%)', type: 'number', placeholder: '0', col: 4 },
-      { key: 'pendingCases', label: 'Pending Applications', type: 'number', placeholder: '0', col: 4 },
-      { key: 'avgApprovalTime', label: 'Calculated Avg. Approval Days', type: 'text', placeholder: 'e.g. 30 days', col: 4 }
+      { key: 'appsReceived', label: 'Applications Received', type: 'text', placeholder: 'Enter here...', col: 4 },
+      { key: 'appsApproved', label: 'Applications Approved', type: 'text', placeholder: 'Enter here...', col: 4 },
+      { key: 'appsRejected', label: 'Applications Rejected', type: 'text', placeholder: 'Enter here...', col: 4 },
+      { key: 'beneficiariesCovered', label: 'Beneficiaries Covered', type: 'text', placeholder: 'Enter here...', col: 4 },
+      { key: 'womenBeneficiaries', label: 'Women Beneficiaries', type: 'text', placeholder: 'Enter here...', col: 4 },
+      { key: 'scStBeneficiaries', label: 'SC/ST Beneficiaries', type: 'text', placeholder: 'Enter here...', col: 4 },
+      { key: 'minorityBeneficiaries', label: 'Minority Beneficiaries', type: 'text', placeholder: 'Enter here...', col: 4 },
+      { key: 'fundsReleased', label: 'Funds Released (Cr.)', type: 'text', placeholder: 'Enter here...', col: 4 },
+      { key: 'fundsUtilized', label: 'Funds Utilized (Cr.)', type: 'text', placeholder: 'Enter here...', col: 4 },
+      { key: 'utilizationPercent', label: ' Utilization Percentage (%)', type: 'text', placeholder: 'Enter here...', col: 4 },
+      { key: 'successRate', label: 'Success Rate (%)', type: 'text', placeholder: 'Enter here...', col: 4 },
+      { key: 'pendingCases', label: 'Pending Cases ', type: 'text', placeholder: 'Enter here...', col: 4 },
+      { key: 'avgApprovalTime', label: 'Average Approval Time', type: 'text', placeholder: 'e.g. 30 days', col: 4 }
     ]
   },
   {
@@ -577,16 +199,16 @@ export const SCHEME_TABS_CONFIG = [
     title: '13. Outcome Indicators',
     icon: 'bi-clipboard-data-fill',
     fields: [
-      { key: 'jobsCreated', label: 'Direct/Indirect Jobs Created', type: 'number', placeholder: '0', col: 4 },
-      { key: 'housesBuilt', label: 'Concrete Houses Built', type: 'number', placeholder: '0', col: 4 },
-      { key: 'farmersBenefitted', label: 'Total Farmers Benefitted', type: 'number', placeholder: '0', col: 4 },
-      { key: 'studentsBenefitted', label: 'Total Students Benefitted', type: 'number', placeholder: '0', col: 4 },
-      { key: 'roadsConstructed', label: 'Rural Roads Built (kms)', type: 'number', placeholder: '0', col: 4 },
-      { key: 'villagesCovered', label: 'Total Villages Covered', type: 'number', placeholder: '0', col: 4 },
-      { key: 'enterprisesSupported', label: 'SMEs/Enterprises Supported', type: 'number', placeholder: '0', col: 4 },
-      { key: 'carbonReduction', label: 'Carbon Reduction (Metric Tons)', type: 'number', placeholder: '0', col: 4 },
-      { key: 'waterSaved', label: 'Water Saved/Harvested (Litres)', type: 'number', placeholder: '0', col: 4 },
-      { key: 'productivityIncrease', label: 'Estimated Crop Productivity Boost (%)', type: 'number', placeholder: '0', col: 4 }
+      { key: 'jobsCreated', label: 'Jobs Created', type: 'text', placeholder: 'Enter here...', col: 4 },
+      { key: 'housesBuilt', label: 'Houses Built',  type: 'text', placeholder: 'Enter here...', col: 4 },
+      { key: 'farmersBenefitted', label: 'Farmers Benefitted',  type: 'text', placeholder: 'Enter here...', col: 4 },
+      { key: 'studentsBenefitted', label: 'Students Benefitted',  type: 'text', placeholder: 'Enter here...', col: 4 },
+      { key: 'roadsConstructed', label: 'Roads Constructed',  type: 'text', placeholder: 'Enter here...', col: 4 },
+      { key: 'villagesCovered', label: 'Villages Covered',  type: 'text', placeholder: 'Enter here...', col: 4 },
+      { key: 'enterprisesSupported', label: 'Enterprises Supported',  type: 'text', placeholder: 'Enter here...', col: 4 },
+      { key: 'carbonReduction', label: 'Carbon Reduction',  type: 'text', placeholder: 'Enter here...', col: 4 },
+      { key: 'waterSaved', label: 'Water Saved',  type: 'text', placeholder: 'Enter here...', col: 4 },
+      { key: 'productivityIncrease', label: 'Productivity Increase',  type: 'text', placeholder: 'Enter here...', col: 4 }
     ]
   },
   {
@@ -594,13 +216,13 @@ export const SCHEME_TABS_CONFIG = [
     title: '14. Monitoring Frame',
     icon: 'bi-eye-fill',
     fields: [
-      { key: 'kpiDefinitions', label: 'Monitoring KPI Definitions', type: 'textarea', placeholder: 'List the defined indicators of success...', col: 12 },
-      { key: 'monitoringFrequency', label: 'Audit / Monitoring Frequency', type: 'select', options: [], col: 4 },
+      { key: 'kpis', label: 'Kpis', type: 'text', placeholder: 'Enter here...', col: 4 },
+      { key: 'monitoringFrequency', label: 'Monitoring Frequency', type: 'select', options: [], col: 4 },
       { key: 'thirdPartyEvaluation', label: 'Third-party Evaluation Agency', type: 'text', placeholder: 'e.g. NITIE / IIT Kanpur', col: 4 },
-      { key: 'socialAudit', label: 'Is Social Audit Compulsory?', type: 'select', options: [], col: 4 },
-      { key: 'auditReports', label: 'Audit Reports & Guidelines References', type: 'textarea', placeholder: 'Upload link or manual reference...', col: 12 },
-      { key: 'impactAssessment', label: 'Latest Impact Assessment Findings', type: 'textarea', placeholder: 'Key conclusions from recent evaluations...', col: 12 },
-      { key: 'dashboardAvailable', label: 'Public Analytics Dashboard Available?', type: 'select', options: [], col: 4 }
+      { key: 'socialAudit', label: 'Is Social Audit Compulsory?',  type: 'text', placeholder: 'Enter here...', col: 4 },
+      { key: 'auditReports', label: 'Audit Reports & Guidelines References', type: 'text', placeholder: 'Upload link or manual reference...', col: 8 },
+      { key: 'impactAssessment', label: 'Latest Impact Assessment Findings',  type: 'text', placeholder: 'Enter here...', col: 4 },
+      { key: 'dashboardAvailable', label: 'Public Analytics Dashboard Available?',  type: 'text', placeholder: 'Enter here...', col: 4 }
     ]
   },
   {
@@ -608,16 +230,16 @@ export const SCHEME_TABS_CONFIG = [
     title: '15. Technology Stack',
     icon: 'bi-cpu-fill',
     fields: [
-      { key: 'portal', label: 'Portal Hosting Details', type: 'text', placeholder: 'e.g. NIC Cloud Server (Meghraj)', col: 4 },
-      { key: 'mobileAppTech', label: 'Mobile App Technologies', type: 'text', placeholder: 'e.g. Android Native (Java/Kotlin)', col: 4 },
-      { key: 'apiAvailable', label: 'Are Open APIs Available?', type: 'select', options: ['No', 'Yes'], col: 4 },
-      { key: 'aadhaarIntegration', label: 'Aadhaar UIDAI eKYC Integrated?', type: 'select', options: [], col: 4 },
-      { key: 'digilocker', label: 'DigiLocker Document Pull Integrated?', type: 'select', options: [], col: 4 },
-      { key: 'eKyc', label: 'Biometric / OTP e-KYC Enabled?', type: 'select', options: [], col: 4 },
-      { key: 'pfms', label: 'PFMS (Public Financial Management System) Integrated?', type: 'select', options: [], col: 4 },
-      { key: 'dbtTech', label: 'Direct Benefit Transfer (DBT) Pipeline?', type: 'select', options: [], col: 4 },
-      { key: 'gis', label: 'GIS Mapping & Geo-tagging Enabled?', type: 'select', options: [], col: 4 },
-      { key: 'aiMlUsed', label: 'AI/ML Technologies (e.g. Fraud detection)?', type: 'select', options: ['No', 'Yes'], col: 4 }
+      { key: 'portal', label: 'Portal Hosting Details',  type: 'text', placeholder: 'Enter here...', col: 4 },
+      { key: 'mobileAppTech', label: 'Mobile App Technologies',  type: 'text', placeholder: 'Enter here...', col: 4 },
+      { key: 'apiAvailable', label: 'Are Open APIs Available?', type: 'select', options: ['', 'Yes', 'No'], col: 4 },
+      { key: 'aadhaarIntegration', label: 'Aadhaar UIDAI eKYC Integrated?', type: 'select', options: ['','Yes','No'], col: 4 },
+      { key: 'digilocker', label: 'DigiLocker', type: 'select', options: ['','Yes','No'], col: 4 },
+      { key: 'eKyc', label: 'e-KYC', type: 'select', options: ['', 'Yes', 'No'], col: 4 },
+      { key: 'pfms', label: 'PFMS', type: 'text', placeholder: 'Enter here...', col: 4 },
+      { key: 'dbtTech', label: 'DBT', type: 'text', placeholder: 'Enter here...', col: 4 },
+      { key: 'gis', label: 'GIS', type: 'text', placeholder: 'Enter here...', col: 4 },
+      { key: 'aiMlUsed', label: 'AI/ML Used', type: 'select', options: ['','No', 'Yes'], col: 4 }
     ]
   },
   {
@@ -625,14 +247,14 @@ export const SCHEME_TABS_CONFIG = [
     title: '16. Stakeholders',
     icon: 'bi-diagram-3',
     fields: [
-      { key: 'ministryRoles', label: 'Nodal Ministries & Roles', type: 'text', placeholder: 'e.g. Ministry of Housing & Urban Affairs (Nodal)', col: 6 },
-      { key: 'stateGovt', label: 'State Government Counterparts', type: 'text', placeholder: 'e.g. State Housing Departments', col: 6 },
-      { key: 'district', label: 'District Administration Nodal Officers', type: 'text', placeholder: 'e.g. District Magistrate (DM) / Collector', col: 6 },
-      { key: 'panchayat', label: 'Panchayat / Urban Local Bodies Roles', type: 'text', placeholder: 'e.g. Ward Committees / Gram Sabhas', col: 6 },
-      { key: 'ngo', label: 'Registered NGO / Civil Society Partners', type: 'text', placeholder: 'e.g. Community Welfare NGOs', col: 6 },
-      { key: 'banks', label: 'Involved Financial Institutions / Banks', type: 'text', placeholder: 'e.g. Public Sector Banks, Post Offices, RRBs', col: 6 },
-      { key: 'csc', label: 'Common Service Centres (CSC) Role', type: 'text', placeholder: 'e.g. Primary Offline Facilitators', col: 6 },
-      { key: 'privatePartners', label: 'Private Developers / Sector Partners', type: 'text', placeholder: 'e.g. Private Construction Contractors', col: 12 }
+      { key: 'ministryRoles', label: 'Ministries',type: 'text', placeholder: 'Enter here...', col: 4 },
+      { key: 'stateGovt', label: 'State Government', type: 'text', placeholder: 'Enter here...', col: 4 },
+      { key: 'district', label: 'District', type: 'text', placeholder: 'Enter here...', col: 4 },
+      { key: 'panchayat', label: 'Panchayat', type: 'text', placeholder: 'Enter here...', col: 4 },
+      { key: 'ngo', label: 'NGO', type: 'text', placeholder: 'Enter here...', col: 4 },
+      { key: 'banks', label: 'Banks', type: 'text', placeholder: 'Enter here...', col: 4 },
+      { key: 'csc', label: 'CSC', type: 'text', placeholder: 'Enter here...', col: 4 },
+      { key: 'privatePartners', label: 'Private Partners', type: 'text', placeholder: 'Enter here...', col: 4 }
     ]
   },
   {
@@ -640,13 +262,13 @@ export const SCHEME_TABS_CONFIG = [
     title: '17. Scheme Documents',
     icon: 'bi-folder-symlink-fill',
     fields: [
-      { key: 'guidelines', label: 'Official Operational Guidelines Link', type: 'text', placeholder: 'https://...', col: 6 },
-      { key: 'sop', label: 'SOP for Registration & Verification', type: 'text', placeholder: 'https://...', col: 6 },
-      { key: 'operationalManual', label: 'Field Staff Training Manual Link', type: 'text', placeholder: 'https://...', col: 6 },
-      { key: 'faq', label: 'FAQ Documents Reference Link', type: 'text', placeholder: 'https://...', col: 6 },
-      { key: 'forms', label: 'Blank Form Downloads Link', type: 'text', placeholder: 'https://...', col: 6 },
-      { key: 'circulars', label: 'Circulars & Instructions Archive', type: 'text', placeholder: 'https://...', col: 6 },
-      { key: 'notifications', label: 'Legal Notifications / Gazette Orders', type: 'text', placeholder: 'https://...', col: 12 }
+      { key: 'guidelines', label: 'Guidelines', type: 'text', placeholder: 'Enter here...', col: 6 },
+      { key: 'sop', label: 'SOP', type: 'text', placeholder: 'Enter here...', col: 6 },
+      { key: 'operationalManual', label: 'Operational Manual', type: 'text', placeholder: 'Enter here...', col: 6 },
+      { key: 'faq', label: 'FAQ', type: 'text', placeholder: 'Enter here...', col: 6 },
+      { key: 'forms', label: 'Form', type: 'text', placeholder: 'Enter here...', col: 6 },
+      { key: 'circulars', label: 'Circulars', type: 'text', placeholder: 'Enter here...', col: 6 },
+      { key: 'notifications', label: 'Notifications', type: 'text', placeholder: 'Enter here...', col: 12 }
     ]
   },
   {
@@ -654,11 +276,11 @@ export const SCHEME_TABS_CONFIG = [
     title: '18. Risks & Challenges',
     icon: 'bi-exclamation-octagon-fill',
     fields: [
-      { key: 'challenges', label: 'Critical Execution Challenges', type: 'textarea', placeholder: 'e.g. Delay in beneficiary identification, land disputes...', col: 12 },
-      { key: 'risks', label: 'Financial / Leakage Risks', type: 'textarea', placeholder: 'e.g. Intermediary bribery, duplicate claims...', col: 12 },
-      { key: 'bottlenecks', label: 'Administrative Bottlenecks', type: 'textarea', placeholder: 'e.g. Slower state-share budget disbursals...', col: 6 },
-      { key: 'fraudRisks', label: 'Document Forgery / Fraud Risks', type: 'textarea', placeholder: 'e.g. fake income certificates...', col: 6 },
-      { key: 'mitigationMeasures', label: 'Regulatory Mitigation Measures', type: 'textarea', placeholder: 'e.g. Mandatory geo-tagging, Public Social Audits, PFMS payments...', col: 12 }
+      { key: 'challenges', label: 'Challenges', type: 'text', placeholder: 'Enter here...', col: 6 },
+      { key: 'risks', label: 'Risks', type: 'text', placeholder: 'Enter here...', col: 6 },
+      { key: 'bottlenecks', label: 'Bottlenecks', type: 'text', placeholder: 'Enter here...', col: 6 },
+      { key: 'fraudRisks', label: 'Fraud Risks', type: 'text', placeholder: 'Enter here...', col: 6 },
+      { key: 'mitigationMeasures', label: 'Mitigation Measures',type: 'text', placeholder: 'Enter here...', col: 12 }
     ]
   },
   {
@@ -666,10 +288,10 @@ export const SCHEME_TABS_CONFIG = [
     title: '19. Success Stories',
     icon: 'bi-trophy-fill',
     fields: [
-      { key: 'caseStudies', label: 'Key Analytical Case Studies', type: 'textarea', placeholder: 'Documented field success records...', col: 12 },
-      { key: 'awards', label: 'National / International Awards Won', type: 'textarea', placeholder: 'e.g. Digital India Gold Award 2025...', col: 12 },
-      { key: 'testimonials', label: 'Direct Beneficiary Testimonials', type: 'textarea', placeholder: 'Quotes from satisfied citizens...', col: 6 },
-      { key: 'bestPractices', label: 'Administrative Best Practices Logged', type: 'textarea', placeholder: 'e.g. Single-window fast approvals in Indore...', col: 6 }
+      { key: 'caseStudies', label: 'Case Studies', type: 'text', placeholder: 'Enter here...', col: 6 },
+      { key: 'awards', label: 'Awards', type: 'text', placeholder: 'Enter here...', col: 6 },
+      { key: 'testimonials', label: 'Testimonials', type: 'text', placeholder: 'Enter here...', col: 6 },
+      { key: 'bestPractices', label: 'Best Practices',type: 'text', placeholder: 'Enter here...', col: 6 }
     ]
   },
   {
@@ -677,14 +299,14 @@ export const SCHEME_TABS_CONFIG = [
     title: '20. Scheme Relationships',
     icon: 'bi-share-fill',
     fields: [
-      { key: 'parentScheme', label: 'Parent / Apex Scheme (if any)', type: 'text', placeholder: 'e.g. Housing for All Mission', col: 6 },
-      { key: 'similarSchemes', label: 'Similar Regional Schemes', type: 'text', placeholder: 'e.g. State-level Housing Grants', col: 6 },
-      { key: 'complementarySchemes', label: 'Complementary Schemes Linkages', type: 'text', placeholder: 'e.g. Swachh Bharat Mission, Saubhagya, Ujjwala', col: 6 },
-      { key: 'duplicateSchemes', label: 'Duplicate / Overlapping Schemes To Avoid', type: 'text', placeholder: 'e.g. Old regional housing subsidy programs', col: 6 },
-      { key: 'replacedScheme', label: 'Preceding Replaced Scheme Name', type: 'text', placeholder: 'e.g. Indira Awaas Yojana (IAY)', col: 6 },
-      { key: 'convergedWith', label: 'Converged Schemes under same umbrella', type: 'text', placeholder: 'e.g. Swajaldhara converged with Jal Jeevan', col: 6 },
-      { key: 'linkedSdgId', label: 'Linked Sustainable Development Goal (SDG)', type: 'select', options: [], col: 6 },
-      { key: 'linkedMissions', label: 'Linked National Missions', type: 'text', placeholder: 'e.g. National Urban Livelihoods Mission', col: 6 }
+      { key: 'parentScheme', label: 'Parent Scheme', type: 'text', placeholder: 'Enter here...', col: 6 },
+      { key: 'similarSchemes', label: 'Similar Schemes', type: 'text', placeholder: 'Enter here...', col: 6 },
+      { key: 'complementarySchemes', label: 'Complementary Schemes', type: 'text', placeholder: 'Enter here...', col: 6 },
+      { key: 'duplicateSchemes', label: 'Duplicate Schemes', type: 'text', placeholder: 'Enter here...', col: 6 },
+      { key: 'replacedScheme', label: 'Replaced Scheme', type: 'text', placeholder: 'Enter here...', col: 6 },
+      { key: 'convergedWith', label: 'Converged with', type: 'text', placeholder: 'Enter here...', col: 6 },
+      { key: 'linkedSdgId', label: 'Linked Sustainable Development Goal (SDG)', type: 'text', placeholder: 'Enter here...', col: 6 },
+      { key: 'linkedMissions', label: 'Linked Missions', type: 'text', placeholder: 'Enter here...', col: 6 }
     ]
   },
   {
@@ -692,20 +314,20 @@ export const SCHEME_TABS_CONFIG = [
     title: '21. Derived Analytics',
     icon: 'bi-activity',
     fields: [
-      { key: 'budgetGrowth', label: 'CAGR Budget Growth Rate (%)', type: 'number', placeholder: '12', col: 4 },
-      { key: 'beneficiaryGrowth', label: 'Beneficiary Enrolment Growth (%)', type: 'number', placeholder: '15', col: 4 },
-      { key: 'fundUtilization', label: 'Budget Utilization Efficiency (%)', type: 'number', placeholder: '94.5', col: 4 },
-      { key: 'coveragePercent', label: 'National Target Coverage Rate (%)', type: 'number', placeholder: '82', col: 4 },
-      { key: 'genderRatio', label: 'Gender Ratio representation (F:M)', type: 'text', placeholder: 'e.g. 52:48', col: 4 },
-      { key: 'ruralUrbanRatio', label: 'Rural vs Urban Disbursal Ratio', type: 'text', placeholder: 'e.g. 70:30', col: 4 },
-      { key: 'stateRanking', label: 'Highest Performing State', type: 'text', placeholder: 'e.g. Madhya Pradesh (Rank 1)', col: 4 },
-      { key: 'ministryRanking', label: 'Nodal Ministry Efficiency Rank', type: 'text', placeholder: 'e.g. Tier-1 Rank 3', col: 4 },
-      { key: 'popularity', label: 'Citizen Search Popularity Index', type: 'number', placeholder: '88', col: 4 },
-      { key: 'satisfaction', label: 'Beneficiary Satisfaction Rating (1-5)', type: 'number', placeholder: '4.6', col: 4 },
-      { key: 'impact', label: 'Calculated Social Impact Score', type: 'number', placeholder: '92', col: 4 },
-      { key: 'costPerBeneficiary', label: 'Average Delivery Cost per Beneficiary (₹)', type: 'number', placeholder: '124000', col: 4 },
-      { key: 'roi', label: 'Estimated Social Return on Investment (SROI)', type: 'number', placeholder: '2.4', col: 4 },
-      { key: 'efficiency', label: 'Overall Administrative Efficiency Score (%)', type: 'number', placeholder: '89', col: 4 }
+      { key: 'budgetGrowth', label: 'Budget Growth', type: 'text', placeholder: 'Enter here...', col: 4 },
+      { key: 'beneficiaryGrowth', label: 'Beneficiary Growth', type: 'text', placeholder: 'Enter here...', col: 4 },
+      { key: 'fundUtilization', label: 'Fund Utilization Efficiency (%)', type: 'number', placeholder: '94.5', col: 4 },
+      { key: 'coveragePercent', label: 'Coverage (%)', type: 'number', placeholder: '82', col: 4 },
+      { key: 'genderRatio', label: 'Gender Ratio', type: 'text', placeholder: 'Enter here...', col: 4 },
+      { key: 'ruralUrbanRatio', label: 'Rural vs Urban', type: 'text', placeholder: 'Enter here...', col: 4 },
+      { key: 'stateRanking', label: 'State Ranking', type: 'text', placeholder: 'Enter here...', col: 4 },
+      { key: 'ministryRanking', label: 'Ministry Ranking',type: 'text', placeholder: 'Enter here...', col: 4 },
+      { key: 'popularity', label: 'Scheme Popularity', type: 'text', placeholder: 'Enter here...', col: 4 },
+      { key: 'satisfaction', label: 'Satisfaction Score', type: 'text', placeholder: 'Enter here...', col: 4 },
+      { key: 'impact', label: 'Impact Score', type: 'text', placeholder: 'Enter here...', col: 4 },
+      { key: 'costPerBeneficiary', label: 'Cost per Beneficiary', type: 'text', placeholder: 'Enter here...', col: 4 },
+      { key: 'roi', label: 'ROI', type: 'text', placeholder: 'Enter here...', col: 4 },
+      { key: 'efficiency', label: 'Efficiency Score', type: 'text', placeholder: 'Enter here...', col: 4 }
     ]
   },
   {
@@ -713,16 +335,16 @@ export const SCHEME_TABS_CONFIG = [
     title: '22. AI-Friendly Attributes',
     icon: 'bi-stars',
     fields: [
-      { key: 'keywords', label: 'Semantic Search Keywords (Comma separated)', type: 'text', placeholder: 'housing, concrete home, subsidy, rural welfare, dbt', col: 6 },
-      { key: 'tags', label: 'Metadata Categorization Tags', type: 'text', placeholder: 'flagship, infrastructure, central-sector, primary-citizens', col: 6 },
-      { key: 'summary100', label: 'Executive Summary (Strictly 100 Words)', type: 'textarea', placeholder: 'Write a concise 100-word overview for chatbot references...', col: 12 },
-      { key: 'detailedDescription', label: 'Detailed Scheme Description', type: 'textarea', placeholder: 'Long description containing absolute legal facts...', col: 12 },
-      { key: 'faqsText', label: 'Chatbot FAQ Dataset JSON / Raw Text', type: 'textarea', placeholder: 'Format: Q: Is bank account required? A: Yes, for Direct Transfer...', col: 12 },
-      { key: 'objectivesText', label: 'Summarized Broad Objectives', type: 'textarea', placeholder: 'Consolidated list of primary aims...', col: 6 },
-      { key: 'challengesText', label: 'Administrative Pitfalls / Challenges', type: 'textarea', placeholder: 'Historical challenges encountered...', col: 6 },
-      { key: 'innovationsText', label: 'Pioneering Technical Innovations Used', type: 'textarea', placeholder: 'e.g. Real-time geo-referenced photograph uploads through app...', col: 12 },
-      { key: 'lessonsLearned', label: 'Key Policy Lessons Learned', type: 'textarea', placeholder: 'Policy modifications based on audits...', col: 6 },
-      { key: 'futureRoadmap', label: 'Future Operational Roadmap & Milestones', type: 'textarea', placeholder: 'Next extension targets and digital upgrades...', col: 6 }
+      { key: 'keywords', label: 'Keywords', type: 'text', placeholder: 'Enter here...', col: 6 },
+      { key: 'tags', label: 'Tags',  type: 'text', placeholder: 'Enter here...', col: 6 },
+      { key: 'summary100', label: 'Summary (100 Words)', type: 'textarea', placeholder: 'Write a concise 100-word overview for chatbot references...', col: 12 },
+      { key: 'detailedDescription', label: 'Detailed Description', type: 'textarea', placeholder: 'Long description containing absolute legal facts...', col: 12 },
+      { key: 'faqsText', label: 'FAQs', type: 'textarea', placeholder: 'Format: Q: Is bank account required? A: Yes, for Direct Transfer...', col: 12 },
+      { key: 'objectivesText', label: 'Objectives', type: 'text', placeholder: 'Enter here...', col: 6 },
+      { key: 'challengesText', label: 'Challenges',  type: 'text', placeholder: 'Enter here...', col: 6 },
+      { key: 'innovationsText', label: 'Innovations',  type: 'text', placeholder: 'Enter here...', col: 12 },
+      { key: 'lessonsLearned', label: 'Lessons Learned',  type: 'text', placeholder: 'Enter here...', col: 6 },
+      { key: 'futureRoadmap', label: 'Future Roadmap',  type: 'text', placeholder: 'Enter here...', col: 6 }
     ]
   },
   {
@@ -730,14 +352,14 @@ export const SCHEME_TABS_CONFIG = [
     title: '23. Meta Audit Trail',
     icon: 'bi-shield-lock-fill',
     fields: [
-      { key: 'createdBy', label: 'Created / Registered By', type: 'text', placeholder: 'e.g. Officer on Special Duty (OSD)', col: 4 },
+      { key: 'createdBy', label: 'Created By', type: 'text', placeholder: 'Enter here... ', col: 4 },
       { key: 'createdDate', label: 'Created Date', type: 'date', col: 4 },
-      { key: 'lastUpdated', label: 'Last System Update Date', type: 'date', col: 4 },
-      { key: 'verifiedBy', label: 'Nodal Verification Authority', type: 'text', placeholder: 'e.g. Joint Secretary, MoHUA', col: 4 },
-      { key: 'source', label: 'Official Information Source / PDF Guide Link', type: 'text', placeholder: 'https://mohua.gov.in/guidelines.pdf', col: 4 },
-      { key: 'dataConfidence', label: 'Information Confidence Score', type: 'select', options: [], col: 4 },
-      { key: 'version', label: 'Registry Record Version', type: 'text', placeholder: 'e.g. v3.1', col: 4 },
-      { key: 'remarks', label: 'Nodal Remarks / Registry Notes', type: 'textarea', placeholder: 'Special system notes on this revision...', col: 12 }
+      { key: 'lastUpdated', label: 'Last Updated', type: 'date', col: 4 },
+      { key: 'verifiedBy', label: 'Verified By', type: 'text', placeholder: 'Enter here...', col: 4 },
+      { key: 'source', label: 'Source', type: 'text', placeholder: 'Enter here...', col: 4 },
+      { key: 'dataConfidence', label: 'Data Confidence', type: 'text', placeholder: 'Enter here...', col: 4 },
+      { key: 'version', label: 'Version', type: 'text', placeholder: 'Enter here...', col: 4 },
+      { key: 'remarks', label: 'Remarks', type: 'textarea', placeholder: 'Special system notes on this revision...', col: 12 }
     ]
   }
 ];

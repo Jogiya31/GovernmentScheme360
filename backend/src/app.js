@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
 
-const apiRoutes = require("./routes/apiRoutes");
+const master = require("./routes/master");
 
 const app = express();
 
@@ -17,6 +17,6 @@ app.get("/", (req, res) => {
     });
 });
 
-app.use("/api", apiRoutes);
+app.use("/api", master);
 
 module.exports = app;

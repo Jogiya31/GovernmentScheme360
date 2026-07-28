@@ -14,9 +14,6 @@ const getStoredUsers = () => {
   return DEFAULT_USERS;
 };
 
-const saveStoredUsers = (users) => {
-  localStorage.setItem('gov_scheme_users', JSON.stringify(users));
-};
 
 const DEFAULT_ROLES = [
   { id: 1, title: 'Super Admin', status: true },
@@ -138,7 +135,7 @@ export const api = createApi({
     'getDeliveryMechanism',
     'getDepartment',
     'getDistrict',
-    'getDocument',
+    'getDocumentRequired',
     'getFinancialAssistanceType',
     'getFundSharingPattern',
     'getGender',
@@ -297,153 +294,6 @@ export const api = createApi({
       },
       providesTags: ['Users'],
     }),
-    addUser: builder.mutation({
-      async queryFn(newUser) {
-        try {
-          const users = getStoredUsers();
-          const added = { id: Date.now(), ...newUser };
-          const updated = [...users, added];
-          saveStoredUsers(updated);
-          return { data: added };
-        } catch (error) {
-          return { error: { status: 'CUSTOM_ERROR', error: error.message } };
-        }
-      },
-      invalidatesTags: ['Users'],
-    }),
-    updateUser: builder.mutation({
-      async queryFn({ id, ...updatedData }) {
-        try {
-          const users = getStoredUsers();
-          const updated = users.map((u) => (u.id === id ? { ...u, ...updatedData } : u));
-          saveStoredUsers(updated);
-          const updatedUser = updated.find((u) => u.id === id);
-          return { data: updatedUser };
-        } catch (error) {
-          return { error: { status: 'CUSTOM_ERROR', error: error.message } };
-        }
-      },
-      invalidatesTags: ['Users'],
-    }),
-    deleteUser: builder.mutation({
-      async queryFn(id) {
-        try {
-          const users = getStoredUsers();
-          const updated = users.filter((u) => u.id !== id);
-          saveStoredUsers(updated);
-          return { data: { success: true, id } };
-        } catch (error) {
-          return { error: { status: 'CUSTOM_ERROR', error: error.message } };
-        }
-      },
-      invalidatesTags: ['Users'],
-    }),
-
-    getRoles: builder.query({
-      async queryFn() {
-        try {
-          const data = getStoredRoles();
-          return { data };
-        } catch (error) {
-          return { error: { status: 'CUSTOM_ERROR', error: error.message } };
-        }
-      },
-      providesTags: ['Roles'],
-    }),
-    addRole: builder.mutation({
-      async queryFn(newItem) {
-        try {
-          const roles = getStoredRoles();
-          const added = { id: Date.now(), title: newItem, status: true };
-          const updated = [...roles, added];
-          saveStoredRoles(updated);
-          return { data: added };
-        } catch (error) {
-          return { error: { status: 'CUSTOM_ERROR', error: error.message } };
-        }
-      },
-      invalidatesTags: ['Roles'],
-    }),
-    updateRole: builder.mutation({
-      async queryFn({ id, ...updatedData }) {
-        try {
-          const roles = getStoredRoles();
-          const updated = roles.map((r) => (r.id === id ? { ...r, ...updatedData } : r));
-          saveStoredRoles(updated);
-          const updatedRole = updated.find((r) => r.id === id);
-          return { data: updatedRole };
-        } catch (error) {
-          return { error: { status: 'CUSTOM_ERROR', error: error.message } };
-        }
-      },
-      invalidatesTags: ['Roles'],
-    }),
-    deleteRole: builder.mutation({
-      async queryFn(id) {
-        try {
-          const roles = getStoredRoles();
-          const updated = roles.filter((r) => r.id !== id);
-          saveStoredRoles(updated);
-          return { data: { success: true, id } };
-        } catch (error) {
-          return { error: { status: 'CUSTOM_ERROR', error: error.message } };
-        }
-      },
-      invalidatesTags: ['Roles'],
-    }),
-
-    getDepartments: builder.query({
-      async queryFn() {
-        try {
-          const data = getStoredDepartments();
-          return { data };
-        } catch (error) {
-          return { error: { status: 'CUSTOM_ERROR', error: error.message } };
-        }
-      },
-      providesTags: ['Departments'],
-    }),
-    addDepartment: builder.mutation({
-      async queryFn(newItem) {
-        try {
-          const depts = getStoredDepartments();
-          const added = { id: Date.now(), title: newItem, status: true };
-          const updated = [...depts, added];
-          saveStoredDepartments(updated);
-          return { data: added };
-        } catch (error) {
-          return { error: { status: 'CUSTOM_ERROR', error: error.message } };
-        }
-      },
-      invalidatesTags: ['Departments'],
-    }),
-    updateDepartment: builder.mutation({
-      async queryFn({ id, ...updatedData }) {
-        try {
-          const depts = getStoredDepartments();
-          const updated = depts.map((d) => (d.id === id ? { ...d, ...updatedData } : d));
-          saveStoredDepartments(updated);
-          const updatedDept = updated.find((d) => d.id === id);
-          return { data: updatedDept };
-        } catch (error) {
-          return { error: { status: 'CUSTOM_ERROR', error: error.message } };
-        }
-      },
-      invalidatesTags: ['Departments'],
-    }),
-    deleteDepartment: builder.mutation({
-      async queryFn(id) {
-        try {
-          const depts = getStoredDepartments();
-          const updated = depts.filter((d) => d.id !== id);
-          saveStoredDepartments(updated);
-          return { data: { success: true, id } };
-        } catch (error) {
-          return { error: { status: 'CUSTOM_ERROR', error: error.message } };
-        }
-      },
-      invalidatesTags: ['Departments'],
-    }),
 
     getMinistries: builder.query({
       async queryFn() {
@@ -561,9 +411,9 @@ export const api = createApi({
       }),
     }),
 
-    getDocument: builder.mutation({
+    getDocumentRequired: builder.mutation({
       query: (data = {}) => ({
-        url: '/Document',
+        url: '/DocumentRequired',
         method: 'POST',
         body: data,
       }),
@@ -807,17 +657,6 @@ export const {
   useLoginMutation,
   useGetDashboardSummaryQuery,
   useGetUsersQuery,
-  useAddUserMutation,
-  useUpdateUserMutation,
-  useDeleteUserMutation,
-  useGetRolesQuery,
-  useAddRoleMutation,
-  useUpdateRoleMutation,
-  useDeleteRoleMutation,
-  useGetDepartmentsQuery,
-  useAddDepartmentMutation,
-  useUpdateDepartmentMutation,
-  useDeleteDepartmentMutation,
   useGetMinistriesQuery,
   useAddMinistryMutation,
   useUpdateMinistryMutation,
@@ -830,7 +669,7 @@ export const {
   useGetDeliveryMechanismMutation,
   useGetDepartmentMutation,
   useGetDistrictMutation,
-  useGetDocumentMutation,
+  useGetDocumentRequiredMutation,
   useGetFinancialAssistanceTypeMutation,
   useGetFundSharingPatternMutation,
   useGetGenderMutation,

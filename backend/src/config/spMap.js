@@ -16,7 +16,7 @@ module.exports = {
 
     District: "sp_GetDistrictMasterForDropdown",
 
-    Document: "sp_GetDocumentMasterForDropdown",
+    DocumentRequired: "sp_GetDocumentMasterForDropdown",
 
     FinancialAssistanceType: "sp_GetFinancialAssistanceTypeMasterForDropdown",
 
