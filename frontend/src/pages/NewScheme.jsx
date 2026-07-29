@@ -1,10 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import {
-  SCHEME_TABS_CONFIG,
-  getInitialSchemeState,
-} from '../data/schemeFields';
+import { SCHEME_TABS_CONFIG, getInitialSchemeState } from '../data/schemeFields';
 
 import Alert from '../components/Common/Alert';
 import Card from '../components/Common/Card';
@@ -50,6 +47,8 @@ import {
   useGetTargetGroupMutation,
   useGetThemeMutation,
   useGetUrbanRuralMutation,
+  useSetSchemeBeneficiariesMutation,
+  useSetSchemeBenefitsMutation,
 } from '../app/api';
 
 const extractDataArray = (res) => {
@@ -72,61 +71,172 @@ const extractDataArray = (res) => {
   return [];
 };
 
-const getOptionName = (item) => {
-  if (!item && item !== 0) return '';
-  if (typeof item === 'string') return item;
-  if (typeof item === 'number') return String(item);
-  if (typeof item !== 'object') return String(item);
+const getOptionObj = (item) => {
+  if (item === null || item === undefined) return null;
+  if (typeof item === 'string' || typeof item === 'number') {
+    const str = String(item).trim();
+    return str ? { value: str, label: str } : null;
+  }
+  if (typeof item !== 'object') return null;
 
-  const standardKeys = [
-    'name', 'title', 'label', 'value', 'description', 'text', 'categoryName',
-    'typeName', 'groupName', 'departmentName', 'ministryName', 'agencyName',
-    'statusName', 'sectorName', 'modeName', 'priorityName', 'frequencyName',
-    'coverageName', 'bodyName', 'indicatorName', 'schemeName', 'phaseName',
-    'patternName', 'mechanismName', 'criteriaName'
+  // 1. Determine Label / Name
+  let label = '';
+  const labelKeys = [
+    'label',
+    'name',
+    'title',
+    'text',
+    'description',
+    'categoryName',
+    'typeName',
+    'groupName',
+    'departmentName',
+    'ministryName',
+    'agencyName',
+    'statusName',
+    'sectorName',
+    'modeName',
+    'priorityName',
+    'frequencyName',
+    'coverageName',
+    'bodyName',
+    'indicatorName',
+    'schemeName',
+    'phaseName',
+    'patternName',
+    'mechanismName',
+    'criteriaName',
+    'documentName',
+    'limitName',
+    'insuranceName',
   ];
-  for (const k of standardKeys) {
-    if (item[k] !== undefined && item[k] !== null && typeof item[k] === 'string' && item[k].trim()) {
-      return item[k].trim();
+  for (const k of labelKeys) {
+    if (item[k] !== undefined && item[k] !== null && String(item[k]).trim()) {
+      label = String(item[k]).trim();
+      break;
     }
   }
 
-  const keys = Object.keys(item);
-  const nameKey = keys.find(
-    (k) =>
-      k.toLowerCase().endsWith('name') ||
-      k.toLowerCase().endsWith('title') ||
-      k.toLowerCase().endsWith('type') ||
-      k.toLowerCase().endsWith('category') ||
-      k.toLowerCase().endsWith('frequency') ||
-      k.toLowerCase().endsWith('coverage') ||
-      k.toLowerCase().endsWith('priority') ||
-      k.toLowerCase().endsWith('status') ||
-      k.toLowerCase().endsWith('sdg') ||
-      k.toLowerCase().endsWith('sector') ||
-      k.toLowerCase().endsWith('mode') ||
-      k.toLowerCase().endsWith('group') ||
-      k.toLowerCase().endsWith('criteria') ||
-      k.toLowerCase().endsWith('body') ||
-      k.toLowerCase().endsWith('agency') ||
-      k.toLowerCase().endsWith('phase') ||
-      k.toLowerCase().endsWith('pattern') ||
-      k.toLowerCase().endsWith('mechanism') ||
-      k.toLowerCase().endsWith('department') ||
-      k.toLowerCase().endsWith('ministry') ||
-      k.toLowerCase().endsWith('description')
-  );
-  if (nameKey && item[nameKey] !== undefined && item[nameKey] !== null) return String(item[nameKey]).trim();
+  if (!label) {
+    const keys = Object.keys(item);
+    const nameKey = keys.find(
+      (k) =>
+        k.toLowerCase().endsWith('name') ||
+        k.toLowerCase().endsWith('title') ||
+        k.toLowerCase().endsWith('type') ||
+        k.toLowerCase().endsWith('category') ||
+        k.toLowerCase().endsWith('frequency') ||
+        k.toLowerCase().endsWith('coverage') ||
+        k.toLowerCase().endsWith('priority') ||
+        k.toLowerCase().endsWith('status') ||
+        k.toLowerCase().endsWith('sdg') ||
+        k.toLowerCase().endsWith('sector') ||
+        k.toLowerCase().endsWith('mode') ||
+        k.toLowerCase().endsWith('group') ||
+        k.toLowerCase().endsWith('criteria') ||
+        k.toLowerCase().endsWith('body') ||
+        k.toLowerCase().endsWith('agency') ||
+        k.toLowerCase().endsWith('phase') ||
+        k.toLowerCase().endsWith('pattern') ||
+        k.toLowerCase().endsWith('mechanism') ||
+        k.toLowerCase().endsWith('department') ||
+        k.toLowerCase().endsWith('ministry') ||
+        k.toLowerCase().endsWith('description'),
+    );
+    if (nameKey && item[nameKey] !== undefined && item[nameKey] !== null) {
+      label = String(item[nameKey]).trim();
+    }
+  }
 
-  const stringKey = keys.find(
-    (k) => typeof item[k] === 'string' && k !== 'id' && k !== '_id' && !k.toLowerCase().includes('id') && item[k].trim()
-  );
-  if (stringKey) return item[stringKey].trim();
+  if (!label) {
+    const keys = Object.keys(item);
+    const stringKey = keys.find(
+      (k) =>
+        typeof item[k] === 'string' &&
+        k !== 'id' &&
+        k !== '_id' &&
+        !k.toLowerCase().includes('id') &&
+        item[k].trim(),
+    );
+    if (stringKey) label = item[stringKey].trim();
+  }
 
-  const anyStringKey = keys.find((k) => typeof item[k] === 'string' && item[k].trim());
-  if (anyStringKey) return item[anyStringKey].trim();
+  if (!label) {
+    const keys = Object.keys(item);
+    const anyStringKey = keys.find((k) => typeof item[k] === 'string' && item[k].trim());
+    if (anyStringKey) label = item[anyStringKey].trim();
+  }
 
-  return item[keys[0]] !== undefined ? String(item[keys[0]]) : '';
+  if (!label) {
+    const keys = Object.keys(item);
+    if (keys.length > 0 && item[keys[0]] !== undefined) {
+      label = String(item[keys[0]]);
+    }
+  }
+
+  // 2. Determine Value / ID
+  let value = '';
+  const valueKeys = [
+    'value',
+    'id',
+    '_id',
+    'ID',
+    'Id',
+    'code',
+    'key',
+    'schemeID',
+    'schemeId',
+    'departmentID',
+    'departmentId',
+    'ministryID',
+    'ministryId',
+    'sectorID',
+    'sectorId',
+    'districtID',
+    'districtId',
+    'stateID',
+    'stateId',
+  ];
+  for (const k of valueKeys) {
+    if (item[k] !== undefined && item[k] !== null && String(item[k]).trim() !== '') {
+      value = String(item[k]).trim();
+      break;
+    }
+  }
+
+  if (!value) {
+    const keys = Object.keys(item);
+    const idKey = keys.find(
+      (k) =>
+        k.toLowerCase() === 'id' ||
+        k.toLowerCase() === '_id' ||
+        k.toLowerCase() === 'code' ||
+        k.toLowerCase().endsWith('id') ||
+        k.toLowerCase().endsWith('_id') ||
+        k.toLowerCase().endsWith('code'),
+    );
+    if (
+      idKey &&
+      item[idKey] !== undefined &&
+      item[idKey] !== null &&
+      String(item[idKey]).trim() !== ''
+    ) {
+      value = String(item[idKey]).trim();
+    }
+  }
+
+  if (!value) {
+    value = label;
+  }
+
+  if (!label && !value) return null;
+
+  return { value, label: label };
+};
+
+const getOptionName = (item) => {
+  const obj = getOptionObj(item);
+  return obj ? obj.label : '';
 };
 
 export default function NewScheme() {
@@ -173,6 +283,8 @@ export default function NewScheme() {
   const [getTargetGroup, { data: targetGroupsRes }] = useGetTargetGroupMutation();
   const [getTheme, { data: themesRes }] = useGetThemeMutation();
   const [getUrbanRural, { data: urbanRuralRes }] = useGetUrbanRuralMutation();
+  const [SetSchemeBeneficiaries] = useSetSchemeBeneficiariesMutation();
+  const [SetSchemeBenefits] = useSetSchemeBenefitsMutation();
 
   const [isFetchingOptions, setIsFetchingOptions] = useState(false);
   const [apiSchemes, setApiSchemes] = useState([]);
@@ -232,8 +344,8 @@ export default function NewScheme() {
           .catch((err) => {
             console.warn(`Error fetching ${key}:`, err);
             return { key, list: [] };
-          })
-      )
+          }),
+      ),
     ).then((results) => {
       const fetchedMap = {};
       results.forEach((r) => {
@@ -254,7 +366,8 @@ export default function NewScheme() {
 
   const backendOptionsMap = {
     ageGroup: apiOptionsMap.ageGroup || extractDataArray(ageGroupRes),
-    beneficiaryCategories: apiOptionsMap.beneficiaryCategories || extractDataArray(beneficiaryCategoriesRes),
+    beneficiaryCategories:
+      apiOptionsMap.beneficiaryCategories || extractDataArray(beneficiaryCategoriesRes),
     beneficiaryTypes: apiOptionsMap.beneficiaryTypes || extractDataArray(beneficiaryTypesRes),
     benefitFrequencies: apiOptionsMap.benefitFrequencies || extractDataArray(benefitFrequenciesRes),
     benefitTypes: apiOptionsMap.benefitTypes || extractDataArray(benefitTypesRes),
@@ -262,22 +375,28 @@ export default function NewScheme() {
     departments: apiOptionsMap.departments || extractDataArray(departmentsRes),
     districts: apiOptionsMap.districts || extractDataArray(districtsRes),
     documentsRequired: apiOptionsMap.documentsRequired || extractDataArray(documentsRequiredRes),
-    financialAssistanceTypes: apiOptionsMap.financialAssistanceTypes || extractDataArray(financialAssistanceTypesRes),
-    fundSharingPatterns: apiOptionsMap.fundSharingPatterns || extractDataArray(fundSharingPatternsRes),
+    financialAssistanceTypes:
+      apiOptionsMap.financialAssistanceTypes || extractDataArray(financialAssistanceTypesRes),
+    fundSharingPatterns:
+      apiOptionsMap.fundSharingPatterns || extractDataArray(fundSharingPatternsRes),
     genders: apiOptionsMap.genders || extractDataArray(gendersRes),
-    geographicCoverages: apiOptionsMap.geographicCoverages || extractDataArray(geographicCoveragesRes),
-    implementingAgencies: apiOptionsMap.implementingAgencies || extractDataArray(implementingAgenciesRes),
+    geographicCoverages:
+      apiOptionsMap.geographicCoverages || extractDataArray(geographicCoveragesRes),
+    implementingAgencies:
+      apiOptionsMap.implementingAgencies || extractDataArray(implementingAgenciesRes),
     incomeLimit: apiOptionsMap.incomeCriteria || extractDataArray(incomeCriteriaRes),
     insurance: apiOptionsMap.insuranceTypes || extractDataArray(insuranceTypesRes),
     localBodies: apiOptionsMap.localBodies || extractDataArray(localBodiesRes),
     ministries: apiOptionsMap.ministries || extractDataArray(ministriesRes),
     missions: apiOptionsMap.missions || extractDataArray(missionsRes),
-    monitoringFrequency: apiOptionsMap.monitoringAgencies || extractDataArray(monitoringAgenciesRes),
+    monitoringFrequency:
+      apiOptionsMap.monitoringAgencies || extractDataArray(monitoringAgenciesRes),
     nationalPriorities: apiOptionsMap.nationalPriorities || extractDataArray(nationalPrioritiesRes),
     occupations: apiOptionsMap.occupations || extractDataArray(occupationsRes),
     outcomeIndicators: apiOptionsMap.outcomeIndicators || extractDataArray(outcomeIndicatorsRes),
     reviewFrequencies: apiOptionsMap.reviewFrequencies || extractDataArray(reviewFrequenciesRes),
-    schemes: apiSchemes.length > 0 ? apiSchemes : (apiOptionsMap.schemes || extractDataArray(schemesRes)),
+    schemes:
+      apiSchemes.length > 0 ? apiSchemes : apiOptionsMap.schemes || extractDataArray(schemesRes),
     schemePhases: apiOptionsMap.schemePhases || extractDataArray(schemePhasesRes),
     schemeStatuses: apiOptionsMap.schemeStatuses || extractDataArray(schemeStatusesRes),
     schemeTypes: apiOptionsMap.schemeTypes || extractDataArray(schemeTypesRes),
@@ -326,9 +445,51 @@ export default function NewScheme() {
       message,
       confirmText,
       confirmClass,
-      onConfirm: () => {
-        onConfirm();
-        setConfirmModal((prev) => ({ ...prev, isOpen: false }));
+      onConfirm: async () => {
+        try {
+          if (formData) {
+            await Promise.all([
+              SetSchemeBeneficiaries({
+                SchemeID: formData.SchemeMaster.schemeId,
+                BeneficiaryCategoryID: formData.SchemeBeneficiaries.category,
+                TargetGroupID: formData.SchemeBeneficiaries.targetGroup,
+                GenderID: formData.SchemeBeneficiaries.gender,
+                AgeGroupID: formData.SchemeBeneficiaries.ageGroup,
+                IncomeCriteriaTypeID: formData.SchemeBeneficiaries.incomeCriteria,
+                IncomeLimit: formData.SchemeBeneficiaries.incomeLimit,
+                SocialCategoryID: formData.SchemeBeneficiaries.socialCategory,
+                OccupationID: formData.SchemeBeneficiaries.occupation,
+                GeographicCoverageID: formData.SchemeBeneficiaries.geographicCoverage,
+                UrbanRuralID: formData.SchemeBeneficiaries.urbanRural,
+                EstimatedBeneficiaries: formData.SchemeBeneficiaries.estimatedBeneficiaries,
+                BeneficiaryTypeID: formData.SchemeBeneficiaries.beneficiaryTypes,
+              }).unwrap(),
+
+              SetSchemeBenefits({
+                SchemeID: formData.SchemeMaster.schemeId,
+                BenefitTypeID: formData.SchemeBenefits.benefitType,
+                MonetaryBenefit: formData.SchemeBenefits.monetaryBenefit,
+                NonMonetaryBenefit: formData.SchemeBenefits.nonMonetaryBenefit,
+                SubsidyAmount: formData.SchemeBenefits.subsidyAmount,
+                MaximumAssistance: formData.SchemeBenefits.maxAssistance,
+                BenefitFrequencyID: formData.SchemeBenefits.frequency,
+                DirectBenefit: formData.SchemeBenefits.directBenefit,
+                IndirectBenefit: formData.SchemeBenefits.indirectBenefit,
+              }).unwrap(),
+            ]);
+
+            // Both APIs completed successfully
+            showAlert('Scheme saved successfully.', 'success');
+            setFormData(getInitialSchemeState());
+          }
+
+          onConfirm();
+        } catch (error) {
+          console.error(error);
+          showAlert('Failed to save scheme.', 'danger');
+        } finally {
+          setConfirmModal((prev) => ({ ...prev, isOpen: false }));
+        }
       },
     });
   };
@@ -428,9 +589,7 @@ export default function NewScheme() {
     });
   };
 
-  const rawSchemesList = Array.isArray(backendOptionsMap.schemes)
-    ? backendOptionsMap.schemes
-    : [];
+  const rawSchemesList = Array.isArray(backendOptionsMap.schemes) ? backendOptionsMap.schemes : [];
 
   const schemeOptions = rawSchemesList
     .map((s) => {
@@ -438,10 +597,8 @@ export default function NewScheme() {
       if (typeof s === 'string' || typeof s === 'number') {
         return { value: String(s), label: String(s) };
       }
-      const val =
-        s.SchemeID ?? s.schemeID ?? s.schemeId ?? s.id ?? s.ID ?? getOptionName(s);
-      const lbl =
-        s.SchemeName ?? s.schemeName ?? s.name ?? s.title ?? s.label ?? getOptionName(s);
+      const val = s.SchemeID ?? s.schemeID ?? s.schemeId ?? s.id ?? s.ID ?? getOptionName(s);
+      const lbl = s.SchemeName ?? s.schemeName ?? s.name ?? s.title ?? s.label ?? getOptionName(s);
       if (!val && !lbl) return null;
       return {
         value: String(val || lbl),
@@ -464,10 +621,8 @@ export default function NewScheme() {
 
     const foundScheme = rawSchemesList.find((s) => {
       if (!s) return false;
-      if (typeof s === 'string' || typeof s === 'number')
-        return String(s) === String(val);
-      const sVal =
-        s.SchemeID ?? s.schemeID ?? s.schemeId ?? s.id ?? s.ID ?? getOptionName(s);
+      if (typeof s === 'string' || typeof s === 'number') return String(s) === String(val);
+      const sVal = s.SchemeID ?? s.schemeID ?? s.schemeId ?? s.id ?? s.ID ?? getOptionName(s);
       return String(sVal) === String(val);
     });
 
@@ -607,7 +762,10 @@ export default function NewScheme() {
       <div className="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3  mt-2">
         <div>
           <h4 className="mb-1 text-dark-emphasis fw-bold">Government Scheme 360° Portal</h4>
-          <span className="badge bg-primary-subtle text-primary border border-primary-subtle px-2.5 py-1 mt-1" style={{ fontSize: '0.75rem' }}>
+          <span
+            className="badge bg-primary-subtle text-primary border border-primary-subtle px-2.5 py-1 mt-1"
+            style={{ fontSize: '0.75rem' }}
+          >
             Form Progress: {getOverallProgress()}%
           </span>
         </div>
@@ -625,7 +783,10 @@ export default function NewScheme() {
 
       {/* Alert Banner & API Data Loading Spinner Banner */}
       {isFetchingOptions && (
-        <div className="alert alert-info py-2 px-3 mb-3 d-flex align-items-center gap-2 rounded border-info-subtle bg-info-subtle text-info-emphasis shadow-sm" style={{ fontSize: '0.85rem' }}>
+        <div
+          className="alert alert-info py-2 px-3 mb-3 d-flex align-items-center gap-2 rounded border-info-subtle bg-info-subtle text-info-emphasis shadow-sm"
+          style={{ fontSize: '0.85rem' }}
+        >
           <Spinner size="xs" variant="info" />
           <span>Fetching master dropdown options from API endpoints...</span>
         </div>
@@ -673,7 +834,7 @@ export default function NewScheme() {
               onChange={(val) => setCurrentTab(Number(val))}
               searchable={true}
               placeholder="Jump to tab..."
-              style={{minWidth: '240px' }}
+              style={{ minWidth: '240px' }}
             />
           </div>
         </div>
@@ -826,22 +987,37 @@ export default function NewScheme() {
                   backendOptionsMap[field.key + 's'];
 
                 const apiOpts = (Array.isArray(backendOpts) ? backendOpts : [])
-                  .map((item) => getOptionName(item))
+                  .map((item) => getOptionObj(item))
                   .filter(Boolean);
 
-                const staticOpts = Array.isArray(field.options) ? field.options : [];
+                const staticOpts = (Array.isArray(field.options) ? field.options : [])
+                  .map((item) => getOptionObj(item))
+                  .filter(Boolean);
 
                 // Purely use live API options (or static field options if defined in field schema)
                 let rawOptions = apiOpts.length > 0 ? apiOpts : staticOpts;
 
-                // Remove duplicate trimmed values
-                let optionsList = Array.from(
-                  new Set(rawOptions.map((opt) => String(opt).trim()).filter(Boolean))
-                );
+                // Deduplicate by option value
+                const seenValues = new Set();
+                let optionsList = [];
+                for (const opt of rawOptions) {
+                  const valStr = String(opt.value).trim();
+                  if (valStr && !seenValues.has(valStr)) {
+                    seenValues.add(valStr);
+                    optionsList.push(opt);
+                  }
+                }
 
-                // Ensure the current selected value is always present in the options list
-                if (value && !optionsList.includes(value)) {
-                  optionsList = [value, ...optionsList];
+                // Ensure the current selected value is always present in optionsList so it displays properly
+                if (value !== undefined && value !== null && String(value).trim() !== '') {
+                  const valStr = String(value).trim();
+                  const exists = optionsList.some(
+                    (opt) =>
+                      String(opt.value).trim() === valStr || String(opt.label).trim() === valStr,
+                  );
+                  if (!exists) {
+                    optionsList = [{ value: valStr, label: valStr }, ...optionsList];
+                  }
                 }
 
                 const isSelect = field.type === 'select';

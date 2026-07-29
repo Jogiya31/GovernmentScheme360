@@ -14,7 +14,6 @@ const getStoredUsers = () => {
   return DEFAULT_USERS;
 };
 
-
 const DEFAULT_ROLES = [
   { id: 1, title: 'Super Admin', status: true },
   { id: 2, title: 'Ministry Nodal Officer', status: true },
@@ -165,6 +164,10 @@ export const api = createApi({
     'getTargetGroup',
     'getTheme',
     'getUrbanRural',
+    //-----------------//
+    'setSchemeBeneficiaries',
+    'setSchemeBenefits'
+
   ],
 
   endpoints: (builder) => ({
@@ -650,6 +653,22 @@ export const api = createApi({
         body: data,
       }),
     }),
+
+    setSchemeBeneficiaries: builder.mutation({
+      query: (data) => ({
+        url: 'setSchemeBeneficiaries',
+        method: 'post',
+        body: data,
+      }),
+    }),
+
+    setSchemeBenefits: builder.mutation({
+      query: (data) => ({
+        url: 'setSchemeBenefits',
+        method: 'post',
+        body: data,
+      }),
+    }),
   }),
 });
 
@@ -699,4 +718,7 @@ export const {
   useGetTargetGroupMutation,
   useGetThemeMutation,
   useGetUrbanRuralMutation,
+  //
+  useSetSchemeBeneficiariesMutation,
+  useSetSchemeBenefitsMutation
 } = api;

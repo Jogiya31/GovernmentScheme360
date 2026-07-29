@@ -1,5 +1,12 @@
 // Scheme Fields Specification for Government Scheme 360° Portal
 // Organizes the form structure across 23 tabs
+const financialYearOptions = [''];
+
+const currentYear = new Date().getFullYear();
+
+for (let year = 2004; year <= currentYear; year++) {
+  financialYearOptions.push(`${year}-${year + 1}`);
+}
 
 export const DEFAULT_FALLBACK_OPTIONS = {};
 
@@ -9,18 +16,18 @@ export const SCHEME_TABS_CONFIG = [
     title: '1. Basic Info',
     icon: 'bi-info-circle-fill',
     fields: [
-      { key: 'schemeId', label: 'Scheme ID', type: 'text', placeholder: 'Unique Identifier, e.g. SCH-PMAY-2026', col: 4 },
-      { key: 'schemeName', label: 'Official Scheme Name', type: 'text', placeholder: 'Full official name of the scheme', col: 8 },
+      // { key: 'schemeId', label: 'Scheme ID', type: 'text', placeholder: 'Unique Identifier, e.g. SCH-PMAY-2026', col: 4 },
+      { key: 'schemeName', label: 'Official Scheme Name', type: 'text', placeholder: 'Full official name of the scheme', col: 4 },
       { key: 'alternateName', label: 'Alternate Name / Acronym', type: 'text', placeholder: 'e.g. PMAY-U / PMAY-G', col: 4 },
       { key: 'ministry', label: 'Nodal Ministry', type: 'select', options: [], col: 4 },
       { key: 'department', label: 'Implementing Department', type: 'select', options: [], col: 4 },
       { key: 'schemeType', label: 'Scheme Type', type: 'select', options: [], col: 4 },
       { key: 'launchDate', label: 'Launch Date', type: 'date', col: 4 },
-      { key: 'fyStarted', label: 'Financial Year Started', type: 'date', col: 4 },
+      { key: 'fyStarted', label: 'Financial Year Started',  type: 'select', options: financialYearOptions, col: 4 },
       { key: 'status', label: 'Current Status', type: 'select', options: [], col: 4 },
       { key: 'website', label: 'Official Website / Portal', type: 'text', placeholder: 'https://...', col: 4 },
       { key: 'notification', label: 'Gazette / Notification Reference', type: 'text', placeholder: 'e.g. Notification No. 10/2026', col: 4 },
-      { key: 'logoUrl', label: 'Scheme Logo Image URL', type: 'text', placeholder: 'https://...', col: 12 }
+      // { key: 'logoUrl', label: 'Scheme Logo Image URL', type: 'text', placeholder: 'https://...', col: 12 }
     ]
   },
   {
@@ -48,7 +55,7 @@ export const SCHEME_TABS_CONFIG = [
       { key: 'nationalPriority', label: 'National Priority Mapping', type: 'select', options: [], col: 4 },
       { key: 'aspirationalDistrictScheme', label: 'Aspirational District Scheme', type: 'select', options: ['','Yes','No'], col: 4 },
       { key: 'flagshipScheme', label: 'Is Flagship Scheme',  type: 'text', placeholder: 'Enter here...', col: 4 },
-      // { key: 'categoryTag', label: 'Welfare / Infrastructure Category', type: 'select', options: [], col: 4 }
+      { key: 'categoryTag', label: 'Welfare / Infrastructure Category', type: 'select', options: [], col: 4 }
     ]
   },
   {
@@ -60,12 +67,13 @@ export const SCHEME_TABS_CONFIG = [
       { key: 'targetGroup', label: 'Primary Target Group',  type: 'select', options: [], col: 4 },
       { key: 'gender', label: 'Gender focus', type: 'select', options: [], col: 4 },
       { key: 'ageGroup', label: 'Target Age Group', type: 'select', options: [], col: 4 },
-      { key: 'incomeCriteria', label: 'Income Criteria Limits',type: 'select', options: [], col: 4 },
+      { key: 'incomeCriteria', label: 'Income Criteria',type: 'number', placeholder:'Enter here...', col: 4 },
+      { key: 'incomeLimit', label: 'Income Limits', type: 'select', options: [], col: 4 },
       { key: 'socialCategory', label: 'Social Category Emphasis', type: 'select', options: [], col: 4 },
       { key: 'occupation', label: 'Target Occupation', type: 'select', options: [], col: 4 },
       { key: 'geographicCoverage', label: 'Beneficiary Geographic Area', type: 'select', options: [], col: 4 },
       { key: 'urbanRural', label: 'Urban / Rural Segment', type: 'select', options: [], col: 4 },
-      { key: 'individualInstitution', label: 'Entity Type', type: 'text', placeholder:'Enter here...', col: 4 },
+      { key: 'beneficiaryTypes', label: 'Benificary Type', type: 'select', options: [], col: 4 },
       { key: 'estimatedBeneficiaries', label: 'Estimated Beneficiaries', type: 'number', placeholder: 'e.g. 5000000', col: 4 }
     ]
   },
@@ -151,13 +159,13 @@ export const SCHEME_TABS_CONFIG = [
     icon: 'bi-gift-fill',
     fields: [
       { key: 'benefitType', label: 'Main Benefit Category', type: 'select', options: [], col: 4 },
-      { key: 'monetaryBenefit', label: 'Details of Monetary Benefit', type: 'text', placeholder: 'e.g. Direct cash subsidy of ₹ 1.2 Lakhs', col: 4 },
+      { key: 'monetaryBenefit', label: 'Details of Monetary Benefit', type: 'number', placeholder: 'e.g. Direct cash subsidy of ₹ 1.2 Lakhs', col: 4 },
       { key: 'nonMonetaryBenefit', label: 'Details of Non-Monetary Benefit', type: 'text', placeholder: 'e.g. Free electricity connections, toilets', col: 4 },
       { key: 'subsidyAmount', label: 'Explicit Subsidy Amount (₹)', type: 'number', placeholder: 'e.g. 120000', col: 4 },
       { key: 'maxAssistance', label: 'Maximum Assistance per Beneficiary (₹)', type: 'number', placeholder: 'e.g. 150000', col: 4 },
-      { key: 'frequency', label: 'Disbursement Frequency', type: 'select', options: [], col: 4 },
-      { key: 'directBenefit', label: 'Direct Beneficiary Transfer (DBT)?', type: 'text', placeholder:'Enter here...', col: 4 },
-      { key: 'indirectBenefit', label: 'Indirect Community Benefit?', type: 'text', placeholder:'Enter here...', col: 4 }
+      { key: 'frequency', label: 'Benifit Frequency', type: 'select', options: [], col: 4 },
+      { key: 'directBenefit', label: 'Direct Beneficit', type: 'text', placeholder:'Enter here...', col: 4 },
+      { key: 'indirectBenefit', label: 'Indirect Beneficit', type: 'text', placeholder:'Enter here...', col: 4 }
     ]
   },
   {

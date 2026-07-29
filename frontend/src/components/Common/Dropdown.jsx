@@ -31,9 +31,11 @@ export default function Dropdown({
       if (typeof opt === 'string' || typeof opt === 'number') {
         return { value: opt, label: String(opt) };
       }
+      const val = opt.value !== undefined && opt.value !== null ? opt.value : opt.label;
+      const lbl = opt.label ? String(opt.label) : String(val ?? '');
       return {
-        value: opt.value,
-        label: opt.label || String(opt.value),
+        value: val,
+        label: lbl,
         icon: opt.icon
       };
     });
@@ -66,13 +68,21 @@ export default function Dropdown({
   // Find label of currently selected option in single mode
   const selectedSingleOption = useMemo(() => {
     if (isMulti) return null;
-    return normalizedOptions.find((opt) => opt.value === value);
+    if (value === undefined || value === null || value === '') return null;
+    const strVal = String(value);
+    return (
+      normalizedOptions.find((opt) => String(opt.value) === strVal) ||
+      normalizedOptions.find((opt) => String(opt.label) === strVal)
+    );
   }, [normalizedOptions, value, isMulti]);
 
   // Find labels of selected options in multi mode
   const selectedMultiOptions = useMemo(() => {
     if (!isMulti || !Array.isArray(value)) return [];
-    return normalizedOptions.filter((opt) => value.includes(opt.value));
+    const strVals = value.map(String);
+    return normalizedOptions.filter(
+      (opt) => strVals.includes(String(opt.value)) || strVals.includes(String(opt.label))
+    );
   }, [normalizedOptions, value, isMulti]);
 
   const handleToggle = () => {
@@ -262,8 +272,8 @@ export default function Dropdown({
             ) : (
               filteredOptions.map((opt) => {
                 const isSelected = isMulti
-                  ? (Array.isArray(value) && value.includes(opt.value))
-                  : value === opt.value;
+                  ? (Array.isArray(value) && (value.map(String).includes(String(opt.value)) || value.map(String).includes(String(opt.label))))
+                  : (value !== undefined && value !== null && value !== '') && (String(value) === String(opt.value) || String(value) === String(opt.label));
 
                 return (
                   <div

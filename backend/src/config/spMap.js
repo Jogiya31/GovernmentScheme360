@@ -74,6 +74,12 @@ module.exports = {
 
     Theme: "sp_GetThemeMasterForDropdown",
 
-    UrbanRural: "sp_GetUrbanRuralMasterForDropdown"
+    UrbanRural: "sp_GetUrbanRuralMasterForDropdown",
+
+    // api for insert scheme benificiaries
+
+    setSchemeBeneficiaries: "SchemeDetails.usp_InsertSchemeBeneficiaries",
+    
+    setSchemeBenefits: "SchemeDetails.usp_InsertSchemeBenefits"
 
 };
