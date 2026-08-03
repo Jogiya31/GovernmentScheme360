@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { useLoginMutation } from '../app/api';
 import { setCredentials } from '../features/auth/authSlice';
+import scheme360 from '../assets/scheme360.png'
 
 export default function Login() {
   const dispatch = useDispatch();
@@ -37,8 +38,8 @@ export default function Login() {
       <div className="card shadow-lg border-0 m-3" style={{ maxWidth: '450px', width: '100%', borderRadius: '8px' }}>
         <div className="card-body p-5">
           <div className="text-center mb-4">
-            <i className="bi bi-cpu-fill text-primary display-4"></i>
-            <h3 className="fw-bold mt-2 mb-1">Free<span className="text-primary">Dash</span> Admin</h3>
+            <img src={scheme360} alt="Scheme360 Logo" className="display-4" style={{ height: '45px', width: 'auto', objectFit: 'contain' }} />
+            <h3 className="fw-bold mt-2 mb-1">Welcome to <span className="text-primary">Scheme</span> 360</h3>
             <p className="text-muted text-sm">Sign in to manage your executive dashboard</p>
           </div>
 

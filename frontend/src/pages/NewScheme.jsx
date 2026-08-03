@@ -449,7 +449,7 @@ export default function NewScheme() {
         try {
           if (formData) {
             await Promise.all([
-              SetSchemeBeneficiaries({
+              SetSchemeBeneficiaries({ 
                 SchemeID: formData.SchemeMaster.schemeId,
                 BeneficiaryCategoryID: formData.SchemeBeneficiaries.category,
                 TargetGroupID: formData.SchemeBeneficiaries.targetGroup,

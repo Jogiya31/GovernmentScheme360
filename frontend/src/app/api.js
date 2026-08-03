@@ -164,9 +164,30 @@ export const api = createApi({
     'getTargetGroup',
     'getTheme',
     'getUrbanRural',
+    
     //-----------------//
     'setSchemeBeneficiaries',
-    'setSchemeBenefits'
+    'setSchemeBenefits',
+    'setSchemeClassification',
+    'setSchemeComplementary',
+    'setSchemeConvergence',
+    'setSchemeDistrict',
+    'setSchemeDuplicate',
+    'setSchemeEligibility',
+    'setSchemeFinancials',
+    'setSchemeGeography',
+    'setSchemeImplementation',
+    'setSchemeMaster',
+    'setSchemeMission',
+    'setSchemeObjectives',
+    'setSchemeOutcomes',
+    'setSchemeRelationships',
+    'setSchemeRisks',
+    'setSchemeSDG',
+    'setSchemeSimilar',
+    'setSchemeStakeholders',
+    'setSchemeState',
+    'setSchemeTimeline'
 
   ],
 
@@ -669,6 +690,167 @@ export const api = createApi({
         body: data,
       }),
     }),
+
+    setSchemeClassification: builder.mutation({
+      query: (data) => ({
+        url: 'setSchemeClassification',
+        method: 'post',
+        body: data,
+      }),
+    }),
+
+    setSchemeComplementary: builder.mutation({
+      query: (data) => ({
+        url: 'setSchemeComplementary',
+        method: 'post',
+        body: data,
+      }),
+    }),
+
+    setSchemeConvergence: builder.mutation({
+      query: (data) => ({
+        url: 'setSchemeConvergence',
+        method: 'post',
+        body: data,
+      }),
+    }),
+
+    setSchemeDistrict: builder.mutation({
+      query: (data) => ({
+        url: 'setSchemeDistrict',
+        method: 'post',
+        body: data,
+      }),
+    }),
+
+    setSchemeDuplicate: builder.mutation({
+      query: (data) => ({
+        url: 'setSchemeDuplicate',
+        method: 'post',
+        body: data,
+      }),
+    }),
+
+    setSchemeEligibility: builder.mutation({
+      query: (data) => ({
+        url: 'setSchemeEligibility',
+        method: 'post',
+        body: data,
+      }),
+    }),
+
+    setSchemeFinancials: builder.mutation({
+      query: (data) => ({
+        url: 'setSchemeFinancials',
+        method: 'post',
+        body: data,
+      }),
+    }),
+
+    setSchemeGeography: builder.mutation({
+      query: (data) => ({
+        url: 'setSchemeGeography',
+        method: 'post',
+        body: data,
+      }),
+    }),
+
+    setSchemeImplementation: builder.mutation({
+      query: (data) => ({
+        url: 'setSchemeImplementation',
+        method: 'post',
+        body: data,
+      }),
+    }),
+
+    setSchemeMaster: builder.mutation({
+      query: (data) => ({
+        url: 'setSchemeMaster',
+        method: 'post',
+        body: data,
+      }),
+    }),
+
+    setSchemeMission: builder.mutation({
+      query: (data) => ({
+        url: 'setSchemeMission',
+        method: 'post',
+        body: data,
+      }),
+    }),
+
+    setSchemeObjectives: builder.mutation({
+      query: (data) => ({
+        url: 'setSchemeObjectives',
+        method: 'post',
+        body: data,
+      }),
+    }),
+
+    setSchemeOutcomes: builder.mutation({
+      query: (data) => ({
+        url: 'setSchemeOutcomes',
+        method: 'post',
+        body: data,
+      }),
+    }),
+
+    setSchemeRelationships: builder.mutation({
+      query: (data) => ({
+        url: 'setSchemeRelationships',
+        method: 'post',
+        body: data,
+      }),
+    }),
+
+    setSchemeRisks: builder.mutation({
+      query: (data) => ({
+        url: 'setSchemeRisks',
+        method: 'post',
+        body: data,
+      }),
+    }),
+
+    setSchemeSDG: builder.mutation({
+      query: (data) => ({
+        url: 'setSchemeSDG',
+        method: 'post',
+        body: data,
+      }),
+    }),
+
+    setSchemeSimilar: builder.mutation({
+      query: (data) => ({
+        url: 'setSchemeSimilar',
+        method: 'post',
+        body: data,
+      }),
+    }),
+
+    setSchemeStakeholders: builder.mutation({
+      query: (data) => ({
+        url: 'setSchemeStakeholders',
+        method: 'post',
+        body: data,
+      }),
+    }),
+
+    setSchemeState: builder.mutation({
+      query: (data) => ({
+        url: 'setSchemeState',
+        method: 'post',
+        body: data,
+      }),
+    }),
+
+    setSchemeTimeline: builder.mutation({
+      query: (data) => ({
+        url: 'setSchemeTimeline',
+        method: 'post',
+        body: data,
+      }),
+    }),
+
   }),
 });
 
@@ -720,5 +902,25 @@ export const {
   useGetUrbanRuralMutation,
   //
   useSetSchemeBeneficiariesMutation,
-  useSetSchemeBenefitsMutation
+  useSetSchemeBenefitsMutation,
+  useSetSchemeClassificationMutation,
+  useSetSchemeComplementaryMutation,
+  useSetSchemeConvergenceMutation,
+  useSetSchemeDistrictMutation,
+  useSetSchemeDuplicateMutation,
+  useSetSchemeEligibilityMutation,
+  useSetSchemeFinancialsMutation,
+  useSetSchemeGeographyMutation,
+  useSetSchemeImplementationMutation,
+  useSetSchemeMasterMutation,
+  useSetSchemeMissionMutation,
+  useSetSchemeObjectivesMutation,
+  useSetSchemeOutcomesMutation,
+  useSetSchemeRelationshipsMutation,
+  useSetSchemeRisksMutation,
+  useSetSchemeSDGMutation,
+  useSetSchemeSimilarMutation,
+  useSetSchemeStakeholdersMutation,
+  useSetSchemeStateMutation,
+  useSetSchemeTimelineMutation,
 } = api;
