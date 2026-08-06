@@ -1,4 +1,8 @@
 module.exports = {
+  // api for get scheme
+  getSchemeById: "SchemeDetails.usp_GetSchemeDetailsByID",
+  
+  // api for get master data
   AgeGroup: "sp_GetAgeGroupMasterForDropdown",
   BeneficiaryCategory: "sp_GetBeneficiaryCategoryMasterForDropdown",
   BeneficiaryType: "sp_GetBeneficiaryTypeMasterForDropdown",
@@ -38,8 +42,7 @@ module.exports = {
   Theme: "sp_GetThemeMasterForDropdown",
   UrbanRural: "sp_GetUrbanRuralMasterForDropdown",
 
-  // api for insert scheme benificiaries
-
+  // api for insert scheme
   setSchemeMaster: "SchemeDetails.usp_InsertSchemeMaster",
   setSchemeObjectives: "SchemeDetails.usp_InsertSchemeObjectives",
   setSchemeClassification: "SchemeDetails.usp_InsertSchemeClassification",
@@ -62,4 +65,27 @@ module.exports = {
   setSchemeDuplicate: "SchemeDetails.usp_InsertSchemeDuplicate",
   setSchemeState: "SchemeDetails.usp_InsertSchemeState",
   setSchemeDistrict: "SchemeDetails.usp_InsertSchemeDistrict",
+
+  // api for update scheme
+  updateSchemeMaster: "SchemeDetails.usp_UpdateSchemeMaster",
+  updateSchemeObjectives: "SchemeDetails.usp_UpdateSchemeObjectives",
+  updateSchemeClassification: "SchemeDetails.usp_UpdateSchemeClassification",
+  updateSchemeBeneficiaries: "SchemeDetails.usp_UpdateSchemeBeneficiaries",
+  updateSchemeEligibility: "SchemeDetails.usp_UpdateSchemeEligibility",
+  updateSchemeFinancials: "SchemeDetails.usp_UpdateSchemeFinancials",
+  updateSchemeImplementation: "SchemeDetails.usp_UpdateSchemeImplementation",
+  updateSchemeGeography: "SchemeDetails.usp_UpdateSchemeGeography",
+  updateSchemeTimeline: "SchemeDetails.usp_UpdateSchemeTimeline",
+  updateSchemeBenefits: "SchemeDetails.usp_UpdateSchemeBenefits",
+  updateSchemeComplementary: "SchemeDetails.usp_UpdateSchemeComplementary",
+  updateSchemeConvergence: "SchemeDetails.usp_UpdateSchemeConvergence",
+  updateSchemeOutcomes: "SchemeDetails.usp_UpdateSchemeOutcomes",
+  updateSchemeSimilar: "SchemeDetails.usp_UpdateSchemeSimilar",
+  updateSchemeSDG: "SchemeDetails.usp_UpdateSchemeSDG",
+  updateSchemeStakeholders: "SchemeDetails.usp_UpdateSchemeStakeholders",
+  updateSchemeRisks: "SchemeDetails.usp_UpdateSchemeRisks",
+  updateSchemeMission: "SchemeDetails.usp_UpdateSchemeMission",
+  updateSchemeRelationships: "SchemeDetails.usp_UpdateSchemeRelationships",
+  updateSchemeState: "SchemeDetails.usp_UpdateSchemeState",
+  updateSchemeDistrict: "SchemeDetails.usp_UpdateSchemeDistrict",
 };

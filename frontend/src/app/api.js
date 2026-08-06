@@ -164,7 +164,7 @@ export const api = createApi({
     'getTargetGroup',
     'getTheme',
     'getUrbanRural',
-    
+
     //-----------------//
     'setSchemeBeneficiaries',
     'setSchemeBenefits',
@@ -187,8 +187,34 @@ export const api = createApi({
     'setSchemeSimilar',
     'setSchemeStakeholders',
     'setSchemeState',
-    'setSchemeTimeline'
+    'setSchemeTimeline',
 
+    //-----------------//
+    'updateSchemeBeneficiaries',
+    'updateSchemeBenefits',
+    'updateSchemeClassification',
+    'updateSchemeComplementary',
+    'updateSchemeConvergence',
+    'updateSchemeDistrict',
+    'updateSchemeDuplicate',
+    'updateSchemeEligibility',
+    'updateSchemeFinancials',
+    'updateSchemeGeography',
+    'updateSchemeImplementation',
+    'updateSchemeMaster',
+    'updateSchemeMission',
+    'updateSchemeObjectives',
+    'updateSchemeOutcomes',
+    'updateSchemeRelationships',
+    'updateSchemeRisks',
+    'updateSchemeSDG',
+    'updateSchemeSimilar',
+    'updateSchemeStakeholders',
+    'updateSchemeState',
+    'updateSchemeTimeline',
+
+    //-----------------//
+    'getSchemeById',
   ],
 
   endpoints: (builder) => ({
@@ -306,6 +332,7 @@ export const api = createApi({
       },
       providesTags: ['Users'],
     }),
+    // User Management APIs
     getUsers: builder.query({
       async queryFn() {
         try {
@@ -317,7 +344,15 @@ export const api = createApi({
       },
       providesTags: ['Users'],
     }),
-
+    // api for get scheme by id
+    getSchemeById: builder.mutation({
+      query: (data) => ({
+        url: 'getSchemeById',
+        method: 'post',
+        body: data,
+      }),
+    }),
+    // api for get master data
     getMinistries: builder.query({
       async queryFn() {
         try {
@@ -636,7 +671,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     // api for scheme data
     setSchemeBeneficiaries: builder.mutation({
       query: (data) => ({
@@ -792,7 +826,161 @@ export const api = createApi({
         body: data,
       }),
     }),
-
+    // api for update scheme
+    updateSchemeBeneficiaries: builder.mutation({
+      query: (data) => ({
+        url: 'updateSchemeBeneficiaries',
+        method: 'post',
+        body: data,
+      }),
+    }),
+    updateSchemeBenefits: builder.mutation({
+      query: (data) => ({
+        url: 'updateSchemeBenefits',
+        method: 'post',
+        body: data,
+      }),
+    }),
+    updateSchemeClassification: builder.mutation({
+      query: (data) => ({
+        url: 'updateSchemeClassification',
+        method: 'post',
+        body: data,
+      }),
+    }),
+    updateSchemeComplementary: builder.mutation({
+      query: (data) => ({
+        url: 'updateSchemeComplementary',
+        method: 'post',
+        body: data,
+      }),
+    }),
+    updateSchemeConvergence: builder.mutation({
+      query: (data) => ({
+        url: 'updateSchemeConvergence',
+        method: 'post',
+        body: data,
+      }),
+    }),
+    updateSchemeDistrict: builder.mutation({
+      query: (data) => ({
+        url: 'updateSchemeDistrict',
+        method: 'post',
+        body: data,
+      }),
+    }),
+    updateSchemeDuplicate: builder.mutation({
+      query: (data) => ({
+        url: 'updateSchemeDuplicate',
+        method: 'post',
+        body: data,
+      }),
+    }),
+    updateSchemeEligibility: builder.mutation({
+      query: (data) => ({
+        url: 'updateSchemeEligibility',
+        method: 'post',
+        body: data,
+      }),
+    }),
+    updateSchemeFinancials: builder.mutation({
+      query: (data) => ({
+        url: 'updateSchemeFinancials',
+        method: 'post',
+        body: data,
+      }),
+    }),
+    updateSchemeGeography: builder.mutation({
+      query: (data) => ({
+        url: 'updateSchemeGeography',
+        method: 'post',
+        body: data,
+      }),
+    }),
+    updateSchemeImplementation: builder.mutation({
+      query: (data) => ({
+        url: 'updateSchemeImplementation',
+        method: 'post',
+        body: data,
+      }),
+    }),
+    updateSchemeMaster: builder.mutation({
+      query: (data) => ({
+        url: 'updateSchemeMaster',
+        method: 'post',
+        body: data,
+      }),
+    }),
+    updateSchemeMission: builder.mutation({
+      query: (data) => ({
+        url: 'updateSchemeMission',
+        method: 'post',
+        body: data,
+      }),
+    }),
+    updateSchemeObjectives: builder.mutation({
+      query: (data) => ({
+        url: 'updateSchemeObjectives',
+        method: 'post',
+        body: data,
+      }),
+    }),
+    updateSchemeOutcomes: builder.mutation({
+      query: (data) => ({
+        url: 'updateSchemeOutcomes',
+        method: 'post',
+        body: data,
+      }),
+    }),
+    updateSchemeRelationships: builder.mutation({
+      query: (data) => ({
+        url: 'updateSchemeRelationships',
+        method: 'post',
+        body: data,
+      }),
+    }),
+    updateSchemeRisks: builder.mutation({
+      query: (data) => ({
+        url: 'updateSchemeRisks',
+        method: 'post',
+        body: data,
+      }),
+    }),
+    updateSchemeSDG: builder.mutation({
+      query: (data) => ({
+        url: 'updateSchemeSDG',
+        method: 'post',
+        body: data,
+      }),
+    }),
+    updateSchemeSimilar: builder.mutation({
+      query: (data) => ({
+        url: 'updateSchemeSimilar',
+        method: 'post',
+        body: data,
+      }),
+    }),
+    updateSchemeStakeholders: builder.mutation({
+      query: (data) => ({
+        url: 'updateSchemeStakeholders',
+        method: 'post',
+        body: data,
+      }),
+    }),
+    updateSchemeState: builder.mutation({
+      query: (data) => ({
+        url: 'updateSchemeState',
+        method: 'post',
+        body: data,
+      }),
+    }),
+    updateSchemeTimeline: builder.mutation({
+      query: (data) => ({
+        url: 'updateSchemeTimeline',
+        method: 'post',
+        body: data,
+      }),
+    }),
   }),
 });
 
@@ -800,7 +988,6 @@ export const {
   useLoginMutation,
   useGetDashboardSummaryQuery,
   useGetUsersQuery,
-
   // get dropdown data
   useGetMinistriesQuery,
   useGetAgeGroupMutation,
@@ -841,7 +1028,6 @@ export const {
   useGetTargetGroupMutation,
   useGetThemeMutation,
   useGetUrbanRuralMutation,
-
   // set form tab data
   useSetSchemeBeneficiariesMutation,
   useSetSchemeBenefitsMutation,
@@ -865,4 +1051,29 @@ export const {
   useSetSchemeStakeholdersMutation,
   useSetSchemeStateMutation,
   useSetSchemeTimelineMutation,
+  // get scheme by id
+  useGetSchemeByIdMutation,
+  // update form tab data
+  useUpdateSchemeBeneficiariesMutation,
+  useUpdateSchemeBenefitsMutation,
+  useUpdateSchemeClassificationMutation,
+  useUpdateSchemeComplementaryMutation,
+  useUpdateSchemeConvergenceMutation,
+  useUpdateSchemeDistrictMutation,
+  useUpdateSchemeDuplicateMutation,
+  useUpdateSchemeEligibilityMutation,
+  useUpdateSchemeFinancialsMutation,
+  useUpdateSchemeGeographyMutation,
+  useUpdateSchemeImplementationMutation,
+  useUpdateSchemeMasterMutation,
+  useUpdateSchemeMissionMutation,
+  useUpdateSchemeObjectivesMutation,
+  useUpdateSchemeOutcomesMutation,
+  useUpdateSchemeRelationshipsMutation,
+  useUpdateSchemeRisksMutation,
+  useUpdateSchemeSDGMutation,
+  useUpdateSchemeSimilarMutation,
+  useUpdateSchemeStakeholdersMutation,
+  useUpdateSchemeStateMutation,
+  useUpdateSchemeTimelineMutation,
 } = api;

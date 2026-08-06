@@ -57,7 +57,6 @@ import {
   useSetSchemeFinancialsMutation,
   useSetSchemeGeographyMutation,
   useSetSchemeImplementationMutation,
-  useSetSchemeMasterMutation,
   useSetSchemeMissionMutation,
   useSetSchemeObjectivesMutation,
   useSetSchemeOutcomesMutation,
@@ -68,6 +67,7 @@ import {
   useSetSchemeStakeholdersMutation,
   useSetSchemeStateMutation,
   useSetSchemeTimelineMutation,
+  useUpdateSchemeMasterMutation,
 } from '../app/api';
 import { useSelector } from 'react-redux';
 
@@ -397,7 +397,6 @@ export default function NewScheme() {
   const [getTheme, { data: themesRes }] = useGetThemeMutation();
   const [getUrbanRural, { data: urbanRuralRes }] = useGetUrbanRuralMutation();
 
-  const [setSchemeMaster] = useSetSchemeMasterMutation();
   const [setSchemeObjectives] = useSetSchemeObjectivesMutation();
   const [setSchemeClassification] = useSetSchemeClassificationMutation();
   const [setSchemeBeneficiaries] = useSetSchemeBeneficiariesMutation();
@@ -419,6 +418,29 @@ export default function NewScheme() {
   const [setSchemeDuplicate] = useSetSchemeDuplicateMutation();
   const [setSchemeState] = useSetSchemeStateMutation();
   const [setSchemeDistrict] = useSetSchemeDistrictMutation();
+
+  const [updateSchemeMaster] = useUpdateSchemeMasterMutation();
+  // const [updateSchemeObjectives] = useUpdateSchemeObjectivesMutation();
+  // const [updateSchemeClassification] = useUpdateSchemeClassificationMutation();
+  // const [updateSchemeBeneficiaries] = useUpdateSchemeBeneficiariesMutation();
+  // const [updateSchemeEligibility] = useUpdateSchemeEligibilityMutation();
+  // const [updateSchemeFinancials] = useUpdateSchemeFinancialsMutation();
+  // const [updateSchemeImplementation] = useUpdateSchemeImplementationMutation();
+  // const [updateSchemeGeography] = useUpdateSchemeGeographyMutation();
+  // const [updateSchemeTimeline] = useUpdateSchemeTimelineMutation();
+  // const [updateSchemeBenefits] = useUpdateSchemeBenefitsMutation();
+  // const [updateSchemeComplementary] = useUpdateSchemeComplementaryMutation();
+  // const [updateSchemeConvergence] = useUpdateSchemeConvergenceMutation();
+  // const [updateSchemeOutcomes] = useUpdateSchemeOutcomesMutation();
+  // const [updateSchemeSimilar] = useUpdateSchemeSimilarMutation();
+  // const [updateSchemeSDG] = useUpdateSchemeSDGMutation();
+  // const [updateSchemeStakeholders] = useUpdateSchemeStakeholdersMutation();
+  // const [updateSchemeRisks] = useUpdateSchemeRisksMutation();
+  // const [updateSchemeMission] = useUpdateSchemeMissionMutation();
+  // const [update_schemeRelationships] = useUpdate_schemeRelationshipsMutation();
+  // const [update_schemeDuplicate] = useUpdate_schemeDuplicateMutation();
+  // const [update_schemeState] = useUpdate_schemeStateMutation();
+  // const [update_schemeDistrict] = useUpdate_schemeDistrictMutation();
 
   const [isFetchingOptions, setIsFetchingOptions] = useState(false);
   const [apiSchemes, setApiSchemes] = useState([]);
@@ -806,7 +828,7 @@ export default function NewScheme() {
           );
 
           if (updatedFormData) {
-            setSchemeMaster(updatedFormData.SchemeMaster).unwrap();
+            updateSchemeMaster(updatedFormData.SchemeMaster).unwrap();
             setSchemeObjectives(updatedFormData.SchemeObjectives).unwrap();
             setSchemeClassification(updatedFormData.SchemeClassification).unwrap();
             setSchemeBeneficiaries(updatedFormData.SchemeBeneficiaries).unwrap();

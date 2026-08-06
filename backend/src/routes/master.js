@@ -27,12 +27,45 @@ async function executeStoredProcedure(req, res, procedure) {
       }
     });
 
-
     const result = await request.execute(procedure);
 
+    // Handle GetSchemeDetailsByID (Multiple Result Sets)
+    if (procedure === "SchemeDetails.usp_GetSchemeDetailsByID") {
+      const rs = result.recordsets;
+
+      return res.status(200).json({
+        success: true,
+        data: {
+          SchemeMaster: rs[0]?.[0] || null,
+          SchemeRisks: rs[1]?.[0] || null,
+          SchemeTimeline: rs[2]?.[0] || null,
+          SchemeEligibility: rs[3]?.[0] || null,
+          SchemeFinancials: rs[4]?.[0] || null,
+          SchemeGeography: rs[5]?.[0] || null,
+          SchemeBeneficiaries: rs[6]?.[0] || null,
+          SchemeClassification: rs[7]?.[0] || null,
+          SchemeObjectives: rs[8]?.[0] || null,
+          SchemeState: rs[9] || [],
+          SchemeDistrict: rs[10] || [],
+          SchemeSDG: rs[11] || [],
+          SchemeSimilar: rs[12] || [],
+          SchemeComplementary: rs[13] || [],
+          SchemeConvergence: rs[14] || [],
+          SchemeDuplicate: rs[15] || [],
+          SchemeStakeholders: rs[16] || [],
+          SchemeRelationships: rs[17]?.[0] || null,
+          SchemeOutcomes: rs[18]?.[0] || null,
+          SchemeMission: rs[19]?.[0] || null,
+          SchemeImplementation: rs[20]?.[0] || null,
+          SchemeBenefits: rs[21]?.[0] || null,
+        },
+      });
+    }
+
+    // Default response for all other procedures
     return res.status(200).json({
       success: true,
-            data: result.recordset
+      data: result.recordset,
     });
   } catch (error) {
     console.error(`Error executing ${procedure}:`, error);
