@@ -17,7 +17,6 @@ import {
   useGetDeliveryMechanismMutation,
   useGetDepartmentMutation,
   useGetDistrictMutation,
-  useGetDocumentRequiredMutation,
   useGetFinancialAssistanceTypeMutation,
   useGetFundSharingPatternMutation,
   useGetGenderMutation,
@@ -49,7 +48,28 @@ import {
   useGetUrbanRuralMutation,
   useSetSchemeBeneficiariesMutation,
   useSetSchemeBenefitsMutation,
+  useSetSchemeClassificationMutation,
+  useSetSchemeComplementaryMutation,
+  useSetSchemeConvergenceMutation,
+  useSetSchemeDistrictMutation,
+  useSetSchemeDuplicateMutation,
+  useSetSchemeEligibilityMutation,
+  useSetSchemeFinancialsMutation,
+  useSetSchemeGeographyMutation,
+  useSetSchemeImplementationMutation,
+  useSetSchemeMasterMutation,
+  useSetSchemeMissionMutation,
+  useSetSchemeObjectivesMutation,
+  useSetSchemeOutcomesMutation,
+  useSetSchemeRelationshipsMutation,
+  useSetSchemeRisksMutation,
+  useSetSchemeSDGMutation,
+  useSetSchemeSimilarMutation,
+  useSetSchemeStakeholdersMutation,
+  useSetSchemeStateMutation,
+  useSetSchemeTimelineMutation,
 } from '../app/api';
+import { useSelector } from 'react-redux';
 
 const extractDataArray = (res) => {
   if (!res) return [];
@@ -109,6 +129,7 @@ const getOptionObj = (item) => {
     'documentName',
     'limitName',
     'insuranceName',
+    'Goal',
   ];
   for (const k of labelKeys) {
     if (item[k] !== undefined && item[k] !== null && String(item[k]).trim()) {
@@ -196,6 +217,7 @@ const getOptionObj = (item) => {
     'districtId',
     'stateID',
     'stateId',
+    'SDGCode',
   ];
   for (const k of valueKeys) {
     if (item[k] !== undefined && item[k] !== null && String(item[k]).trim() !== '') {
@@ -239,7 +261,99 @@ const getOptionName = (item) => {
   return obj ? obj.label : '';
 };
 
+const normalizeRecordKey = (key) => String(key).replace(/[\s_-]/g, '').toLowerCase();
+
+const getRecordValue = (record, aliases = []) => {
+  if (!record || typeof record !== 'object') return undefined;
+
+  for (const key of aliases) {
+    if (Object.prototype.hasOwnProperty.call(record, key)) {
+      return record[key];
+    }
+  }
+
+  const normalizedAliases = aliases.map(normalizeRecordKey);
+  const foundKey = Object.keys(record).find((key) =>
+    normalizedAliases.includes(normalizeRecordKey(key)),
+  );
+
+  return foundKey ? record[foundKey] : undefined;
+};
+
+const getSchemeRecordId = (scheme, fallback = '') => {
+  if (typeof scheme === 'string' || typeof scheme === 'number') return String(scheme);
+  const id = getRecordValue(scheme, ['SchemeID', 'schemeID', 'schemeId', 'SchemeId', 'id', 'ID']);
+  return id !== undefined && id !== null && String(id).trim() !== '' ? String(id) : String(fallback);
+};
+
+const getSchemeRecordName = (scheme, fallback = '') => {
+  if (typeof scheme === 'string' || typeof scheme === 'number') return String(scheme);
+  const name =
+    getRecordValue(scheme, ['SchemeName', 'schemeName', 'scheme_name', 'name', 'title', 'label']) ||
+    getOptionName(scheme);
+  return name !== undefined && name !== null && String(name).trim() !== ''
+    ? String(name)
+    : String(fallback);
+};
+
+const normalizeFormFieldValue = (value, field) => {
+  if (value === undefined || value === null) return '';
+  if (field?.type !== 'date') return String(value);
+
+  const raw = String(value).trim();
+  if (!raw) return '';
+
+  const isoMatch = raw.match(/^(\d{4}-\d{2}-\d{2})/);
+  if (isoMatch) return isoMatch[1];
+
+  const slashOrDashMatch = raw.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})$/);
+  if (slashOrDashMatch) {
+    const [, dd, mm, yyyy] = slashOrDashMatch;
+    return `${yyyy}-${mm.padStart(2, '0')}-${dd.padStart(2, '0')}`;
+  }
+
+  const parsedDate = new Date(raw);
+  if (!Number.isNaN(parsedDate.getTime())) {
+    return parsedDate.toISOString().slice(0, 10);
+  }
+
+  return '';
+};
+
+const buildFormFromSchemeRecord = (scheme, selectedValue = '') => {
+  const nextForm = getInitialSchemeState();
+  const schemeId = getSchemeRecordId(scheme, selectedValue);
+  const schemeName = getSchemeRecordName(scheme, selectedValue);
+
+  if (scheme && typeof scheme === 'object') {
+    SCHEME_TABS_CONFIG.forEach((tab) => {
+      const nestedTabData = getRecordValue(scheme, [tab.id]);
+      if (nestedTabData && typeof nestedTabData === 'object' && !Array.isArray(nestedTabData)) {
+        nextForm[tab.id] = { ...nextForm[tab.id], ...nestedTabData };
+      }
+
+      tab.fields.forEach((field) => {
+        const value = getRecordValue(scheme, [field.key]);
+        if (value !== undefined && value !== null) {
+          nextForm[tab.id][field.key] = normalizeFormFieldValue(value, field);
+        } else if (nextForm[tab.id][field.key] !== undefined && nextForm[tab.id][field.key] !== null) {
+          nextForm[tab.id][field.key] = normalizeFormFieldValue(nextForm[tab.id][field.key], field);
+        }
+      });
+    });
+  }
+
+  if (nextForm.SchemeMaster) {
+    if (schemeId) nextForm.SchemeMaster.SchemeID = schemeId;
+    if (schemeName) nextForm.SchemeMaster.SchemeName = schemeName;
+  }
+
+  return { nextForm, schemeId, schemeName };
+};
+
 export default function NewScheme() {
+  const { user } = useSelector((state) => state.auth);
+
   const [getAgeGroup, { data: ageGroupRes }] = useGetAgeGroupMutation();
   const [getBeneficiaryCategory, { data: beneficiaryCategoriesRes }] =
     useGetBeneficiaryCategoryMutation();
@@ -249,7 +363,6 @@ export default function NewScheme() {
   const [getDeliveryMechanism, { data: deliveryMechanismsRes }] = useGetDeliveryMechanismMutation();
   const [getDepartment, { data: departmentsRes }] = useGetDepartmentMutation();
   const [getDistrict, { data: districtsRes }] = useGetDistrictMutation();
-  const [getDocumentsRequired, { data: documentsRequiredRes }] = useGetDocumentRequiredMutation();
   const [getFinancialAssistanceType, { data: financialAssistanceTypesRes }] =
     useGetFinancialAssistanceTypeMutation();
   const [getFundSharingPattern, { data: fundSharingPatternsRes }] =
@@ -283,8 +396,29 @@ export default function NewScheme() {
   const [getTargetGroup, { data: targetGroupsRes }] = useGetTargetGroupMutation();
   const [getTheme, { data: themesRes }] = useGetThemeMutation();
   const [getUrbanRural, { data: urbanRuralRes }] = useGetUrbanRuralMutation();
-  const [SetSchemeBeneficiaries] = useSetSchemeBeneficiariesMutation();
-  const [SetSchemeBenefits] = useSetSchemeBenefitsMutation();
+
+  const [setSchemeMaster] = useSetSchemeMasterMutation();
+  const [setSchemeObjectives] = useSetSchemeObjectivesMutation();
+  const [setSchemeClassification] = useSetSchemeClassificationMutation();
+  const [setSchemeBeneficiaries] = useSetSchemeBeneficiariesMutation();
+  const [setSchemeEligibility] = useSetSchemeEligibilityMutation();
+  const [setSchemeFinancials] = useSetSchemeFinancialsMutation();
+  const [setSchemeImplementation] = useSetSchemeImplementationMutation();
+  const [setSchemeGeography] = useSetSchemeGeographyMutation();
+  const [setSchemeTimeline] = useSetSchemeTimelineMutation();
+  const [setSchemeBenefits] = useSetSchemeBenefitsMutation();
+  const [setSchemeComplementary] = useSetSchemeComplementaryMutation();
+  const [setSchemeConvergence] = useSetSchemeConvergenceMutation();
+  const [setSchemeOutcomes] = useSetSchemeOutcomesMutation();
+  const [setSchemeSimilar] = useSetSchemeSimilarMutation();
+  const [setSchemeSDG] = useSetSchemeSDGMutation();
+  const [setSchemeStakeholders] = useSetSchemeStakeholdersMutation();
+  const [setSchemeRisks] = useSetSchemeRisksMutation();
+  const [setSchemeMission] = useSetSchemeMissionMutation();
+  const [setSchemeRelationships] = useSetSchemeRelationshipsMutation();
+  const [setSchemeDuplicate] = useSetSchemeDuplicateMutation();
+  const [setSchemeState] = useSetSchemeStateMutation();
+  const [setSchemeDistrict] = useSetSchemeDistrictMutation();
 
   const [isFetchingOptions, setIsFetchingOptions] = useState(false);
   const [apiSchemes, setApiSchemes] = useState([]);
@@ -302,7 +436,6 @@ export default function NewScheme() {
       { key: 'deliveryMechanisms', fn: getDeliveryMechanism },
       { key: 'departments', fn: getDepartment },
       { key: 'districts', fn: getDistrict },
-      { key: 'documentsRequired', fn: getDocumentsRequired },
       { key: 'financialAssistanceTypes', fn: getFinancialAssistanceType },
       { key: 'fundSharingPatterns', fn: getFundSharingPattern },
       { key: 'genders', fn: getGender },
@@ -374,7 +507,6 @@ export default function NewScheme() {
     deliveryMechanisms: apiOptionsMap.deliveryMechanisms || extractDataArray(deliveryMechanismsRes),
     departments: apiOptionsMap.departments || extractDataArray(departmentsRes),
     districts: apiOptionsMap.districts || extractDataArray(districtsRes),
-    documentsRequired: apiOptionsMap.documentsRequired || extractDataArray(documentsRequiredRes),
     financialAssistanceTypes:
       apiOptionsMap.financialAssistanceTypes || extractDataArray(financialAssistanceTypesRes),
     fundSharingPatterns:
@@ -389,8 +521,7 @@ export default function NewScheme() {
     localBodies: apiOptionsMap.localBodies || extractDataArray(localBodiesRes),
     ministries: apiOptionsMap.ministries || extractDataArray(ministriesRes),
     missions: apiOptionsMap.missions || extractDataArray(missionsRes),
-    monitoringFrequency:
-      apiOptionsMap.monitoringAgencies || extractDataArray(monitoringAgenciesRes),
+    monitoringAgencies: apiOptionsMap.monitoringAgencies || extractDataArray(monitoringAgenciesRes),
     nationalPriorities: apiOptionsMap.nationalPriorities || extractDataArray(nationalPrioritiesRes),
     occupations: apiOptionsMap.occupations || extractDataArray(occupationsRes),
     outcomeIndicators: apiOptionsMap.outcomeIndicators || extractDataArray(outcomeIndicatorsRes),
@@ -432,68 +563,6 @@ export default function NewScheme() {
     onConfirm: null,
   });
 
-  const triggerConfirmation = ({
-    title,
-    message,
-    onConfirm,
-    confirmText = 'Confirm',
-    confirmClass = 'btn-danger',
-  }) => {
-    setConfirmModal({
-      isOpen: true,
-      title,
-      message,
-      confirmText,
-      confirmClass,
-      onConfirm: async () => {
-        try {
-          if (formData) {
-            await Promise.all([
-              SetSchemeBeneficiaries({ 
-                SchemeID: formData.SchemeMaster.schemeId,
-                BeneficiaryCategoryID: formData.SchemeBeneficiaries.category,
-                TargetGroupID: formData.SchemeBeneficiaries.targetGroup,
-                GenderID: formData.SchemeBeneficiaries.gender,
-                AgeGroupID: formData.SchemeBeneficiaries.ageGroup,
-                IncomeCriteriaTypeID: formData.SchemeBeneficiaries.incomeCriteria,
-                IncomeLimit: formData.SchemeBeneficiaries.incomeLimit,
-                SocialCategoryID: formData.SchemeBeneficiaries.socialCategory,
-                OccupationID: formData.SchemeBeneficiaries.occupation,
-                GeographicCoverageID: formData.SchemeBeneficiaries.geographicCoverage,
-                UrbanRuralID: formData.SchemeBeneficiaries.urbanRural,
-                EstimatedBeneficiaries: formData.SchemeBeneficiaries.estimatedBeneficiaries,
-                BeneficiaryTypeID: formData.SchemeBeneficiaries.beneficiaryTypes,
-              }).unwrap(),
-
-              SetSchemeBenefits({
-                SchemeID: formData.SchemeMaster.schemeId,
-                BenefitTypeID: formData.SchemeBenefits.benefitType,
-                MonetaryBenefit: formData.SchemeBenefits.monetaryBenefit,
-                NonMonetaryBenefit: formData.SchemeBenefits.nonMonetaryBenefit,
-                SubsidyAmount: formData.SchemeBenefits.subsidyAmount,
-                MaximumAssistance: formData.SchemeBenefits.maxAssistance,
-                BenefitFrequencyID: formData.SchemeBenefits.frequency,
-                DirectBenefit: formData.SchemeBenefits.directBenefit,
-                IndirectBenefit: formData.SchemeBenefits.indirectBenefit,
-              }).unwrap(),
-            ]);
-
-            // Both APIs completed successfully
-            showAlert('Scheme saved successfully.', 'success');
-            setFormData(getInitialSchemeState());
-          }
-
-          onConfirm();
-        } catch (error) {
-          console.error(error);
-          showAlert('Failed to save scheme.', 'danger');
-        } finally {
-          setConfirmModal((prev) => ({ ...prev, isOpen: false }));
-        }
-      },
-    });
-  };
-
   const tabsContainerRef = useRef(null);
 
   // Scroll active tab into view when currentTab changes
@@ -534,8 +603,8 @@ export default function NewScheme() {
   // Extract scheme name from formData
   const getSchemeName = () => {
     return (
+      formData.SchemeMaster?.SchemeName ||
       formData.SchemeMaster?.schemeName ||
-      formData.basicInfo?.schemeName ||
       'Unnamed Government Scheme'
     );
   };
@@ -570,25 +639,6 @@ export default function NewScheme() {
     return Math.round((filledFields / totalFields) * 100) || 0;
   };
 
-  // Submit form (without validation as requested)
-  const handleSubmitScheme = (e) => {
-    if (e && e.preventDefault) e.preventDefault();
-    const schemeName = getSchemeName();
-
-    triggerConfirmation({
-      title: 'Register & Authorize Scheme',
-      message: `Are you sure you want to register and authorize the scheme "${schemeName}"? This will save it permanently in the official portal directory.`,
-      confirmText: 'Submit & Authorize',
-      confirmClass: 'btn-success',
-      onConfirm: () => {
-        showAlert(
-          `Government Scheme "${schemeName}" has been successfully registered & authorized!`,
-          'success',
-        );
-      },
-    });
-  };
-
   const rawSchemesList = Array.isArray(backendOptionsMap.schemes) ? backendOptionsMap.schemes : [];
 
   const schemeOptions = rawSchemesList
@@ -597,8 +647,8 @@ export default function NewScheme() {
       if (typeof s === 'string' || typeof s === 'number') {
         return { value: String(s), label: String(s) };
       }
-      const val = s.SchemeID ?? s.schemeID ?? s.schemeId ?? s.id ?? s.ID ?? getOptionName(s);
-      const lbl = s.SchemeName ?? s.schemeName ?? s.name ?? s.title ?? s.label ?? getOptionName(s);
+      const val = getSchemeRecordId(s, getOptionName(s));
+      const lbl = getSchemeRecordName(s, val);
       if (!val && !lbl) return null;
       return {
         value: String(val || lbl),
@@ -622,55 +672,28 @@ export default function NewScheme() {
     const foundScheme = rawSchemesList.find((s) => {
       if (!s) return false;
       if (typeof s === 'string' || typeof s === 'number') return String(s) === String(val);
-      const sVal = s.SchemeID ?? s.schemeID ?? s.schemeId ?? s.id ?? s.ID ?? getOptionName(s);
-      return String(sVal) === String(val);
+      return getSchemeRecordId(s, getOptionName(s)) === String(val);
     });
 
     if (foundScheme) {
-      const newForm = getInitialSchemeState();
-      if (typeof foundScheme === 'object') {
-        Object.keys(foundScheme).forEach((key) => {
-          if (newForm[key] && typeof foundScheme[key] === 'object') {
-            newForm[key] = { ...newForm[key], ...foundScheme[key] };
-          }
-        });
-
-        const schemeName =
-          foundScheme.SchemeName ||
-          foundScheme.schemeName ||
-          foundScheme.name ||
-          foundScheme.title ||
-          getOptionName(foundScheme);
-        const schemeId =
-          foundScheme.SchemeID ||
-          foundScheme.schemeID ||
-          foundScheme.schemeId ||
-          foundScheme.id ||
-          val;
-
-        if (newForm.SchemeMaster) {
-          if (schemeName) newForm.SchemeMaster.schemeName = schemeName;
-          if (schemeId) newForm.SchemeMaster.schemeId = String(schemeId);
-        }
-        if (newForm.basicInfo) {
-          if (schemeName) newForm.basicInfo.schemeName = schemeName;
-          if (schemeId) newForm.basicInfo.schemeId = String(schemeId);
-        }
-
-        setFormData(newForm);
-        setLoadedRecordId(String(schemeId));
-        setCurrentTab(0);
-        showAlert(`Loaded scheme "${schemeName || 'Record'}" from API!`, 'info');
-      }
+      const { nextForm, schemeId, schemeName } = buildFormFromSchemeRecord(foundScheme, val);
+      setFormData(nextForm);
+      setLoadedRecordId(String(schemeId || val));
+      setCurrentTab(0);
+      showAlert(`Loaded scheme "${schemeName || 'Record'}" from API!`, 'info');
+      return;
     }
+
+    setLoadedRecordId(String(val));
+    showAlert('Selected scheme details were not found in the loaded API data.', 'warning');
   };
 
   // Export full 23-tab scheme structure into a majestic PDF report
   const handleExportPDFReport = () => {
     try {
       const doc = new jsPDF();
-      const schemeTitle = formData.basicInfo?.schemeName || 'Government Scheme Register';
-      const ministryName = formData.basicInfo?.ministry || 'Nodal Ministry Unspecified';
+      const schemeTitle = formData.SchemeMaster?.SchemeName || 'Government Scheme Register';
+      const ministryName = formData.SchemeMaster?.MinistryID || 'Nodal Ministry Unspecified';
 
       // Title Cover banner
       doc.setFont('helvetica');
@@ -730,7 +753,7 @@ export default function NewScheme() {
         }
       });
 
-      doc.save(`scheme-report-${formData.basicInfo?.schemeId || 'registry'}.pdf`);
+      doc.save(`scheme-report-${formData.SchemeMaster?.SchemeID || 'registry'}.pdf`);
       showAlert(
         'PDF report compiled and downloaded successfully with all 23 schema tables!',
         'success',
@@ -755,6 +778,87 @@ export default function NewScheme() {
   const filteredTabs = SCHEME_TABS_CONFIG.map((tab, idx) => ({ ...tab, originalIdx: idx }));
 
   const activeTabConfig = SCHEME_TABS_CONFIG[currentTab];
+
+  const triggerConfirmation = ({
+    title,
+    message,
+    onConfirm,
+    confirmText = 'Confirm',
+    confirmClass = 'btn-danger',
+  }) => {
+    setConfirmModal({
+      isOpen: true,
+      title,
+      message,
+      confirmText,
+      confirmClass,
+      onConfirm: async () => {
+        try {
+          const updatedFormData = Object.fromEntries(
+            Object.entries(formData).map(([key, value]) => [
+              key,
+              {
+                ...value,
+                SchemeID: loadedRecordId,
+                CreatedBy: user?.id || '',
+              },
+            ]),
+          );
+
+          if (updatedFormData) {
+            setSchemeMaster(updatedFormData.SchemeMaster).unwrap();
+            setSchemeObjectives(updatedFormData.SchemeObjectives).unwrap();
+            setSchemeClassification(updatedFormData.SchemeClassification).unwrap();
+            setSchemeBeneficiaries(updatedFormData.SchemeBeneficiaries).unwrap();
+            setSchemeEligibility(updatedFormData.SchemeEligibility).unwrap();
+            setSchemeFinancials(updatedFormData.SchemeFinancials).unwrap();
+            setSchemeImplementation(updatedFormData.SchemeImplementation).unwrap();
+            setSchemeGeography(updatedFormData.SchemeGeography).unwrap();
+            setSchemeTimeline(updatedFormData.SchemeTimeline).unwrap();
+            setSchemeBenefits(updatedFormData.SchemeBenefits).unwrap();
+            setSchemeComplementary(updatedFormData.SchemeComplementary).unwrap();
+            setSchemeConvergence(updatedFormData.SchemeConvergence).unwrap();
+            setSchemeOutcomes(updatedFormData.SchemeOutcomes).unwrap();
+            setSchemeSimilar(updatedFormData.SchemeSimilar).unwrap();
+            setSchemeSDG(updatedFormData.SchemeSDG).unwrap();
+            setSchemeStakeholders(updatedFormData.SchemeStakeholders).unwrap();
+            setSchemeRisks(updatedFormData.SchemeRisks).unwrap();
+            setSchemeMission(updatedFormData.SchemeMission).unwrap();
+            setSchemeRelationships(updatedFormData.SchemeRelationships).unwrap();
+            setSchemeDuplicate(updatedFormData.SchemeDuplicate).unwrap();
+            setSchemeState(updatedFormData.SchemeState).unwrap();
+            setSchemeDistrict(updatedFormData.SchemeDistrict).unwrap();
+          }
+
+          onConfirm();
+        } catch (error) {
+          console.error(error);
+          showAlert('Failed to save scheme.', 'danger');
+        } finally {
+          setConfirmModal((prev) => ({ ...prev, isOpen: false }));
+        }
+      },
+    });
+  };
+
+  // Submit form (without validation as requested)
+  const handleSubmitScheme = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    const schemeName = getSchemeName();
+
+    triggerConfirmation({
+      title: 'Register & Authorize Scheme',
+      message: `Are you sure you want to register and authorize the scheme "${schemeName}"? This will save it permanently in the official portal directory.`,
+      confirmText: 'Submit & Authorize',
+      confirmClass: 'btn-success',
+      onConfirm: () => {
+        showAlert(
+          `Government Scheme "${schemeName}" has been successfully registered & authorized!`,
+          'success',
+        );
+      },
+    });
+  };
 
   return (
     <div className="fade-in pb-5">
@@ -936,48 +1040,50 @@ export default function NewScheme() {
 
                 // Resolve options array from backend map or static configs
                 const keyMap = {
-                  ministry: 'ministries',
-                  schemeType: 'schemeTypes',
-                  status: 'schemeStatuses',
-                  schemeStatus: 'schemeStatuses',
-                  sector: 'sectors',
-                  subSector: 'subSectors',
-                  gender: 'genders',
-                  urbanRural: 'urbanRural',
-                  assistanceType: 'financialAssistanceTypes',
-                  financialAssistanceType: 'financialAssistanceTypes',
-                  deliveryMechanism: 'deliveryMechanisms',
-                  reviewFrequency: 'reviewFrequencies',
-                  benefitType: 'benefitTypes',
-                  frequency: 'benefitFrequencies',
-                  benefitFrequency: 'benefitFrequencies',
-                  sharingPattern: 'fundSharingPatterns',
-                  fundSharingPattern: 'fundSharingPatterns',
-                  ageGroup: 'ageGroup',
-                  category: 'beneficiaryCategories',
-                  beneficiaryCategory: 'beneficiaryCategories',
-                  beneficiaryType: 'beneficiaryTypes',
-                  targetGroup: 'targetGroups',
-                  socialCategory: 'socialCategories',
-                  occupation: 'occupations',
-                  implementingAgency: 'implementingAgencies',
-                  monitoringAgency: 'monitoringAgencies',
-                  state: 'states',
-                  district: 'districts',
-                  department: 'departments',
-                  theme: 'themes',
-                  nationalPriority: 'nationalPriorities',
-                  geographicCoverage: 'geographicCoverages',
-                  localBody: 'localBodies',
-                  mission: 'missions',
-                  schemePhase: 'schemePhases',
-                  sdg: 'sdgs',
-                  serviceMode: 'serviceModes',
-                  stakeholderType: 'stakeholderTypes',
-                  document: 'documents',
-                  insuranceType: 'insuranceTypes',
-                  outcomeIndicator: 'outcomeIndicators',
-                  incomeCriteria: 'incomeCriteria',
+                  MinistryID: 'ministries',
+                  SchemeTypeID: 'schemeTypes',
+                  SchemeCategoryID: 'schemeTypes',
+                  SchemeStatusID: 'schemeStatuses',
+                  SectorID: 'sectors',
+                  SubSectorID: 'subSectors',
+                  GenderID: 'genders',
+                  UrbanRuralID: 'urbanRural',
+                  FinancialAssistanceTypeID: 'financialAssistanceTypes',
+                  DeliveryMechanismID: 'deliveryMechanisms',
+                  ReviewFrequencyID: 'reviewFrequencies',
+                  BenefitTypeID: 'benefitTypes',
+                  BenefitFrequencyID: 'benefitFrequencies',
+                  FundSharingPatternID: 'fundSharingPatterns',
+                  AgeGroupID: 'ageGroup',
+                  BeneficiaryCategoryID: 'beneficiaryCategories',
+                  BeneficiaryTypeID: 'beneficiaryTypes',
+                  TargetGroupID: 'targetGroups',
+                  SocialCategoryID: 'socialCategories',
+                  OccupationID: 'occupations',
+                  ImplementingAgencyID: 'implementingAgencies',
+                  MonitoringAgencyID: 'monitoringAgencies',
+                  StateID: 'states',
+                  DistrictID: 'districts',
+                  DepartmentID: 'departments',
+                  ThemeID: 'themes',
+                  NationalPriorityID: 'nationalPriorities',
+                  GeographicCoverageID: 'geographicCoverages',
+                  LocalBodyID: 'localBodies',
+                  MissionID: 'missions',
+                  SchemePhaseID: 'schemePhases',
+                  SDGID: 'sdgs',
+                  ServiceModeID: 'serviceModes',
+                  StakeholderTypeID: 'stakeholderTypes',
+                  InsuranceTypeID: 'insurance',
+                  OutcomeIndicatorID: 'outcomeIndicators',
+                  IncomeCriteriaTypeID: 'incomeLimit',
+
+                  ParentSchemeID: 'schemes',
+                  ComplementarySchemeID: 'schemes',
+                  ConvergedSchemeID: 'schemes',
+                  SimilarSchemeID: 'schemes',
+                  ReplacedSchemeID: 'schemes',
+                  DuplicateSchemeID: 'schemes',
                 };
 
                 const backendKey = keyMap[field.key] || field.key;
