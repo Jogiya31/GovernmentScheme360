@@ -192,7 +192,7 @@ export const api = createApi({
   ],
 
   endpoints: (builder) => ({
-    // 1. Login API
+    // Login API
     login: builder.mutation({
       async queryFn(credentials) {
         try {
@@ -216,7 +216,7 @@ export const api = createApi({
         }
       },
     }),
-    // 2. Dashboard Summary API
+    // Dashboard Summary API
     getDashboardSummary: builder.query({
       async queryFn() {
         try {
@@ -306,7 +306,6 @@ export const api = createApi({
       },
       providesTags: ['Users'],
     }),
-
     getUsers: builder.query({
       async queryFn() {
         try {
@@ -378,7 +377,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     getBeneficiaryCategory: builder.mutation({
       query: (data = {}) => ({
         url: '/BeneficiaryCategory',
@@ -386,7 +384,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     getBeneficiaryType: builder.mutation({
       query: (data = {}) => ({
         url: '/BeneficiaryType',
@@ -394,7 +391,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     getBenefitFrequency: builder.mutation({
       query: (data = {}) => ({
         url: '/BenefitFrequency',
@@ -402,7 +398,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     getBenefitType: builder.mutation({
       query: (data = {}) => ({
         url: '/BenefitType',
@@ -410,7 +405,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     getDeliveryMechanism: builder.mutation({
       query: (data = {}) => ({
         url: '/DeliveryMechanism',
@@ -418,7 +412,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     getDepartment: builder.mutation({
       query: (data = {}) => ({
         url: '/Department',
@@ -426,7 +419,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     getDistrict: builder.mutation({
       query: (data = {}) => ({
         url: '/District',
@@ -434,7 +426,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     getDocumentRequired: builder.mutation({
       query: (data = {}) => ({
         url: '/DocumentRequired',
@@ -442,7 +433,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     getFinancialAssistanceType: builder.mutation({
       query: (data = {}) => ({
         url: '/FinancialAssistanceType',
@@ -450,7 +440,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     getFundSharingPattern: builder.mutation({
       query: (data = {}) => ({
         url: '/FundSharingPattern',
@@ -458,7 +447,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     getGender: builder.mutation({
       query: (data = {}) => ({
         url: '/Gender',
@@ -466,7 +454,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     getGeographicCoverage: builder.mutation({
       query: (data = {}) => ({
         url: '/GeographicCoverage',
@@ -474,7 +461,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     getImplementingAgency: builder.mutation({
       query: (data = {}) => ({
         url: '/ImplementingAgency',
@@ -482,7 +468,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     getIncomeCriteria: builder.mutation({
       query: (data = {}) => ({
         url: '/IncomeCriteria',
@@ -490,7 +475,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     getInsuranceType: builder.mutation({
       query: (data = {}) => ({
         url: '/InsuranceType',
@@ -498,7 +482,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     getLocalBody: builder.mutation({
       query: (data = {}) => ({
         url: '/LocalBody',
@@ -506,7 +489,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     getMinistry: builder.mutation({
       query: (data = {}) => ({
         url: '/Ministry',
@@ -514,7 +496,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     getMission: builder.mutation({
       query: (data = {}) => ({
         url: '/Mission',
@@ -522,7 +503,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     getMonitoringAgency: builder.mutation({
       query: (data = {}) => ({
         url: '/MonitoringAgency',
@@ -530,7 +510,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     getNationalPriority: builder.mutation({
       query: (data = {}) => ({
         url: '/NationalPriority',
@@ -538,7 +517,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     getOccupation: builder.mutation({
       query: (data = {}) => ({
         url: '/Occupation',
@@ -546,7 +524,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     getOutcomeIndicator: builder.mutation({
       query: (data = {}) => ({
         url: '/OutcomeIndicator',
@@ -554,7 +531,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     getReviewFrequency: builder.mutation({
       query: (data = {}) => ({
         url: '/ReviewFrequency',
@@ -562,7 +538,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     getScheme: builder.mutation({
       query: (data = {}) => ({
         url: '/Scheme',
@@ -570,7 +545,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     getSchemePhase: builder.mutation({
       query: (data = {}) => ({
         url: '/SchemePhase',
@@ -578,7 +552,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     getSchemeStatus: builder.mutation({
       query: (data = {}) => ({
         url: '/SchemeStatus',
@@ -586,7 +559,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     getSchemeType: builder.mutation({
       query: (data = {}) => ({
         url: '/SchemeType',
@@ -594,7 +566,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     getSDG: builder.mutation({
       query: (data = {}) => ({
         url: '/SDG',
@@ -602,7 +573,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     getSector: builder.mutation({
       query: (data = {}) => ({
         url: '/Sector',
@@ -610,7 +580,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     getServiceMode: builder.mutation({
       query: (data = {}) => ({
         url: '/ServiceMode',
@@ -618,7 +587,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     getSocialCategory: builder.mutation({
       query: (data = {}) => ({
         url: '/SocialCategory',
@@ -626,7 +594,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     getStakeholderType: builder.mutation({
       query: (data = {}) => ({
         url: '/StakeholderType',
@@ -634,7 +601,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     getState: builder.mutation({
       query: (data = {}) => ({
         url: '/State',
@@ -642,7 +608,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     getSubSector: builder.mutation({
       query: (data = {}) => ({
         url: '/SubSector',
@@ -650,7 +615,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     getTargetGroup: builder.mutation({
       query: (data = {}) => ({
         url: '/TargetGroup',
@@ -658,7 +622,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     getTheme: builder.mutation({
       query: (data = {}) => ({
         url: '/Theme',
@@ -666,7 +629,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     getUrbanRural: builder.mutation({
       query: (data = {}) => ({
         url: '/UrbanRural',
@@ -675,6 +637,7 @@ export const api = createApi({
       }),
     }),
 
+    // api for scheme data
     setSchemeBeneficiaries: builder.mutation({
       query: (data) => ({
         url: 'setSchemeBeneficiaries',
@@ -682,7 +645,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     setSchemeBenefits: builder.mutation({
       query: (data) => ({
         url: 'setSchemeBenefits',
@@ -690,7 +652,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     setSchemeClassification: builder.mutation({
       query: (data) => ({
         url: 'setSchemeClassification',
@@ -698,7 +659,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     setSchemeComplementary: builder.mutation({
       query: (data) => ({
         url: 'setSchemeComplementary',
@@ -706,7 +666,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     setSchemeConvergence: builder.mutation({
       query: (data) => ({
         url: 'setSchemeConvergence',
@@ -714,7 +673,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     setSchemeDistrict: builder.mutation({
       query: (data) => ({
         url: 'setSchemeDistrict',
@@ -722,7 +680,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     setSchemeDuplicate: builder.mutation({
       query: (data) => ({
         url: 'setSchemeDuplicate',
@@ -730,7 +687,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     setSchemeEligibility: builder.mutation({
       query: (data) => ({
         url: 'setSchemeEligibility',
@@ -738,7 +694,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     setSchemeFinancials: builder.mutation({
       query: (data) => ({
         url: 'setSchemeFinancials',
@@ -746,7 +701,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     setSchemeGeography: builder.mutation({
       query: (data) => ({
         url: 'setSchemeGeography',
@@ -754,7 +708,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     setSchemeImplementation: builder.mutation({
       query: (data) => ({
         url: 'setSchemeImplementation',
@@ -762,7 +715,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     setSchemeMaster: builder.mutation({
       query: (data) => ({
         url: 'setSchemeMaster',
@@ -770,7 +722,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     setSchemeMission: builder.mutation({
       query: (data) => ({
         url: 'setSchemeMission',
@@ -778,7 +729,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     setSchemeObjectives: builder.mutation({
       query: (data) => ({
         url: 'setSchemeObjectives',
@@ -786,7 +736,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     setSchemeOutcomes: builder.mutation({
       query: (data) => ({
         url: 'setSchemeOutcomes',
@@ -794,7 +743,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     setSchemeRelationships: builder.mutation({
       query: (data) => ({
         url: 'setSchemeRelationships',
@@ -802,7 +750,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     setSchemeRisks: builder.mutation({
       query: (data) => ({
         url: 'setSchemeRisks',
@@ -810,7 +757,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     setSchemeSDG: builder.mutation({
       query: (data) => ({
         url: 'setSchemeSDG',
@@ -818,7 +764,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     setSchemeSimilar: builder.mutation({
       query: (data) => ({
         url: 'setSchemeSimilar',
@@ -826,7 +771,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     setSchemeStakeholders: builder.mutation({
       query: (data) => ({
         url: 'setSchemeStakeholders',
@@ -834,7 +778,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     setSchemeState: builder.mutation({
       query: (data) => ({
         url: 'setSchemeState',
@@ -842,7 +785,6 @@ export const api = createApi({
         body: data,
       }),
     }),
-
     setSchemeTimeline: builder.mutation({
       query: (data) => ({
         url: 'setSchemeTimeline',
@@ -858,10 +800,9 @@ export const {
   useLoginMutation,
   useGetDashboardSummaryQuery,
   useGetUsersQuery,
+
+  // get dropdown data
   useGetMinistriesQuery,
-  useAddMinistryMutation,
-  useUpdateMinistryMutation,
-  useDeleteMinistryMutation,
   useGetAgeGroupMutation,
   useGetBeneficiaryCategoryMutation,
   useGetBeneficiaryTypeMutation,
@@ -900,7 +841,8 @@ export const {
   useGetTargetGroupMutation,
   useGetThemeMutation,
   useGetUrbanRuralMutation,
-  //
+
+  // set form tab data
   useSetSchemeBeneficiariesMutation,
   useSetSchemeBenefitsMutation,
   useSetSchemeClassificationMutation,
