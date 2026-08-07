@@ -32,6 +32,7 @@ import {
   useGetOccupationMutation,
   useGetOutcomeIndicatorMutation,
   useGetReviewFrequencyMutation,
+  useGetSchemeByIdMutation,
   useGetSchemeMutation,
   useGetSchemePhaseMutation,
   useGetSchemeStatusMutation,
@@ -46,6 +47,7 @@ import {
   useGetTargetGroupMutation,
   useGetThemeMutation,
   useGetUrbanRuralMutation,
+
   useSetSchemeBeneficiariesMutation,
   useSetSchemeBenefitsMutation,
   useSetSchemeClassificationMutation,
@@ -67,7 +69,29 @@ import {
   useSetSchemeStakeholdersMutation,
   useSetSchemeStateMutation,
   useSetSchemeTimelineMutation,
+
   useUpdateSchemeMasterMutation,
+  useUpdateSchemeObjectivesMutation,
+  useUpdateSchemeClassificationMutation,
+  useUpdateSchemeBeneficiariesMutation,
+  useUpdateSchemeEligibilityMutation,
+  useUpdateSchemeFinancialsMutation,
+  useUpdateSchemeImplementationMutation,
+  useUpdateSchemeGeographyMutation,
+  useUpdateSchemeTimelineMutation,
+  useUpdateSchemeBenefitsMutation,
+  useUpdateSchemeComplementaryMutation,
+  useUpdateSchemeConvergenceMutation,
+  useUpdateSchemeOutcomesMutation,
+  useUpdateSchemeSimilarMutation,
+  useUpdateSchemeSDGMutation,
+  useUpdateSchemeStakeholdersMutation,
+  useUpdateSchemeRisksMutation,
+  useUpdateSchemeMissionMutation,
+  useUpdateSchemeRelationshipsMutation,
+  useUpdateSchemeDuplicateMutation,
+  useUpdateSchemeStateMutation,
+  useUpdateSchemeDistrictMutation,
 } from '../app/api';
 import { useSelector } from 'react-redux';
 
@@ -261,7 +285,10 @@ const getOptionName = (item) => {
   return obj ? obj.label : '';
 };
 
-const normalizeRecordKey = (key) => String(key).replace(/[\s_-]/g, '').toLowerCase();
+const normalizeRecordKey = (key) =>
+  String(key)
+    .replace(/[\s_-]/g, '')
+    .toLowerCase();
 
 const getRecordValue = (record, aliases = []) => {
   if (!record || typeof record !== 'object') return undefined;
@@ -282,15 +309,59 @@ const getRecordValue = (record, aliases = []) => {
 
 const getSchemeRecordId = (scheme, fallback = '') => {
   if (typeof scheme === 'string' || typeof scheme === 'number') return String(scheme);
+
   const id = getRecordValue(scheme, ['SchemeID', 'schemeID', 'schemeId', 'SchemeId', 'id', 'ID']);
-  return id !== undefined && id !== null && String(id).trim() !== '' ? String(id) : String(fallback);
+  if (id !== undefined && id !== null && String(id).trim() !== '') {
+    return String(id);
+  }
+
+  const nested = getRecordValue(scheme, ['SchemeMaster', 'schemeMaster', 'master']);
+  if (nested && typeof nested === 'object') {
+    const nestedId = getRecordValue(nested, [
+      'SchemeID',
+      'schemeID',
+      'schemeId',
+      'SchemeId',
+      'id',
+      'ID',
+    ]);
+    if (nestedId !== undefined && nestedId !== null && String(nestedId).trim() !== '') {
+      return String(nestedId);
+    }
+  }
+
+  return String(fallback);
 };
 
 const getSchemeRecordName = (scheme, fallback = '') => {
   if (typeof scheme === 'string' || typeof scheme === 'number') return String(scheme);
-  const name =
-    getRecordValue(scheme, ['SchemeName', 'schemeName', 'scheme_name', 'name', 'title', 'label']) ||
-    getOptionName(scheme);
+
+  let name = getRecordValue(scheme, [
+    'SchemeName',
+    'schemeName',
+    'scheme_name',
+    'name',
+    'title',
+    'label',
+  ]);
+  if (name === undefined || name === null || String(name).trim() === '') {
+    const nested = getRecordValue(scheme, ['SchemeMaster', 'schemeMaster', 'master']);
+    if (nested && typeof nested === 'object') {
+      name = getRecordValue(nested, [
+        'SchemeName',
+        'schemeName',
+        'scheme_name',
+        'name',
+        'title',
+        'label',
+      ]);
+    }
+  }
+
+  if (name === undefined || name === null || String(name).trim() === '') {
+    name = getOptionName(scheme);
+  }
+
   return name !== undefined && name !== null && String(name).trim() !== ''
     ? String(name)
     : String(fallback);
@@ -298,6 +369,10 @@ const getSchemeRecordName = (scheme, fallback = '') => {
 
 const normalizeFormFieldValue = (value, field) => {
   if (value === undefined || value === null) return '';
+  if (typeof value === 'boolean') {
+    if (field?.type === 'select') return value ? 'Yes' : 'No';
+    return String(value);
+  }
   if (field?.type !== 'date') return String(value);
 
   const raw = String(value).trim();
@@ -320,6 +395,39 @@ const normalizeFormFieldValue = (value, field) => {
   return '';
 };
 
+const unwrapApiResponse = (apiResult) => {
+  if (!apiResult) return null;
+  if (apiResult.data !== undefined) {
+    if (apiResult.data?.data !== undefined) return apiResult.data.data;
+    return apiResult.data;
+  }
+  if (apiResult.result !== undefined) return apiResult.result;
+  return apiResult;
+};
+
+const hasTabData = (value) => {
+  if (value === undefined || value === null) return false;
+  if (Array.isArray(value)) return value.length > 0;
+  if (typeof value === 'object') {
+    return Object.values(value).some(
+      (item) =>
+        item !== undefined &&
+        item !== null &&
+        String(item).trim() !== '' &&
+        !(Array.isArray(item) && item.length === 0),
+    );
+  }
+  return String(value).trim() !== '';
+};
+
+const getLoadedTabState = (scheme) => {
+  const loaded = {};
+  SCHEME_TABS_CONFIG.forEach((tab) => {
+    loaded[tab.id] = hasTabData(getRecordValue(scheme, [tab.id]));
+  });
+  return loaded;
+};
+
 const buildFormFromSchemeRecord = (scheme, selectedValue = '') => {
   const nextForm = getInitialSchemeState();
   const schemeId = getSchemeRecordId(scheme, selectedValue);
@@ -328,15 +436,27 @@ const buildFormFromSchemeRecord = (scheme, selectedValue = '') => {
   if (scheme && typeof scheme === 'object') {
     SCHEME_TABS_CONFIG.forEach((tab) => {
       const nestedTabData = getRecordValue(scheme, [tab.id]);
-      if (nestedTabData && typeof nestedTabData === 'object' && !Array.isArray(nestedTabData)) {
-        nextForm[tab.id] = { ...nextForm[tab.id], ...nestedTabData };
+      const tabSource = Array.isArray(nestedTabData) ? nestedTabData[0] : nestedTabData;
+
+      if (tabSource && typeof tabSource === 'object') {
+        nextForm[tab.id] = { ...nextForm[tab.id], ...tabSource };
       }
 
       tab.fields.forEach((field) => {
-        const value = getRecordValue(scheme, [field.key]);
+        let value;
+        if (tabSource && typeof tabSource === 'object') {
+          value = getRecordValue(tabSource, [field.key]);
+        }
+        if (value === undefined || value === null) {
+          value = getRecordValue(scheme, [field.key]);
+        }
+
         if (value !== undefined && value !== null) {
           nextForm[tab.id][field.key] = normalizeFormFieldValue(value, field);
-        } else if (nextForm[tab.id][field.key] !== undefined && nextForm[tab.id][field.key] !== null) {
+        } else if (
+          nextForm[tab.id][field.key] !== undefined &&
+          nextForm[tab.id][field.key] !== null
+        ) {
           nextForm[tab.id][field.key] = normalizeFormFieldValue(nextForm[tab.id][field.key], field);
         }
       });
@@ -353,6 +473,10 @@ const buildFormFromSchemeRecord = (scheme, selectedValue = '') => {
 
 export default function NewScheme() {
   const { user } = useSelector((state) => state.auth);
+
+  const [getSchemeById] = useGetSchemeByIdMutation();
+
+  const [loadedTabHasData, setLoadedTabHasData] = useState({});
 
   const [getAgeGroup, { data: ageGroupRes }] = useGetAgeGroupMutation();
   const [getBeneficiaryCategory, { data: beneficiaryCategoriesRes }] =
@@ -420,27 +544,27 @@ export default function NewScheme() {
   const [setSchemeDistrict] = useSetSchemeDistrictMutation();
 
   const [updateSchemeMaster] = useUpdateSchemeMasterMutation();
-  // const [updateSchemeObjectives] = useUpdateSchemeObjectivesMutation();
-  // const [updateSchemeClassification] = useUpdateSchemeClassificationMutation();
-  // const [updateSchemeBeneficiaries] = useUpdateSchemeBeneficiariesMutation();
-  // const [updateSchemeEligibility] = useUpdateSchemeEligibilityMutation();
-  // const [updateSchemeFinancials] = useUpdateSchemeFinancialsMutation();
-  // const [updateSchemeImplementation] = useUpdateSchemeImplementationMutation();
-  // const [updateSchemeGeography] = useUpdateSchemeGeographyMutation();
-  // const [updateSchemeTimeline] = useUpdateSchemeTimelineMutation();
-  // const [updateSchemeBenefits] = useUpdateSchemeBenefitsMutation();
-  // const [updateSchemeComplementary] = useUpdateSchemeComplementaryMutation();
-  // const [updateSchemeConvergence] = useUpdateSchemeConvergenceMutation();
-  // const [updateSchemeOutcomes] = useUpdateSchemeOutcomesMutation();
-  // const [updateSchemeSimilar] = useUpdateSchemeSimilarMutation();
-  // const [updateSchemeSDG] = useUpdateSchemeSDGMutation();
-  // const [updateSchemeStakeholders] = useUpdateSchemeStakeholdersMutation();
-  // const [updateSchemeRisks] = useUpdateSchemeRisksMutation();
-  // const [updateSchemeMission] = useUpdateSchemeMissionMutation();
-  // const [update_schemeRelationships] = useUpdate_schemeRelationshipsMutation();
-  // const [update_schemeDuplicate] = useUpdate_schemeDuplicateMutation();
-  // const [update_schemeState] = useUpdate_schemeStateMutation();
-  // const [update_schemeDistrict] = useUpdate_schemeDistrictMutation();
+  const [updateSchemeObjectives] = useUpdateSchemeObjectivesMutation();
+  const [updateSchemeClassification] = useUpdateSchemeClassificationMutation();
+  const [updateSchemeBeneficiaries] = useUpdateSchemeBeneficiariesMutation();
+  const [updateSchemeEligibility] = useUpdateSchemeEligibilityMutation();
+  const [updateSchemeFinancials] = useUpdateSchemeFinancialsMutation();
+  const [updateSchemeImplementation] = useUpdateSchemeImplementationMutation();
+  const [updateSchemeGeography] = useUpdateSchemeGeographyMutation();
+  const [updateSchemeTimeline] = useUpdateSchemeTimelineMutation();
+  const [updateSchemeBenefits] = useUpdateSchemeBenefitsMutation();
+  const [updateSchemeComplementary] = useUpdateSchemeComplementaryMutation();
+  const [updateSchemeConvergence] = useUpdateSchemeConvergenceMutation();
+  const [updateSchemeOutcomes] = useUpdateSchemeOutcomesMutation();
+  const [updateSchemeSimilar] = useUpdateSchemeSimilarMutation();
+  const [updateSchemeSDG] = useUpdateSchemeSDGMutation();
+  const [updateSchemeStakeholders] = useUpdateSchemeStakeholdersMutation();
+  const [updateSchemeRisks] = useUpdateSchemeRisksMutation();
+  const [updateSchemeMission] = useUpdateSchemeMissionMutation();
+  const [updateSchemeRelationships] = useUpdateSchemeRelationshipsMutation();
+  const [updateSchemeDuplicate] = useUpdateSchemeDuplicateMutation();
+  const [updateSchemeState] = useUpdateSchemeStateMutation();
+  const [updateSchemeDistrict] = useUpdateSchemeDistrictMutation();
 
   const [isFetchingOptions, setIsFetchingOptions] = useState(false);
   const [apiSchemes, setApiSchemes] = useState([]);
@@ -683,31 +807,40 @@ export default function NewScheme() {
 
   const selectedDropdownValue = loadedRecordId ? String(loadedRecordId) : '';
 
-  const handleDropdownChange = (val) => {
+  const handleDropdownChange = async (val) => {
     if (!val) {
       setFormData(getInitialSchemeState());
       setLoadedRecordId(null);
+      setLoadedSchemeSource(null);
+      setLoadedTabHasData({});
       setCurrentTab(0);
       return;
     }
 
-    const foundScheme = rawSchemesList.find((s) => {
-      if (!s) return false;
-      if (typeof s === 'string' || typeof s === 'number') return String(s) === String(val);
-      return getSchemeRecordId(s, getOptionName(s)) === String(val);
-    });
+    try {
+      const response = await getSchemeById({ SchemeID: val }).unwrap();
+      const payload = unwrapApiResponse(response);
 
-    if (foundScheme) {
-      const { nextForm, schemeId, schemeName } = buildFormFromSchemeRecord(foundScheme, val);
+      if (!payload || typeof payload !== 'object') {
+        showAlert('Selected scheme response did not contain valid data.', 'warning');
+        setFormData(getInitialSchemeState());
+        setLoadedRecordId(String(val));
+        setLoadedTabHasData({});
+        setCurrentTab(0);
+        return;
+      }
+
+      const { nextForm, schemeId, schemeName } = buildFormFromSchemeRecord(payload, val);
       setFormData(nextForm);
       setLoadedRecordId(String(schemeId || val));
+      setLoadedTabHasData(getLoadedTabState(payload));
       setCurrentTab(0);
-      showAlert(`Loaded scheme "${schemeName || 'Record'}" from API!`, 'info');
-      return;
-    }
 
-    setLoadedRecordId(String(val));
-    showAlert('Selected scheme details were not found in the loaded API data.', 'warning');
+      showAlert(`Loaded scheme "${schemeName || 'Record'}" and auto-filled the form.`, 'success');
+    } catch (error) {
+      console.error('Error fetching selected scheme:', error);
+      showAlert('Failed to load selected scheme. Please try again.', 'danger');
+    }
   };
 
   // Export full 23-tab scheme structure into a majestic PDF report
@@ -816,46 +949,10 @@ export default function NewScheme() {
       confirmClass,
       onConfirm: async () => {
         try {
-          const updatedFormData = Object.fromEntries(
-            Object.entries(formData).map(([key, value]) => [
-              key,
-              {
-                ...value,
-                SchemeID: loadedRecordId,
-                CreatedBy: user?.id || '',
-              },
-            ]),
-          );
-
-          if (updatedFormData) {
-            updateSchemeMaster(updatedFormData.SchemeMaster).unwrap();
-            setSchemeObjectives(updatedFormData.SchemeObjectives).unwrap();
-            setSchemeClassification(updatedFormData.SchemeClassification).unwrap();
-            setSchemeBeneficiaries(updatedFormData.SchemeBeneficiaries).unwrap();
-            setSchemeEligibility(updatedFormData.SchemeEligibility).unwrap();
-            setSchemeFinancials(updatedFormData.SchemeFinancials).unwrap();
-            setSchemeImplementation(updatedFormData.SchemeImplementation).unwrap();
-            setSchemeGeography(updatedFormData.SchemeGeography).unwrap();
-            setSchemeTimeline(updatedFormData.SchemeTimeline).unwrap();
-            setSchemeBenefits(updatedFormData.SchemeBenefits).unwrap();
-            setSchemeComplementary(updatedFormData.SchemeComplementary).unwrap();
-            setSchemeConvergence(updatedFormData.SchemeConvergence).unwrap();
-            setSchemeOutcomes(updatedFormData.SchemeOutcomes).unwrap();
-            setSchemeSimilar(updatedFormData.SchemeSimilar).unwrap();
-            setSchemeSDG(updatedFormData.SchemeSDG).unwrap();
-            setSchemeStakeholders(updatedFormData.SchemeStakeholders).unwrap();
-            setSchemeRisks(updatedFormData.SchemeRisks).unwrap();
-            setSchemeMission(updatedFormData.SchemeMission).unwrap();
-            setSchemeRelationships(updatedFormData.SchemeRelationships).unwrap();
-            setSchemeDuplicate(updatedFormData.SchemeDuplicate).unwrap();
-            setSchemeState(updatedFormData.SchemeState).unwrap();
-            setSchemeDistrict(updatedFormData.SchemeDistrict).unwrap();
-          }
-
-          onConfirm();
+          if (onConfirm) await onConfirm();
         } catch (error) {
           console.error(error);
-          showAlert('Failed to save scheme.', 'danger');
+          showAlert('Action failed. Please try again.', 'danger');
         } finally {
           setConfirmModal((prev) => ({ ...prev, isOpen: false }));
         }
@@ -863,8 +960,83 @@ export default function NewScheme() {
     });
   };
 
+  const getTabPayload = (tabId) => {
+    const tabConfig = SCHEME_TABS_CONFIG.find((tab) => tab.id === tabId);
+    if (!tabConfig || !formData[tabId]) return { ...formData[tabId] };
+
+    return tabConfig.fields.reduce((payload, field) => {
+      if (Object.prototype.hasOwnProperty.call(formData[tabId], field.key)) {
+        payload[field.key] = formData[tabId][field.key];
+      }
+      return payload;
+    }, {});
+  };
+
+  const saveCurrentScheme = async () => {
+    const schemeId = String(loadedRecordId || formData.SchemeMaster?.SchemeID || '').trim();
+    if (!schemeId) {
+      showAlert('Please select a scheme before submitting.', 'warning');
+      return false;
+    }
+
+    const schemeTabApiMap = {
+      SchemeMaster: { update: updateSchemeMaster },
+      SchemeObjectives: { insert: setSchemeObjectives, update: updateSchemeObjectives },
+      SchemeClassification: { insert: setSchemeClassification, update: updateSchemeClassification },
+      SchemeBeneficiaries: { insert: setSchemeBeneficiaries, update: updateSchemeBeneficiaries },
+      SchemeEligibility: { insert: setSchemeEligibility, update: updateSchemeEligibility },
+      SchemeFinancials: { insert: setSchemeFinancials, update: updateSchemeFinancials },
+      SchemeImplementation: { insert: setSchemeImplementation, update: updateSchemeImplementation },
+      SchemeGeography: { insert: setSchemeGeography, update: updateSchemeGeography },
+      SchemeTimeline: { insert: setSchemeTimeline, update: updateSchemeTimeline },
+      SchemeBenefits: { insert: setSchemeBenefits, update: updateSchemeBenefits },
+      SchemeComplementary: { insert: setSchemeComplementary, update: updateSchemeComplementary },
+      SchemeConvergence: { insert: setSchemeConvergence, update: updateSchemeConvergence },
+      SchemeOutcomes: { insert: setSchemeOutcomes, update: updateSchemeOutcomes },
+      SchemeSimilar: { insert: setSchemeSimilar, update: updateSchemeSimilar },
+      SchemeSDG: { insert: setSchemeSDG, update: updateSchemeSDG },
+      SchemeStakeholders: { insert: setSchemeStakeholders, update: updateSchemeStakeholders },
+      SchemeRisks: { insert: setSchemeRisks, update: updateSchemeRisks },
+      SchemeMission: { insert: setSchemeMission, update: updateSchemeMission },
+      SchemeRelationships: { insert: setSchemeRelationships, update: updateSchemeRelationships },
+      SchemeDuplicate: { insert: setSchemeDuplicate, update: updateSchemeDuplicate },
+      SchemeState: { insert: setSchemeState, update: updateSchemeState },
+      SchemeDistrict: { insert: setSchemeDistrict, update: updateSchemeDistrict },
+    };
+
+    try {
+      for (const [tabId, api] of Object.entries(schemeTabApiMap)) {
+        const isUpdate = tabId === 'SchemeMaster' || loadedTabHasData[tabId];
+        const payload = {
+          ...getTabPayload(tabId),
+          SchemeID: schemeId,
+          ...(tabId === 'SchemeMaster'
+            ? { UpdatedBy: user?.id || '' }
+            : isUpdate
+            ? { UpdatedBy: user?.id || '' }
+            : { CreatedBy: user?.id || '' }),
+        };
+
+        const action = isUpdate ? api.update : api.insert;
+        if (!action) continue;
+        
+        await action(payload).unwrap();
+      }
+
+      setLoadedTabHasData(
+        Object.fromEntries(Object.keys(schemeTabApiMap).map((tabId) => [tabId, true])),
+      );
+
+      return true;
+    } catch (error) {
+      console.error('Error saving scheme data:', error);
+      showAlert('Failed to save scheme data. Please try again.', 'danger');
+      return false;
+    }
+  };
+
   // Submit form (without validation as requested)
-  const handleSubmitScheme = (e) => {
+  const handleSubmitScheme = async (e) => {
     if (e && e.preventDefault) e.preventDefault();
     const schemeName = getSchemeName();
 
@@ -873,11 +1045,14 @@ export default function NewScheme() {
       message: `Are you sure you want to register and authorize the scheme "${schemeName}"? This will save it permanently in the official portal directory.`,
       confirmText: 'Submit & Authorize',
       confirmClass: 'btn-success',
-      onConfirm: () => {
-        showAlert(
-          `Government Scheme "${schemeName}" has been successfully registered & authorized!`,
-          'success',
-        );
+      onConfirm: async () => {
+        const saved = await saveCurrentScheme();
+        if (saved) {
+          showAlert(
+            `Government Scheme "${schemeName}" has been successfully registered & authorized!`,
+            'success',
+          );
+        }
       },
     });
   };

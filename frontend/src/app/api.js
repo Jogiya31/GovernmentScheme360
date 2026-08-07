@@ -14,100 +14,6 @@ const getStoredUsers = () => {
   return DEFAULT_USERS;
 };
 
-const DEFAULT_ROLES = [
-  { id: 1, title: 'Super Admin', status: true },
-  { id: 2, title: 'Ministry Nodal Officer', status: true },
-  { id: 3, title: 'Department Administrator', status: true },
-  { id: 4, title: 'Scheme Evaluator', status: true },
-  { id: 5, title: 'District Nodal Officer', status: true },
-  { id: 6, title: 'Auditor & Field Inspector', status: true },
-];
-
-const DEFAULT_DEPARTMENTS = [
-  { id: 101, title: 'Department of Agriculture and Farmers Welfare', status: true },
-  { id: 102, title: 'Department of Land Resources', status: true },
-  { id: 103, title: 'Department of Rural Development', status: true },
-  { id: 104, title: 'Department of School Education and Literacy', status: true },
-  { id: 105, title: 'Department of Higher Education', status: true },
-  { id: 106, title: 'Department of Health and Family Welfare', status: true },
-  { id: 107, title: 'Department of Financial Services', status: true },
-  { id: 108, title: 'Department of Social Justice and Empowerment', status: true },
-  { id: 109, title: 'Department of Drinking Water and Sanitation', status: true },
-  { id: 110, title: 'Department of Micro, Small and Medium Enterprises', status: true },
-];
-
-const DEFAULT_MINISTRIES = [
-  { id: 201, title: 'Ministry of Agriculture and Farmers Welfare', status: true },
-  { id: 202, title: 'Ministry of Housing and Urban Affairs', status: true },
-  { id: 203, title: 'Ministry of Rural Development', status: true },
-  { id: 204, title: 'Ministry of Health and Family Welfare', status: true },
-  { id: 205, title: 'Ministry of Education', status: true },
-  { id: 206, title: 'Ministry of Finance', status: true },
-  { id: 207, title: 'Ministry of Social Justice and Empowerment', status: true },
-  { id: 208, title: 'Ministry of Women and Child Development', status: true },
-  { id: 209, title: 'Ministry of Micro, Small and Medium Enterprises', status: true },
-  { id: 210, title: 'Ministry of Electronics and Information Technology', status: true },
-  { id: 211, title: 'Ministry of Jal Shakti', status: true },
-  { id: 212, title: 'Ministry of Power', status: true },
-  { id: 213, title: 'Ministry of New and Renewable Energy', status: true },
-  { id: 214, title: 'Ministry of Labour and Employment', status: true },
-  { id: 215, title: 'Ministry of Commerce and Industry', status: true },
-  { id: 216, title: 'Ministry of Road Transport and Highways', status: true },
-  { id: 217, title: 'Ministry of Tribal Affairs', status: true },
-  { id: 218, title: 'Ministry of Skill Development and Entrepreneurship', status: true },
-];
-
-const getStoredRoles = () => {
-  const saved = localStorage.getItem('gov_scheme_roles');
-  if (saved) {
-    try {
-      return JSON.parse(saved);
-    } catch {
-      return DEFAULT_ROLES;
-    }
-  }
-  localStorage.setItem('gov_scheme_roles', JSON.stringify(DEFAULT_ROLES));
-  return DEFAULT_ROLES;
-};
-
-const saveStoredRoles = (roles) => {
-  localStorage.setItem('gov_scheme_roles', JSON.stringify(roles));
-};
-
-const getStoredDepartments = () => {
-  const saved = localStorage.getItem('gov_scheme_departments');
-  if (saved) {
-    try {
-      return JSON.parse(saved);
-    } catch {
-      return DEFAULT_DEPARTMENTS;
-    }
-  }
-  localStorage.setItem('gov_scheme_departments', JSON.stringify(DEFAULT_DEPARTMENTS));
-  return DEFAULT_DEPARTMENTS;
-};
-
-const saveStoredDepartments = (depts) => {
-  localStorage.setItem('gov_scheme_departments', JSON.stringify(depts));
-};
-
-const getStoredMinistries = () => {
-  const saved = localStorage.getItem('gov_scheme_ministries');
-  if (saved) {
-    try {
-      return JSON.parse(saved);
-    } catch {
-      return DEFAULT_MINISTRIES;
-    }
-  }
-  localStorage.setItem('gov_scheme_ministries', JSON.stringify(DEFAULT_MINISTRIES));
-  return DEFAULT_MINISTRIES;
-};
-
-const saveStoredMinistries = (ministries) => {
-  localStorage.setItem('gov_scheme_ministries', JSON.stringify(ministries));
-};
-
 export const api = createApi({
   reducerPath: 'api',
   baseQuery: fetchBaseQuery({
@@ -124,8 +30,11 @@ export const api = createApi({
     'getDashboardSummary',
     'Users',
     'Roles',
-    'Departments',
-    'Ministries',
+
+    //-----------------//
+    'getSchemeById',
+
+    //-----------------//
     'getAgeGroup',
     'getBeneficiaryCategory',
     'getBeneficiaryType',
@@ -134,7 +43,6 @@ export const api = createApi({
     'getDeliveryMechanism',
     'getDepartment',
     'getDistrict',
-    'getDocumentRequired',
     'getFinancialAssistanceType',
     'getFundSharingPattern',
     'getGender',
@@ -213,8 +121,7 @@ export const api = createApi({
     'updateSchemeState',
     'updateSchemeTimeline',
 
-    //-----------------//
-    'getSchemeById',
+  
   ],
 
   endpoints: (builder) => ({
@@ -352,59 +259,7 @@ export const api = createApi({
         body: data,
       }),
     }),
-    // api for get master data
-    getMinistries: builder.query({
-      async queryFn() {
-        try {
-          const data = getStoredMinistries();
-          return { data };
-        } catch (error) {
-          return { error: { status: 'CUSTOM_ERROR', error: error.message } };
-        }
-      },
-      providesTags: ['Ministries'],
-    }),
-    addMinistry: builder.mutation({
-      async queryFn(newItem) {
-        try {
-          const ministries = getStoredMinistries();
-          const added = { id: Date.now(), title: newItem, status: true };
-          const updated = [...ministries, added];
-          saveStoredMinistries(updated);
-          return { data: added };
-        } catch (error) {
-          return { error: { status: 'CUSTOM_ERROR', error: error.message } };
-        }
-      },
-      invalidatesTags: ['Ministries'],
-    }),
-    updateMinistry: builder.mutation({
-      async queryFn({ id, ...updatedData }) {
-        try {
-          const ministries = getStoredMinistries();
-          const updated = ministries.map((m) => (m.id === id ? { ...m, ...updatedData } : m));
-          saveStoredMinistries(updated);
-          const updatedMin = updated.find((m) => m.id === id);
-          return { data: updatedMin };
-        } catch (error) {
-          return { error: { status: 'CUSTOM_ERROR', error: error.message } };
-        }
-      },
-      invalidatesTags: ['Ministries'],
-    }),
-    deleteMinistry: builder.mutation({
-      async queryFn(id) {
-        try {
-          const ministries = getStoredMinistries();
-          const updated = ministries.filter((m) => m.id !== id);
-          saveStoredMinistries(updated);
-          return { data: { success: true, id } };
-        } catch (error) {
-          return { error: { status: 'CUSTOM_ERROR', error: error.message } };
-        }
-      },
-      invalidatesTags: ['Ministries'],
-    }),
+
     getAgeGroup: builder.mutation({
       query: (data = {}) => ({
         url: '/AgeGroup',
@@ -457,13 +312,6 @@ export const api = createApi({
     getDistrict: builder.mutation({
       query: (data = {}) => ({
         url: '/District',
-        method: 'POST',
-        body: data,
-      }),
-    }),
-    getDocumentRequired: builder.mutation({
-      query: (data = {}) => ({
-        url: '/DocumentRequired',
         method: 'POST',
         body: data,
       }),
@@ -671,6 +519,7 @@ export const api = createApi({
         body: data,
       }),
     }),
+
     // api for scheme data
     setSchemeBeneficiaries: builder.mutation({
       query: (data) => ({
@@ -826,6 +675,7 @@ export const api = createApi({
         body: data,
       }),
     }),
+
     // api for update scheme
     updateSchemeBeneficiaries: builder.mutation({
       query: (data) => ({
@@ -989,7 +839,6 @@ export const {
   useGetDashboardSummaryQuery,
   useGetUsersQuery,
   // get dropdown data
-  useGetMinistriesQuery,
   useGetAgeGroupMutation,
   useGetBeneficiaryCategoryMutation,
   useGetBeneficiaryTypeMutation,
@@ -998,7 +847,6 @@ export const {
   useGetDeliveryMechanismMutation,
   useGetDepartmentMutation,
   useGetDistrictMutation,
-  useGetDocumentRequiredMutation,
   useGetFinancialAssistanceTypeMutation,
   useGetFundSharingPatternMutation,
   useGetGenderMutation,

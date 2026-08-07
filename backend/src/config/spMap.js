@@ -1,3 +1,5 @@
+const { useUpdateSchemeDuplicateMutation } = require("../../../frontend/src/app/api");
+
 module.exports = {
   // api for get scheme
   getSchemeById: "SchemeDetails.usp_GetSchemeDetailsByID",
@@ -86,6 +88,7 @@ module.exports = {
   updateSchemeRisks: "SchemeDetails.usp_UpdateSchemeRisks",
   updateSchemeMission: "SchemeDetails.usp_UpdateSchemeMission",
   updateSchemeRelationships: "SchemeDetails.usp_UpdateSchemeRelationships",
+  updateSchemeDuplicate: "SchemeDetails.usp_UpdateSchemeDuplicate",
   updateSchemeState: "SchemeDetails.usp_UpdateSchemeState",
   updateSchemeDistrict: "SchemeDetails.usp_UpdateSchemeDistrict",
 };

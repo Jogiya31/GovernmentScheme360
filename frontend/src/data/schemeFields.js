@@ -240,8 +240,8 @@ export const SCHEME_TABS_CONFIG = [
     title: '19. Scheme Relationships',
     icon: 'bi-share-fill',
     fields: [
-      { key: 'ParentSchemeID', label: 'Parent Scheme', type: 'text', placeholder: 'Enter here...', col: 6 },
-      { key: 'ReplacedSchemeID', label: 'Replaced Scheme', type: 'text', placeholder: 'Enter here...', col: 6 },
+      { key: 'ParentSchemeID', label: 'Parent Scheme', type: 'select', options: [], col: 6 },
+      { key: 'ReplacedSchemeID', label: 'Replaced Scheme', type: 'select', options: [], col: 6 },
      ]
   },
   {
