@@ -13,7 +13,7 @@ export const DEFAULT_FALLBACK_OPTIONS = {};
 export const SCHEME_TABS_CONFIG = [
   {
     id: 'SchemeMaster',
-    title: '1. Basic Info',
+    title: 'Basic Info',
     icon: 'bi-info-circle-fill',
     fields: [
       { key: 'SchemeName', label: 'Official Scheme Name', type: 'text', placeholder: 'Full official name of the scheme', col: 4  },
@@ -30,7 +30,7 @@ export const SCHEME_TABS_CONFIG = [
   },
   {
     id: 'SchemeObjectives',
-    title: '2. Scheme Objectives',
+    title: 'Scheme Objectives',
     icon: 'bi-bullseye',
     fields: [
       { key: 'Vision', label: 'Vision Statement', type: 'textarea', placeholder: 'Broad long-term vision...', col: 6 },
@@ -44,7 +44,7 @@ export const SCHEME_TABS_CONFIG = [
   },
   {
     id: 'SchemeClassification',
-    title: '3. Scheme Classification',
+    title: 'Scheme Classification',
     icon: 'bi-bookmark-star-fill',
     fields: [
       { key: 'SectorID', label: 'Primary Sector', type: 'select', options: [], col: 4  },
@@ -58,7 +58,7 @@ export const SCHEME_TABS_CONFIG = [
   },
   {
     id: 'SchemeBeneficiaries',
-    title: '4. Beneficiary Details',
+    title: 'Beneficiary Details',
     icon: 'bi-people-fill',
     fields: [
       { key: 'BeneficiaryCategoryID', label: 'Beneficiary Category',  type: 'select', options: [], col: 4  },
@@ -77,7 +77,7 @@ export const SCHEME_TABS_CONFIG = [
   },
   {
     id: 'SchemeEligibility',
-    title: '5. Eligibility Rules',
+    title: 'Eligibility Rules',
     icon: 'bi-shield-check',
     fields: [
       { key: 'EligibilityCriteria', label: 'Eligibility Criteria Checklist', type: 'textarea', placeholder: 'Provide list of clear eligibility rules...', col: 4  },
@@ -91,7 +91,7 @@ export const SCHEME_TABS_CONFIG = [
   },
   {
     id: 'SchemeFinancials',
-    title: '6. Financial Details',
+    title: 'Financial Details',
     icon: 'bi-cash-coin',
     fields: [
       { key: 'TotalBudget', label: 'Total Allocated Budget (Cr.)', type: 'number', placeholder: 'Total budget in Crores', col: 4 },
@@ -112,7 +112,7 @@ export const SCHEME_TABS_CONFIG = [
   },
   {
     id: 'SchemeImplementation',
-    title: '7. Implementation Model',
+    title: 'Implementation Model',
     icon: 'bi-diagram-3-fill',
     fields: [
       { key: 'SubSectorID', label: 'Sub-Sector', type: 'select', options: [], col: 4 },
@@ -129,7 +129,7 @@ export const SCHEME_TABS_CONFIG = [
   },
   {
     id: 'SchemeGeography',
-    title: '8. Geographic Coverage',
+    title: 'Geographic Coverage',
     icon: 'bi-geo-alt-fill',
     fields: [
       { key: 'SubSectorID', label: 'Sub-Sector', type: 'select', options: [], col: 4 },
@@ -139,7 +139,7 @@ export const SCHEME_TABS_CONFIG = [
   },
   {
     id: 'SchemeTimeline',
-    title: '9. Scheme Timeline',
+    title: 'Scheme Timeline',
     icon: 'bi-calendar-range',
     fields: [
       { key: 'AnnouncementDate', label: 'Announcement Date', type: 'date', col: 4 },
@@ -152,7 +152,7 @@ export const SCHEME_TABS_CONFIG = [
   },
   {
     id: 'SchemeBenefits',
-    title: '10. Benefit Packages',
+    title: 'Benefit Packages',
     icon: 'bi-gift-fill',
     fields: [
       { key: 'BenefitTypeID', label: 'Main Benefit Category', type: 'select', options: [], col: 4 },
@@ -167,7 +167,7 @@ export const SCHEME_TABS_CONFIG = [
   },
   {
     id: 'SchemeComplementary',
-    title: '11. Scheme Complementary',
+    title: 'Scheme Complementary',
     icon: 'bi-file-earmark-text-fill',
     fields: [
       { key: 'ComplementarySchemeID', label: 'Complementary Scheme', type: 'select', options: [], col: 4 },
@@ -175,7 +175,7 @@ export const SCHEME_TABS_CONFIG = [
   },
   {
     id: 'SchemeConvergence',
-    title: '12. Scheme Convergence',
+    title: 'Scheme Convergence',
     icon: 'bi-bar-chart-line-fill',
     fields: [
       { key: 'ConvergedSchemeID', label: 'Converged Scheme', type: 'select', options: [], col: 4 },
@@ -183,7 +183,7 @@ export const SCHEME_TABS_CONFIG = [
   },
   {
     id: 'SchemeOutcomes',
-    title: '13. Outcome Indicators',
+    title: 'Outcome Indicators',
     icon: 'bi-clipboard-data-fill',
     fields: [
       { key: 'OutcomeIndicatorID', label: 'Outcome Indicator',  type: 'select', options: [], col: 4 },
@@ -193,7 +193,7 @@ export const SCHEME_TABS_CONFIG = [
   },
   {
     id: 'SchemeSimilar',
-    title: '14. Similar Schemes',
+    title: 'Similar Schemes',
     icon: 'bi-eye-fill',
     fields: [
       { key: 'SimilarSchemeID', label: 'Similar Schemes', type: 'select', options: [], col: 4 },
@@ -201,7 +201,7 @@ export const SCHEME_TABS_CONFIG = [
   },
   {
     id: 'SchemeSDG',
-    title: '15. Scheme SDG',
+    title: 'Scheme SDG',
     icon: 'bi-cpu-fill',
     fields: [
        { key: 'SDGID', label: 'SDG', type: 'select', options: [], col: 4 },
@@ -209,7 +209,7 @@ export const SCHEME_TABS_CONFIG = [
   },
   {
     id: 'SchemeStakeholders',
-    title: '16. Stakeholders',
+    title: 'Stakeholders',
     icon: 'bi-diagram-3',
     fields: [
       { key: 'StakeholderTypeID', label: 'Stakeholder Type', type: 'select', options: [], col: 4 },
@@ -219,7 +219,7 @@ export const SCHEME_TABS_CONFIG = [
   },
   {
     id: 'SchemeRisks',
-    title: '17. Risks & Challenges',
+    title: 'Risks & Challenges',
     icon: 'bi-exclamation-octagon-fill',
     fields: [
       { key: 'Challenges', label: 'Challenges', type: 'text', placeholder: 'Enter here...', col: 6 },
@@ -231,7 +231,7 @@ export const SCHEME_TABS_CONFIG = [
   },
   {
     id: 'SchemeMission',
-    title: '18. Scheme Mission',
+    title: 'Scheme Mission',
     icon: 'bi-trophy-fill',
     fields: [
       { key: 'MissionID', label: 'Mission', type: 'select', options: [], col: 4 },
@@ -239,7 +239,7 @@ export const SCHEME_TABS_CONFIG = [
   },
   {
     id: 'SchemeRelationships',
-    title: '19. Scheme Relationships',
+    title: 'Scheme Relationships',
     icon: 'bi-share-fill',
     fields: [
       { key: 'ParentSchemeID', label: 'Parent Scheme', type: 'select', options: [], col: 6 },
@@ -248,7 +248,7 @@ export const SCHEME_TABS_CONFIG = [
   },
   {
     id: 'SchemeDuplicate',
-    title: '20. Scheme Duplicate',
+    title: 'Scheme Duplicate',
     icon: 'bi-activity',
     fields: [
       { key: 'DuplicateSchemeID', label: 'Duplicate Scheme',  type: 'select', options: [], col: 4 },
@@ -256,7 +256,7 @@ export const SCHEME_TABS_CONFIG = [
   },
   {
     id: 'SchemeState',
-    title: '21. Scheme State',
+    title: 'Scheme State',
     icon: 'bi-stars',
     fields: [
       { key: 'StateID', label: 'State', type: 'select', options: [], col: 4   },
@@ -264,7 +264,7 @@ export const SCHEME_TABS_CONFIG = [
   },
   {
     id: 'SchemeDistrict',
-    title: '22. Scheme District',
+    title: 'Scheme District',
     icon: 'bi-shield-lock-fill',
     fields: [
        { key: 'DistrictID', label: 'District', type: 'select', options: [], col: 4 },

@@ -15,7 +15,8 @@ export default function Sidebar() {
       title: 'Workspace',
       items: [
         // { path: '/users', label: 'Users Database', icon: 'bi bi-people' },
-        { path: '/scheme', label: 'View/Edit Scheme', icon: 'bi bi-file-earmark-plus' }
+        { path: '/scheme', label: 'View/Edit Scheme', icon: 'bi bi-file-earmark-plus' },
+        { path: '/updatedScheme', label: 'Update Scheme', icon: 'bi bi-file-earmark-plus' }
       ]
     },
     {
