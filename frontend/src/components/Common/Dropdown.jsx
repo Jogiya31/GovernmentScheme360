@@ -16,6 +16,7 @@ export default function Dropdown({
   disabled = false,
   isLoading = false, // Set to true when fetching options from API
   maxSelectedDisplay = 3, // In multi mode, how many chip tags to show before collapsing to "+X more"
+  isInvalid = false, // Set to true to highlight dropdown trigger with error border
   className = '',
   id,
   style = {},
@@ -146,7 +147,7 @@ export default function Dropdown({
       <div
         className={`form-select d-flex align-items-center justify-content-between cursor-pointer py-2 px-3 border rounded ${
           disabled ? 'bg-secondary-bg opacity-75' : ''
-        }`}
+        } ${isInvalid || className.includes('is-invalid') ? 'is-invalid border-danger' : ''}`}
         style={{
           minHeight: '42px',
           background: 'none', // Remove bootstrap default arrow since we render custom chevron

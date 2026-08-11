@@ -1,5 +1,3 @@
-const { useUpdateSchemeDuplicateMutation } = require("../../../frontend/src/app/api");
-
 module.exports = {
   // api for get scheme
   getSchemeById: "SchemeDetails.usp_GetSchemeDetailsByID",

@@ -12,17 +12,18 @@ async function executeStoredProcedure(req, res, procedure) {
     Object.entries(req.body).forEach(([key, value]) => {
       let inputValue = value;
 
-      // Convert Yes/No to boolean
+      // Convert blank form fields to SQL NULL and Yes/No strings to boolean.
       if (typeof inputValue === "string") {
-        const lower = inputValue.toLowerCase();
+        const lower = inputValue.trim().toLowerCase();
 
-        if (lower === "yes") inputValue = true;
+        if (lower === "") inputValue = null;
+        else if (lower === "yes") inputValue = true;
         else if (lower === "no") inputValue = false;
         else if (lower === "true") inputValue = true;
         else if (lower === "false") inputValue = false;
       }
 
-      if (inputValue !== undefined && inputValue !== null) {
+      if (inputValue !== undefined) {
         request.input(key, inputValue);
       }
     });

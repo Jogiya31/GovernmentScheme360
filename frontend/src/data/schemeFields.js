@@ -16,7 +16,7 @@ export const SCHEME_TABS_CONFIG = [
     title: '1. Basic Info',
     icon: 'bi-info-circle-fill',
     fields: [
-      { key: 'SchemeName', label: 'Official Scheme Name', type: 'text', placeholder: 'Full official name of the scheme', col: 4 },
+      { key: 'SchemeName', label: 'Official Scheme Name', type: 'text', placeholder: 'Full official name of the scheme', col: 4  },
       { key: 'AlternateName', label: 'Alternate Name / Acronym', type: 'text', placeholder: 'e.g. PMAY-U / PMAY-G', col: 4 },
       { key: 'MinistryID', label: 'Nodal Ministry', type: 'select', options: [], col: 4 },
       { key: 'DepartmentID', label: 'Implementing Department', type: 'select', options: [], col: 4 },
@@ -47,13 +47,13 @@ export const SCHEME_TABS_CONFIG = [
     title: '3. Scheme Classification',
     icon: 'bi-bookmark-star-fill',
     fields: [
-      { key: 'SectorID', label: 'Primary Sector', type: 'select', options: [], col: 4 },
-      { key: 'SubSectorID', label: 'Sub-Sector', type: 'select', options: [], col: 4 },
+      { key: 'SectorID', label: 'Primary Sector', type: 'select', options: [], col: 4  },
+      { key: 'SubSectorID', label: 'Sub-Sector', type: 'select', options: [], col: 4  },
       { key: 'ThemeID', label: 'Theme', type: 'select', options: [], col: 4  },
-      { key: 'NationalPriorityID', label: 'National Priority', type: 'select', options: [], col: 4 },
-      { key: 'AspirationalDistrictScheme', label: 'Aspirational District Scheme', type: 'select', options: ['','Yes','No'], col: 4 },
-      { key: 'FlagshipScheme', label: 'Flagship Scheme',  type: 'select', options: ['','Yes','No'], col: 4 },
-      { key: 'SchemeCategoryID', label: 'Scheme Category', type: 'select', options: [], col: 4 }
+      { key: 'NationalPriorityID', label: 'National Priority', type: 'select', options: [], col: 4  },
+      { key: 'AspirationalDistrictScheme', label: 'Aspirational District Scheme', type: 'select', options: ['','Yes','No'], col: 4  },
+      { key: 'FlagshipScheme', label: 'Flagship Scheme',  type: 'select', options: ['','Yes','No'], col: 4  },
+      { key: 'SchemeCategoryID', label: 'Scheme Category', type: 'select', options: [], col: 4  }
     ]
   },
   {
@@ -61,18 +61,18 @@ export const SCHEME_TABS_CONFIG = [
     title: '4. Beneficiary Details',
     icon: 'bi-people-fill',
     fields: [
-      { key: 'BeneficiaryCategoryID', label: 'Beneficiary Category',  type: 'select', options: [], col: 4 },
-      { key: 'TargetGroupID', label: 'Primary Target Group',  type: 'select', options: [], col: 4 },
-      { key: 'GenderID', label: 'Gender focus', type: 'select', options: [], col: 4 },
-      { key: 'AgeGroupID', label: 'Target Age Group', type: 'select', options: [], col: 4 },
-      { key: 'IncomeCriteriaTypeID', label: 'Income Criteria', type: 'select', options: [], col: 4 },
-      { key: 'IncomeLimit', label: 'Income Limits', type: 'number', placeholder:'Enter here...', col: 4 },
-      { key: 'SocialCategoryID', label: 'Social Category Emphasis', type: 'select', options: [], col: 4 },
-      { key: 'OccupationID', label: 'Target Occupation', type: 'select', options: [], col: 4 },
-      { key: 'GeographicCoverageID', label: 'Beneficiary Geographic Area', type: 'select', options: [], col: 4 },
-      { key: 'UrbanRuralID', label: 'Urban / Rural Segment', type: 'select', options: [], col: 4 },
-      { key: 'BeneficiaryTypeID', label: 'Benificary Type', type: 'select', options: [], col: 4 },
-      { key: 'EstimatedBeneficiaries', label: 'Estimated Beneficiaries', type: 'number', placeholder: 'e.g. 5000000', col: 4 }
+      { key: 'BeneficiaryCategoryID', label: 'Beneficiary Category',  type: 'select', options: [], col: 4  },
+      { key: 'TargetGroupID', label: 'Primary Target Group',  type: 'select', options: [], col: 4  },
+      { key: 'GenderID', label: 'Gender focus', type: 'select', options: [], col: 4  },
+      { key: 'AgeGroupID', label: 'Target Age Group', type: 'select', options: [], col: 4  },
+      { key: 'IncomeCriteriaTypeID', label: 'Income Criteria', type: 'select', options: [], col: 4  },
+      { key: 'IncomeLimit', label: 'Income Limits', type: 'number', placeholder:'Enter here...', col: 4  },
+      { key: 'SocialCategoryID', label: 'Social Category Emphasis', type: 'select', options: [], col: 4  },
+      { key: 'OccupationID', label: 'Target Occupation', type: 'select', options: [], col: 4  },
+      { key: 'GeographicCoverageID', label: 'Beneficiary Geographic Area', type: 'select', options: [], col: 4  },
+      { key: 'UrbanRuralID', label: 'Urban / Rural Segment', type: 'select', options: [], col: 4  },
+      { key: 'BeneficiaryTypeID', label: 'Benificary Type', type: 'select', options: [], col: 4  },
+      { key: 'EstimatedBeneficiaries', label: 'Estimated Beneficiaries', type: 'number', placeholder: 'e.g. 5000000', col: 4  }
     ]
   },
   {
@@ -80,12 +80,12 @@ export const SCHEME_TABS_CONFIG = [
     title: '5. Eligibility Rules',
     icon: 'bi-shield-check',
     fields: [
-      { key: 'EligibilityCriteria', label: 'Eligibility Criteria Checklist', type: 'textarea', placeholder: 'Provide list of clear eligibility rules...', col: 6 },
-      { key: 'IncomeCriteriaTypeID', label: 'Documents Required for Registration', type: 'select', options: [], col: 6 },
-      { key: 'IncomeLimit', label: 'Explicit Annual Income Limit',  type: 'number',placeholder: 'e.g. 5000000', col: 4 },
-      { key: 'AgeGroupID', label: 'Explicit Age Limit Limits', type: 'select', options: [],  col: 4 },
-      { key: 'AadhaarRequired', label: 'Aadhaar Required', type: 'select', options: ['','Yes','No'], col: 4 },
-      { key: 'BankAccountRequired', label: 'Is Bank Account Compulsory?', type: 'select', options: ['','Yes','No'], col: 4 },
+      { key: 'EligibilityCriteria', label: 'Eligibility Criteria Checklist', type: 'textarea', placeholder: 'Provide list of clear eligibility rules...', col: 4  },
+      { key: 'IncomeCriteriaTypeID', label: 'Documents Required for Registration', type: 'select', options: [], col: 4  },
+      { key: 'IncomeLimit', label: 'Explicit Annual Income Limit',  type: 'number',placeholder: 'e.g. 5000000', col: 4  },
+      { key: 'AgeGroupID', label: 'Explicit Age Limit Limits', type: 'select', options: [],  col: 4  },
+      { key: 'AadhaarRequired', label: 'Aadhaar Required', type: 'select', options: ['','Yes','No'], col: 4  },
+      { key: 'BankAccountRequired', label: 'Is Bank Account Compulsory?', type: 'select', options: ['','Yes','No'], col: 4  },
       { key: 'OtherConditions', label: 'Other Regulatory Conditions', type: 'textarea', placeholder: 'e.g. Must not own a concrete house or a 4-wheeler...', col: 8 }
     ]
   },
@@ -115,10 +115,11 @@ export const SCHEME_TABS_CONFIG = [
     title: '7. Implementation Model',
     icon: 'bi-diagram-3-fill',
     fields: [
-      { key: 'ImplementingAgencyID', label: 'Implementing Agency', type: 'select', options: [], col: 6 },
-      { key: 'StateAgencies', label: 'State-level Implementing Agencies', type: 'text', placeholder: 'e.g. State Housing Boards', col: 6 },
-      { key: 'DistrictAgencies', label: 'District-level Nodal Agencies', type: 'text', placeholder: 'e.g. DRDA / District Collectorate', col: 6 },
-      { key: 'LocalBodyID', label: 'Involved Local Bodies', type: 'select', options: [],col: 6 },
+      { key: 'SubSectorID', label: 'Sub-Sector', type: 'select', options: [], col: 4 },
+      { key: 'ImplementingAgencyID', label: 'Implementing Agency', type: 'select', options: [], col: 4 },
+      { key: 'StateAgencies', label: 'State-level Implementing Agencies', type: 'text', placeholder: 'e.g. State Housing Boards', col: 4 },
+      { key: 'DistrictAgencies', label: 'District-level Nodal Agencies', type: 'text', placeholder: 'e.g. DRDA / District Collectorate', col: 4 },
+      { key: 'LocalBodyID', label: 'Involved Local Bodies', type: 'select', options: [],col: 4 },
       { key: 'DeliveryMechanismID', label: 'Delivery Mechanism Channel', type: 'select', options: [], col: 4 },
       { key: 'ServiceModeID', label: 'Service Mode', type: 'select', options: [], col: 4 },
       { key: 'MobileApp', label: 'Official Mobile App Name', type: 'text', placeholder: 'e.g. AwasApp', col: 4 },
@@ -131,6 +132,7 @@ export const SCHEME_TABS_CONFIG = [
     title: '8. Geographic Coverage',
     icon: 'bi-geo-alt-fill',
     fields: [
+      { key: 'SubSectorID', label: 'Sub-Sector', type: 'select', options: [], col: 4 },
       { key: 'NationalWise', label: 'Is Nationally Applicable?', type: 'select', options: ['','Yes','No'], col: 4 },
       { key: 'NorthEast', label: 'North East',type: 'select', options: ['','Yes','No'], col: 4 }
     ]
@@ -224,7 +226,7 @@ export const SCHEME_TABS_CONFIG = [
       { key: 'Risks', label: 'Risks', type: 'text', placeholder: 'Enter here...', col: 6 },
       { key: 'Bottlenecks', label: 'Bottlenecks', type: 'text', placeholder: 'Enter here...', col: 6 },
       { key: 'FraudRisks', label: 'Fraud Risks', type: 'text', placeholder: 'Enter here...', col: 6 },
-      { key: 'MitigationMeasures', label: 'Mitigation Measures',type: 'text', placeholder: 'Enter here...', col: 12 }
+      { key: 'MitigationMeasures', label: 'Mitigation Measures',type: 'text', placeholder: 'Enter here...', col: 6 }
     ]
   },
   {
@@ -232,7 +234,7 @@ export const SCHEME_TABS_CONFIG = [
     title: '18. Scheme Mission',
     icon: 'bi-trophy-fill',
     fields: [
-      { key: 'MissionID', label: 'Mission', type: 'select', options: [], col: 6 },
+      { key: 'MissionID', label: 'Mission', type: 'select', options: [], col: 4 },
      ]
   },
   {
@@ -257,7 +259,7 @@ export const SCHEME_TABS_CONFIG = [
     title: '21. Scheme State',
     icon: 'bi-stars',
     fields: [
-      { key: 'StateID', label: 'State', type: 'select', options: [], col: 6 },
+      { key: 'StateID', label: 'State', type: 'select', options: [], col: 4   },
      ]
   },
   {
@@ -265,7 +267,7 @@ export const SCHEME_TABS_CONFIG = [
     title: '22. Scheme District',
     icon: 'bi-shield-lock-fill',
     fields: [
-       { key: 'DistrictID', label: 'District', type: 'select', options: [], col: 6 },
+       { key: 'DistrictID', label: 'District', type: 'select', options: [], col: 4 },
       ]
   }
 ];

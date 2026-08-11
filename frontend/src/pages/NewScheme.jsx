@@ -3,11 +3,11 @@ import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { SCHEME_TABS_CONFIG, getInitialSchemeState } from '../data/schemeFields';
 
-import Alert from '../components/Common/Alert';
-import Card from '../components/Common/Card';
-import Modal from '../components/Common/Modal';
-import Dropdown from '../components/Common/Dropdown';
-import Spinner from '../components/Common/Spinner';
+import Alert from '../components/common/Alert';
+import Card from '../components/common/Card';
+import Modal from '../components/common/Modal';
+import Dropdown from '../components/common/Dropdown';
+import Spinner from '../components/common/Spinner';
 import {
   useGetAgeGroupMutation,
   useGetBeneficiaryCategoryMutation,
@@ -471,12 +471,144 @@ const buildFormFromSchemeRecord = (scheme, selectedValue = '') => {
   return { nextForm, schemeId, schemeName };
 };
 
+export const validateField = (field, value, tabId = '', tabValues = {}) => {
+  const strVal = String(value || '').trim();
+
+  const isExplicitlyRequired =
+    field.validate === true ||
+    field.validate === 'true' ||
+    field.required === true ||
+    field.required === 'true';
+
+  // Explicit required check
+  if (isExplicitlyRequired && !strVal) {
+    return `${field.label} is required.`;
+  }
+
+  // If empty and not required, pass validation
+  if (!strVal) return null;
+
+  // Length check for text fields if text entered
+  if (field.type === 'text' && field.key === 'SchemeName' && strVal.length < 3) {
+    return 'Scheme Name must be at least 3 characters long.';
+  }
+
+  // Number fields validation
+  if (field.type === 'number') {
+    const num = Number(strVal);
+    if (isNaN(num)) {
+      return `${field.label} must be a valid number.`;
+    }
+    if (num < 0) {
+      return `${field.label} cannot be negative.`;
+    }
+    if (num > 100000000000) {
+      return `${field.label} exceeds maximum allowed limit.`;
+    }
+    if (field.key === 'EstimatedBeneficiaries' && !Number.isInteger(num)) {
+      return 'Estimated beneficiaries must be a whole integer.';
+    }
+
+    // Financial calculations validation
+    if (tabId === 'SchemeFinancials') {
+      const totalBudget = Number(tabValues.TotalBudget || 0);
+      if (totalBudget > 0) {
+        if (field.key === 'Expenditure' && num > totalBudget) {
+          return `Expenditure (₹${num} Cr) cannot exceed Total Budget (₹${totalBudget} Cr).`;
+        }
+        if (field.key === 'AnnualBudget' && num > totalBudget) {
+          return `Annual Budget (₹${num} Cr) cannot exceed Total Budget (₹${totalBudget} Cr).`;
+        }
+      }
+    }
+  }
+
+  // Date fields validation
+  if (field.type === 'date') {
+    const timestamp = Date.parse(strVal);
+    if (isNaN(timestamp)) {
+      return 'Please enter a valid date.';
+    }
+
+    const dateObj = new Date(strVal);
+    const year = dateObj.getFullYear();
+    if (year < 1947 || year > 2100) {
+      return 'Year must be between 1947 and 2100.';
+    }
+
+    // Timeline chronology checks
+    if (field.key === 'LaunchDate' && tabValues.AnnouncementDate) {
+      const announceTs = Date.parse(String(tabValues.AnnouncementDate).trim());
+      if (!isNaN(announceTs) && timestamp < announceTs) {
+        return 'Launch Date cannot be before Announcement Date.';
+      }
+    }
+    if (field.key === 'FirstDisbursement' && tabValues.LaunchDate) {
+      const launchTs = Date.parse(String(tabValues.LaunchDate).trim());
+      if (!isNaN(launchTs) && timestamp < launchTs) {
+        return 'First Disbursement cannot be before Launch Date.';
+      }
+    }
+    if (field.key === 'EndDate' && tabValues.LaunchDate) {
+      const launchTs = Date.parse(String(tabValues.LaunchDate).trim());
+      if (!isNaN(launchTs) && timestamp < launchTs) {
+        return 'End Date cannot be before Launch Date.';
+      }
+    }
+  }
+
+  // Textarea minimum length check
+  if (field.type === 'textarea') {
+    if (strVal.length < 5) {
+      return `${field.label} should be at least 5 characters long.`;
+    }
+  }
+
+  // Text inputs specific validation
+  if (field.type === 'text') {
+    if (field.key === 'Website' || field.key === 'PortalName') {
+      const urlPattern = /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w-./?%&=]*)?$/i;
+      if (!urlPattern.test(strVal)) {
+        return 'Please enter a valid URL or domain (e.g. pmay.gov.in).';
+      }
+    } else if (strVal.length < 2 && field.key !== 'AlternateName') {
+      return `${field.label} must be at least 2 characters.`;
+    }
+  }
+
+  return null;
+};
+
+export const validateSchemeForm = (formData) => {
+  const errors = {};
+
+  SCHEME_TABS_CONFIG.forEach((tab) => {
+    const tabErrors = {};
+    const tabValues = formData[tab.id] || {};
+
+    tab.fields.forEach((field) => {
+      const val = tabValues[field.key];
+      const errorMsg = validateField(field, val, tab.id, tabValues);
+      if (errorMsg) {
+        tabErrors[field.key] = errorMsg;
+      }
+    });
+
+    if (Object.keys(tabErrors).length > 0) {
+      errors[tab.id] = tabErrors;
+    }
+  });
+
+  return errors;
+};
+
 export default function NewScheme() {
   const { user } = useSelector((state) => state.auth);
 
   const [getSchemeById] = useGetSchemeByIdMutation();
 
   const [loadedTabHasData, setLoadedTabHasData] = useState({});
+  const [formErrors, setFormErrors] = useState({});
 
   const [getAgeGroup, { data: ageGroupRes }] = useGetAgeGroupMutation();
   const [getBeneficiaryCategory, { data: beneficiaryCategoriesRes }] =
@@ -740,6 +872,7 @@ export default function NewScheme() {
       onConfirm: () => {
         setFormData(getInitialSchemeState());
         setLoadedRecordId(null);
+        setFormErrors({});
         setCurrentTab(0);
         showAlert('Scheme form has been fully reset.', 'info');
       },
@@ -813,6 +946,7 @@ export default function NewScheme() {
       setLoadedRecordId(null);
       setLoadedSchemeSource(null);
       setLoadedTabHasData({});
+      setFormErrors({});
       setCurrentTab(0);
       return;
     }
@@ -826,6 +960,7 @@ export default function NewScheme() {
         setFormData(getInitialSchemeState());
         setLoadedRecordId(String(val));
         setLoadedTabHasData({});
+        setFormErrors({});
         setCurrentTab(0);
         return;
       }
@@ -834,6 +969,7 @@ export default function NewScheme() {
       setFormData(nextForm);
       setLoadedRecordId(String(schemeId || val));
       setLoadedTabHasData(getLoadedTabState(payload));
+      setFormErrors({});
       setCurrentTab(0);
 
       showAlert(`Loaded scheme "${schemeName || 'Record'}" and auto-filled the form.`, 'success');
@@ -964,9 +1100,20 @@ export default function NewScheme() {
     const tabConfig = SCHEME_TABS_CONFIG.find((tab) => tab.id === tabId);
     if (!tabConfig || !formData[tabId]) return { ...formData[tabId] };
 
+    const normalizeSubmitValue = (value, field) => {
+      if (value === undefined || value === null) return null;
+      if (typeof value !== 'string') return value;
+
+      const trimmed = value.trim();
+      if (!trimmed && ['number', 'select', 'date'].includes(field.type)) return null;
+      if (field.type === 'number') return Number(trimmed);
+
+      return value;
+    };
+
     return tabConfig.fields.reduce((payload, field) => {
       if (Object.prototype.hasOwnProperty.call(formData[tabId], field.key)) {
-        payload[field.key] = formData[tabId][field.key];
+        payload[field.key] = normalizeSubmitValue(formData[tabId][field.key], field);
       }
       return payload;
     }, {});
@@ -1011,10 +1158,10 @@ export default function NewScheme() {
           ...getTabPayload(tabId),
           SchemeID: schemeId,
           ...(tabId === 'SchemeMaster'
-            ? { UpdatedBy: user?.id || '' }
+            ? { UpdatedBy: user?.id ?? null }
             : isUpdate
-            ? { UpdatedBy: user?.id || '' }
-            : { CreatedBy: user?.id || '' }),
+            ? { UpdatedBy: user?.id ?? null }
+            : { CreatedBy: user?.id ?? null }),
         };
 
         const action = isUpdate ? api.update : api.insert;
@@ -1035,9 +1182,28 @@ export default function NewScheme() {
     }
   };
 
-  // Submit form (without validation as requested)
+  // Submit form with input validation
   const handleSubmitScheme = async (e) => {
     if (e && e.preventDefault) e.preventDefault();
+
+    const errors = validateSchemeForm(formData);
+    setFormErrors(errors);
+
+    const hasErrors = Object.keys(errors).length > 0;
+    if (hasErrors) {
+      const firstTabIdx = SCHEME_TABS_CONFIG.findIndex(
+        (tab) => errors[tab.id] && Object.keys(errors[tab.id]).length > 0,
+      );
+      if (firstTabIdx !== -1) {
+        setCurrentTab(firstTabIdx);
+      }
+      showAlert(
+        'Form validation failed. Please correct the highlighted errors before submitting.',
+        'danger',
+      );
+      return;
+    }
+
     const schemeName = getSchemeName();
 
     triggerConfirmation({
@@ -1110,10 +1276,11 @@ export default function NewScheme() {
         {/* Tab Controls Bar */}
         <div className="p-3 border-bottom d-flex flex-wrap align-items-center justify-content-between gap-3">
           {/* Quick tab keyword search filter */}
-          <div style={{ minWidth: '240px' }}>
+          <div style={{ minWidth: '340px' }}>
             <Dropdown
               options={dropdownOptions}
               value={selectedDropdownValue}
+              className='shadow'
               onChange={handleDropdownChange}
               placeholder="Select scheme..."
               searchable={true}
@@ -1127,15 +1294,19 @@ export default function NewScheme() {
               Jump to:
             </span>
             <Dropdown
-              options={SCHEME_TABS_CONFIG.map((tab, idx) => ({
-                value: idx,
-                label: `${tab.title} (${getTabProgress(tab.id)}% full)`,
-              }))}
+              options={SCHEME_TABS_CONFIG.map((tab, idx) => {
+                const tabErrCount = formErrors[tab.id] ? Object.keys(formErrors[tab.id]).length : 0;
+                return {
+                  value: idx,
+                  label: `${tab.title} (${getTabProgress(tab.id)}% full)${tabErrCount > 0 ? ` ⚠️ (${tabErrCount} err)` : ''}`,
+                };
+              })}
+              className='shadow'
               value={currentTab}
               onChange={(val) => setCurrentTab(Number(val))}
               searchable={true}
               placeholder="Jump to tab..."
-              style={{ minWidth: '240px' }}
+              style={{ minWidth: '340px' }}
             />
           </div>
         </div>
@@ -1164,25 +1335,40 @@ export default function NewScheme() {
             {filteredTabs.map((tab) => {
               const isActive = currentTab === tab.originalIdx;
               const progress = getTabProgress(tab.id);
+              const tabErrors = formErrors[tab.id] ? Object.keys(formErrors[tab.id]).length : 0;
               return (
                 <li key={tab.id} className="nav-item">
                   <button
                     className={`nav-link text-nowrap d-flex align-items-center gap-1.5 px-3 py-2 border rounded-pill transition-all ${
                       isActive
-                        ? 'bg-primary text-white border-primary fw-medium shadow-sm'
-                        : 'bg-light text-muted hover-bg'
+                        ? tabErrors > 0
+                          ? 'bg-danger text-white border-danger fw-medium shadow-sm'
+                          : 'bg-primary text-white border-primary fw-medium shadow-sm'
+                        : tabErrors > 0
+                          ? 'bg-danger-subtle text-danger border-danger-subtle fw-medium'
+                          : 'bg-light text-muted hover-bg'
                     }`}
                     style={{ fontSize: '0.8rem' }}
                     onClick={() => setCurrentTab(tab.originalIdx)}
                   >
                     <i className={tab.icon}></i>
                     <span className=" mx-2"> {tab.title} </span>
-                    <span
-                      className={`badge rounded-pill ${isActive ? 'bg-white text-primary' : 'bg-secondary text-white'}`}
-                      style={{ fontSize: '0.65rem' }}
-                    >
-                      {progress}%
-                    </span>
+                    {tabErrors > 0 ? (
+                      <span
+                        className="badge bg-danger text-white rounded-pill d-inline-flex align-items-center gap-1"
+                        style={{ fontSize: '0.65rem' }}
+                      >
+                        <i className="bi bi-exclamation-circle-fill"></i>
+                        {tabErrors}
+                      </span>
+                    ) : (
+                      <span
+                        className={`badge rounded-pill ${isActive ? 'bg-white text-primary' : 'bg-secondary text-white'}`}
+                        style={{ fontSize: '0.65rem' }}
+                      >
+                        {progress}%
+                      </span>
+                    )}
                   </button>
                 </li>
               );
@@ -1225,14 +1411,45 @@ export default function NewScheme() {
             <div className="row g-3">
               {activeTabConfig.fields.map((field) => {
                 const value = formData[activeTabConfig.id]?.[field.key] || '';
+                const errorText = formErrors[activeTabConfig.id]?.[field.key];
+                const disabled = field.disabled === true || field.disabled === 'true';
+                const isRequired =
+                  field.validate === true ||
+                  field.validate === 'true' ||
+                  field.required === true ||
+                  field.required === 'true';
+
                 const handleFieldChange = (val) => {
-                  setFormData((prev) => ({
-                    ...prev,
-                    [activeTabConfig.id]: {
+                  setFormData((prev) => {
+                    const updatedTab = {
                       ...prev[activeTabConfig.id],
                       [field.key]: val,
-                    },
-                  }));
+                    };
+
+                    // Live validate on field change
+                    const err = validateField(field, val, activeTabConfig.id, updatedTab);
+                    setFormErrors((prevErr) => {
+                      const currentTabErrs = { ...(prevErr[activeTabConfig.id] || {}) };
+                      if (err) {
+                        currentTabErrs[field.key] = err;
+                      } else {
+                        delete currentTabErrs[field.key];
+                      }
+
+                      const newErr = { ...prevErr };
+                      if (Object.keys(currentTabErrs).length > 0) {
+                        newErr[activeTabConfig.id] = currentTabErrs;
+                      } else {
+                        delete newErr[activeTabConfig.id];
+                      }
+                      return newErr;
+                    });
+
+                    return {
+                      ...prev,
+                      [activeTabConfig.id]: updatedTab,
+                    };
+                  });
                 };
 
                 // Resolve options array from backend map or static configs
@@ -1328,10 +1545,13 @@ export default function NewScheme() {
                 return (
                   <div key={field.key} className={`col-12 col-md-${field.col || 6}`}>
                     <label
-                      className="form-label text-dark-emphasis fw-medium mb-1"
+                      className="form-label text-dark-emphasis fw-medium mb-1 d-flex align-items-center justify-content-between"
                       style={{ fontSize: '0.8rem' }}
                     >
-                      {field.label}
+                      <span>
+                        {field.label}
+                        {isRequired && <span className="text-danger ms-1 fw-bold">*</span>}
+                      </span>
                     </label>
 
                     {/* SELECT DROPDOWNS */}
@@ -1343,17 +1563,20 @@ export default function NewScheme() {
                         placeholder={`Select ${field.label.toLowerCase()}...`}
                         searchable={true}
                         isLoading={isFetchingOptions}
+                        isInvalid={!!errorText}
+                        disabled={disabled}
                         style={{ minWidth: '100%' }}
                       />
                     ) : /* TEXTAREAS */
                     field.type === 'textarea' ? (
                       <textarea
                         name={field.key}
-                        className="form-control py-2"
+                        className={`form-control py-2 ${errorText ? 'is-invalid border-danger' : ''}`}
                         rows={3}
                         style={{ fontSize: '0.85rem' }}
                         placeholder={field.placeholder}
                         value={value}
+                        disabled={disabled}
                         onChange={(e) => handleFieldChange(e.target.value)}
                       />
                     ) : (
@@ -1361,12 +1584,23 @@ export default function NewScheme() {
                       <input
                         name={field.key}
                         type={field.type}
-                        className="form-control py-2"
+                        className={`form-control py-2 ${errorText ? 'is-invalid border-danger' : ''}`}
                         style={{ height: '40px', fontSize: '0.85rem' }}
                         placeholder={field.placeholder}
                         value={value}
+                        disabled={disabled}
                         onChange={(e) => handleFieldChange(e.target.value)}
                       />
+                    )}
+
+                    {errorText && (
+                      <div
+                        className="invalid-feedback d-block text-danger mt-1"
+                        style={{ fontSize: '0.78rem' }}
+                      >
+                        <i className="bi bi-exclamation-circle me-1"></i>
+                        {errorText}
+                      </div>
                     )}
                   </div>
                 );
@@ -1378,7 +1612,7 @@ export default function NewScheme() {
               <div className="d-flex gap-2">
                 <button
                   type="button"
-                  className="btn btn-outline-secondary btn-sm px-3 d-flex align-items-center gap-1"
+                  className="btn btn-outline-secondary shadow btn-sm px-3 d-flex align-items-center gap-1"
                   onClick={() => setCurrentTab((prev) => Math.max(0, prev - 1))}
                   disabled={currentTab === 0}
                 >
@@ -1388,7 +1622,7 @@ export default function NewScheme() {
 
                 <button
                   type="button"
-                  className="btn btn-outline-secondary btn-sm px-3 d-flex align-items-center gap-1"
+                  className="btn btn-outline-secondary shadow btn-sm px-3 d-flex align-items-center gap-1"
                   onClick={() =>
                     setCurrentTab((prev) => Math.min(SCHEME_TABS_CONFIG.length - 1, prev + 1))
                   }
@@ -1403,7 +1637,7 @@ export default function NewScheme() {
               <div className="d-flex gap-2 flex-wrap">
                 <button
                   type="button"
-                  className="btn btn-outline-danger btn-sm px-3 d-flex align-items-center gap-1.5"
+                  className="btn btn-outline-danger btn-sm px-3 d-flex align-items-center gap-1.5 shadow rounded "
                   onClick={handleExportPDFReport}
                 >
                   <i className="bi bi-filetype-pdf me-1"></i>
@@ -1411,7 +1645,7 @@ export default function NewScheme() {
                 </button>
                 <button
                   type="submit"
-                  className="btn btn-success btn-sm px-4 fw-medium shadow-sm d-flex align-items-center gap-1.5"
+                  className="btn btn-success btn-sm px-4 fw-medium shadow d-flex align-items-center gap-1.5 border rounded"
                 >
                   <i className="bi bi-check-circle-fill me-1"></i>
                   <span>Submit Scheme Record</span>

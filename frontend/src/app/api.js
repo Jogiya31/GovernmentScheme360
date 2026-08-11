@@ -1,4 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
 
 const DEFAULT_USERS = [];
 const getStoredUsers = () => {
@@ -17,10 +18,9 @@ const getStoredUsers = () => {
 export const api = createApi({
   reducerPath: 'api',
   baseQuery: fetchBaseQuery({
-    baseUrl: import.meta.env.VITE_API_BASE_URL || 'https://e78b-164-100-206-129.ngrok-free.app/api',
+    baseUrl: BASE_URL,
     prepareHeaders: (headers) => {
       headers.set('Content-Type', 'application/json');
-      headers.set('ngrok-skip-browser-warning', 'true');
       return headers;
     },
   }),
