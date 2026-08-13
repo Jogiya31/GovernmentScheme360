@@ -428,6 +428,28 @@ const getLoadedTabState = (scheme) => {
   return loaded;
 };
 
+const getPopulatedTabIds = (schemePayload, nextForm) => {
+  const populated = new Set(['SchemeMaster']);
+  const loadedState = getLoadedTabState(schemePayload);
+
+  SCHEME_TABS_CONFIG.forEach((tab) => {
+    if (loadedState[tab.id]) {
+      populated.add(tab.id);
+    } else if (nextForm && nextForm[tab.id]) {
+      const tabValues = nextForm[tab.id];
+      const hasContent = Object.entries(tabValues).some(([key, val]) => {
+        if (['SchemeID', 'CreatedBy', 'UpdatedBy'].includes(key)) return false;
+        return val !== undefined && val !== null && String(val).trim() !== '';
+      });
+      if (hasContent) {
+        populated.add(tab.id);
+      }
+    }
+  });
+
+  return Array.from(populated);
+};
+
 const buildFormFromSchemeRecord = (scheme, selectedValue = '') => {
   const nextForm = getInitialSchemeState();
   const schemeId = getSchemeRecordId(scheme, selectedValue);
@@ -1007,11 +1029,14 @@ export default function UpdatedScheme() {
       }
 
       const { nextForm, schemeId, schemeName } = buildFormFromSchemeRecord(payload, val);
+      const loadedTabState = getLoadedTabState(payload);
+      const activeTabs = getPopulatedTabIds(payload, nextForm);
+
       setFormData(nextForm);
       setLoadedRecordId(String(schemeId || val));
-      setLoadedTabHasData(getLoadedTabState(payload));
+      setLoadedTabHasData(loadedTabState);
       setFormErrors({});
-      setSelectedTabIds(['SchemeMaster']);
+      setSelectedTabIds(activeTabs);
       setActiveTabId('SchemeMaster');
 
       showAlert(`Loaded scheme "${schemeName || 'Record'}" and auto-filled the form.`, 'success');
