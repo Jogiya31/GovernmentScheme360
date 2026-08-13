@@ -1359,7 +1359,7 @@ export default function UpdatedScheme() {
         {/* Tab Controls Bar */}
         <div className="p-3 border-bottom d-flex flex-wrap align-items-center justify-content-between gap-3">
           {/* Quick tab keyword search filter */}
-          <div style={{ minWidth: '340px' }}>
+          <div className="" >
             <Dropdown
               options={dropdownOptions}
               value={selectedDropdownValue}
@@ -1373,7 +1373,7 @@ export default function UpdatedScheme() {
 
           {/* Quick Dropdown Picker of selected tabs */}
           <div className="d-flex align-items-center gap-2">
-            <span className="text-muted d-none d-sm-inline" style={{ fontSize: '0.8rem' }}>
+            <span className="text-muted d-none d-sm-inline text-nowrap" style={{ fontSize: '0.8rem' }}>
               Jump to:
             </span>
             <Dropdown
@@ -1394,13 +1394,13 @@ export default function UpdatedScheme() {
               }}
               searchable={true}
               placeholder="Jump to active tab..."
-              style={{ minWidth: '340px' }}
+              style={{ width: '100%' }}
             />
           </div>
         </div>
 
-        <div className="p-3 border-bottom d-flex flex-wrap align-items-center justify-content-between gap-3">
-          <div className="w-100 d-flex flex-wrap align-items-center justify-content-between p-3 border-bottom bg-light-subtle gap-2">
+        <div className="p-2 border-bottom d-flex flex-wrap align-items-center justify-content-between gap-3">
+          <div className="w-100 d-flex flex-wrap align-items-center justify-content-between p-2 border-bottom bg-light-subtle gap-2">
             <div className="d-flex align-items-center gap-2">
               <i className="bi bi-ui-checks text-primary fs-5"></i>
               <div>
@@ -1485,7 +1485,6 @@ export default function UpdatedScheme() {
             </div>
           )}
         </div>
-
 
         {/* Horizontal Navigation Tabs with Scroll Chevrons */}
         <div className="position-relative border-bottom pl-2 pr-2 py-2 d-flex align-items-center bg-white">

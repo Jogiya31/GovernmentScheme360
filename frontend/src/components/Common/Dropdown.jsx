@@ -217,7 +217,7 @@ export default function Dropdown({
       {isOpen && (
         <div
           className="position-absolute start-0 w-100 mt-1 bg-body border rounded shadow-lg overflow-hidden"
-          style={{ zIndex: 1100, maxHeight: '320px', display: 'flex', flexDirection: 'column' }}
+          style={{ zIndex: 1100, maxHeight: '320px', display: 'flex', flexDirection: 'column' , minWidth: 'fit-content'}}
         >
           {/* Optional search input filter */}
           {searchable && !isLoading && (

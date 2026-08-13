@@ -1276,7 +1276,7 @@ export default function NewScheme() {
         {/* Tab Controls Bar */}
         <div className="p-3 border-bottom d-flex flex-wrap align-items-center justify-content-between gap-3">
           {/* Quick tab keyword search filter */}
-          <div style={{ minWidth: '340px' }}>
+          <div className="" style={{ maxWidth: '420px' }}>
             <Dropdown
               options={dropdownOptions}
               value={selectedDropdownValue}
@@ -1289,8 +1289,8 @@ export default function NewScheme() {
           </div>
 
           {/* Quick Dropdown Picker of 23 tabs */}
-          <div className="d-flex align-items-center gap-2">
-            <span className="text-muted d-none d-sm-inline" style={{ fontSize: '0.8rem' }}>
+          <div className="d-flex align-items-center gap-2" style={{ maxWidth: '420px' }}>
+            <span className="text-muted d-none d-sm-inline text-nowrap" style={{ fontSize: '0.8rem' }}>
               Jump to:
             </span>
             <Dropdown
@@ -1306,7 +1306,7 @@ export default function NewScheme() {
               onChange={(val) => setCurrentTab(Number(val))}
               searchable={true}
               placeholder="Jump to tab..."
-              style={{ minWidth: '340px' }}
+              style={{ width: '100%' }}
             />
           </div>
         </div>
@@ -1412,7 +1412,6 @@ export default function NewScheme() {
               {activeTabConfig.fields.map((field) => {
                 const value = formData[activeTabConfig.id]?.[field.key] || '';
                 const errorText = formErrors[activeTabConfig.id]?.[field.key];
-                const disabled = field.disabled === true || field.disabled === 'true';
                 const isRequired =
                   field.validate === true ||
                   field.validate === 'true' ||
@@ -1564,7 +1563,6 @@ export default function NewScheme() {
                         searchable={true}
                         isLoading={isFetchingOptions}
                         isInvalid={!!errorText}
-                        disabled={disabled}
                         style={{ minWidth: '100%' }}
                       />
                     ) : /* TEXTAREAS */
@@ -1576,7 +1574,6 @@ export default function NewScheme() {
                         style={{ fontSize: '0.85rem' }}
                         placeholder={field.placeholder}
                         value={value}
-                        disabled={disabled}
                         onChange={(e) => handleFieldChange(e.target.value)}
                       />
                     ) : (
@@ -1588,7 +1585,6 @@ export default function NewScheme() {
                         style={{ height: '40px', fontSize: '0.85rem' }}
                         placeholder={field.placeholder}
                         value={value}
-                        disabled={disabled}
                         onChange={(e) => handleFieldChange(e.target.value)}
                       />
                     )}

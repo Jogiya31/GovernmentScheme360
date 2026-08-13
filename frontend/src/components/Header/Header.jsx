@@ -5,13 +5,14 @@ import { toggleTheme } from '../../features/theme/themeSlice';
 import { logout } from '../../features/auth/authSlice';
 import scheme360 from '../../assets/scheme360.png';
 
-export default function Header({ sidebarCollapsed, toggleSidebar }) {
+export default function Header({ toggleSidebar, mobileSidebarOpen }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { theme } = useSelector((state) => state.theme);
   const { user } = useSelector((state) => state.auth);
 
   const [showProfile, setShowProfile] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   const profileRef = useRef(null);
 
@@ -41,45 +42,40 @@ export default function Header({ sidebarCollapsed, toggleSidebar }) {
     <header className="topbar" data-navbarbg="skin6">
       <nav className="navbar top-navbar navbar-expand-lg navbar-light">
         <div className="navbar-header" data-logobg="skin6">
-          {/* Mobile sidebar toggle */}
+          {/* Mobile sidebar toggle button */}
           <button
-            className="btn btn-link nav-toggler waves-effect waves-light d-block d-lg-none border-0 text-dark-emphasis p-0"
+            className="btn btn-link nav-toggler waves-effect waves-light d-block d-lg-none border-0 text-dark-emphasis p-0 me-2"
             onClick={toggleSidebar}
             aria-label="Toggle Sidebar"
           >
-            <img src={scheme360} alt="Scheme360 Logo" style={{ height: '30px', width: 'auto', objectFit: 'contain' }} />
+            <i className={`bi ${mobileSidebarOpen ? 'bi-x-lg text-danger' : 'bi-list text-primary'} fs-2`}></i>
           </button>
 
           {/* Logo brand */}
           <div className="navbar-brand py-0">
             <Link to="/dashboard" className="d-flex align-items-center text-decoration-none">
               <img src={scheme360} alt="Scheme360 Logo" className="me-2" style={{ height: '32px', width: 'auto', objectFit: 'contain' }} />
-              {!sidebarCollapsed && (
-                <span className="h4 mb-0 fw-bold text-dark-emphasis tracking-tight" style={{ letterSpacing: '-0.02em' }}>
-                  Scheme<span className="text-primary"> 360</span>
-                </span>
-              )}
+              <span className="h4 mb-0 fw-bold text-dark-emphasis tracking-tight" style={{ letterSpacing: '-0.02em' }}>
+                Scheme<span className="text-primary"> 360</span>
+              </span>
             </Link>
           </div>
 
           {/* Mobile toggle button for right-side navbar items */}
           <button
-            className="btn btn-link topbartoggler d-block d-lg-none border-0 text-dark-emphasis p-0"
+            className="btn btn-link topbartoggler d-block d-lg-none border-0 text-dark-emphasis p-0 ms-auto"
             type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent"
-            aria-expanded="false"
+            onClick={() => setMobileNavOpen(!mobileNavOpen)}
             aria-label="Toggle Navigation"
           >
-            <i className="bi bi-three-dots fs-3"></i>
+            <i className="bi bi-three-dots-vertical fs-3"></i>
           </button>
         </div>
 
         {/* Collapsible Navbar content */}
-        <div className="navbar-collapse collapse px-3" id="navbarSupportedContent">
+        <div className={`navbar-collapse collapse px-3 ${mobileNavOpen ? 'show' : ''}`} id="navbarSupportedContent">
           {/* Left section of topbar header */}
-          <ul className="navbar-nav float-left me-auto align-items-center">
+          <ul className="navbar-nav float-left me-auto align-items-center flex-row">
             {/* Desktop Sidebar Toggle */}
             <li className="nav-item d-none d-lg-block">
               <button
@@ -87,14 +83,14 @@ export default function Header({ sidebarCollapsed, toggleSidebar }) {
                 onClick={toggleSidebar}
                 aria-label="Toggle Sidebar"
               >
-                <i className="bi bi-list fs-4"></i>
+                <i className="bi bi-list fs-3"></i>
               </button>
             </li>
 
             {/* Global Search Bar */}
-            <li className="nav-item d-none d-md-block ms-3">
+            <li className="nav-item ms-lg-3 w-100 my-2 my-lg-0">
               <form className="d-flex align-items-center" onSubmit={(e) => e.preventDefault()}>
-                <div className="input-group input-group-sm border-0 bg-light rounded" style={{ maxWidth: '280px' }}>
+                <div className="input-group input-group-sm border bg-light rounded w-100" style={{ maxWidth: '280px' }}>
                   <span className="input-group-text bg-transparent border-0 text-muted">
                     <i className="bi bi-search"></i>
                   </span>
@@ -110,12 +106,12 @@ export default function Header({ sidebarCollapsed, toggleSidebar }) {
           </ul>
 
           {/* Right section of topbar header */}
-          <ul className="navbar-nav float-end align-items-center gap-2">
+          <ul className="navbar-nav float-end align-items-center gap-2 flex-row ms-auto justify-content-end py-2 py-lg-0">
             {/* Theme Toggle Button */}
             <li className="nav-item">
               <button
                 onClick={handleToggleTheme}
-                className="btn  btn-sm border-0  d-flex align-items-center justify-content-center"
+                className="btn btn-sm border-0 d-flex align-items-center justify-content-center"
                 style={{ width: '38px', height: '38px' }}
                 title={theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
                 id="theme-toggle-btn"
@@ -137,16 +133,16 @@ export default function Header({ sidebarCollapsed, toggleSidebar }) {
                   className="avatar-img border border-primary border-2"
                   referrerPolicy="no-referrer"
                 />
-                <span className="d-none d-lg-inline text-dark-emphasis fw-medium" style={{ fontSize: '0.9rem' }}>
+                <span className="d-inline text-dark-emphasis fw-medium" style={{ fontSize: '0.9rem' }}>
                   {user?.name || 'Administrator'}
                 </span>
-                <i className="bi bi-chevron-down d-none d-lg-inline text-muted fs-7"></i>
+                <i className="bi bi-chevron-down text-muted fs-7"></i>
               </button>
 
               {showProfile && (
                 <div
                   className="position-absolute end-0 mt-2 bg-body border rounded shadow-lg p-3"
-                  style={{ width: '220px', zIndex: 1050 }}
+                  style={{ width: '220px', zIndex: 1060 }}
                   id="user-profile-dropdown-menu"
                 >
                   <div className="border-bottom pb-2 mb-2">
@@ -156,13 +152,20 @@ export default function Header({ sidebarCollapsed, toggleSidebar }) {
                   <Link
                     to="/profile"
                     className="dropdown-item py-2 d-flex align-items-center gap-2"
-                    onClick={() => setShowProfile(false)}
+                    onClick={() => {
+                      setShowProfile(false);
+                      setMobileNavOpen(false);
+                    }}
                   >
                     <i className="bi bi-person text-muted"></i> My Profile
                   </Link>
                   <hr className="my-2" />
                   <button
-                    onClick={handleLogout}
+                    onClick={() => {
+                      setShowProfile(false);
+                      setMobileNavOpen(false);
+                      handleLogout();
+                    }}
                     className="dropdown-item py-2 text-danger d-flex align-items-center gap-2 border-0 bg-transparent w-100 text-start"
                   >
                     <i className="bi bi-box-arrow-right"></i> Log Out

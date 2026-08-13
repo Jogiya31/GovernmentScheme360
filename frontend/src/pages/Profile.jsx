@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { updateProfile } from '../features/auth/authSlice';
 import { toggleTheme } from '../features/theme/themeSlice';
-import Alert from '../components/Common/Alert';
+import Alert from '../components/common/Alert';
 
 const AVATAR_PRESETS = [
   {
@@ -372,7 +372,7 @@ export default function Profile() {
           <div className="card shadow-sm border-0 h-100">
             {/* Modular Card Tabs Header */}
             <div className="card-header bg-white border-bottom p-0">
-              <ul className="nav nav-tabs border-0 flex-nowrap" id="profileTab" role="tablist">
+              <ul className="nav nav-tabs border-0 flex-nowrap overflow-x-auto" id="profileTab" role="tablist" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
                 <li className="nav-item flex-fill text-center" role="presentation">
                   <button
                     className={`nav-link border-0 border-bottom border-3 py-3 w-100 fw-bold d-flex align-items-center justify-content-center gap-2 ${activeTab === 'basic' ? 'border-primary text-primary bg-light-subtle' : 'border-transparent text-muted bg-white'}`}
