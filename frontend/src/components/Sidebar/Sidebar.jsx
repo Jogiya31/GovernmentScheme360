@@ -5,16 +5,16 @@ export default function Sidebar({ closeMobileSidebar }) {
   const location = useLocation();
 
   const sections = [
-    {
-      title: 'Personal',
-      items: [
-        { path: '/dashboard', label: 'Dashboard', icon: 'bi bi-speedometer2' }
-      ]
-    },
+    // {
+    //   title: 'Personal',
+    //   items: [
+    //     { path: '/dashboard', label: 'Dashboard', icon: 'bi bi-speedometer2' }
+    //   ]
+    // },
     {
       title: 'Workspace',
       items: [
-        { path: '/scheme', label: 'View/Edit Scheme', icon: 'bi bi-file-earmark-plus' },
+        // { path: '/scheme', label: 'View/Edit Scheme', icon: 'bi bi-file-earmark-plus' },
         { path: '/updatedScheme', label: 'Update Scheme', icon: 'bi bi-file-earmark-text' }
       ]
     },

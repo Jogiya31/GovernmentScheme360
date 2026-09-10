@@ -17,6 +17,7 @@ export default function Dropdown({
   isLoading = false, // Set to true when fetching options from API
   maxSelectedDisplay = 3, // In multi mode, how many chip tags to show before collapsing to "+X more"
   isInvalid = false, // Set to true to highlight dropdown trigger with error border
+  align = 'left', // Alignment of popup menu: 'left' or 'right'
   className = '',
   id,
   style = {},
@@ -145,13 +146,13 @@ export default function Dropdown({
 
       {/* Select Box Trigger */}
       <div
-        className={`form-select d-flex align-items-center justify-content-between cursor-pointer py-2 px-3 border rounded ${
-          disabled ? 'bg-secondary-bg opacity-75' : ''
+        className={`form-select d-flex align-items-center justify-content-between cursor-pointer py-2 px-3 border rounded shadow-sm ${
+          disabled ? 'bg-secondary-bg opacity-75' : 'bg-white'
         } ${isInvalid || className.includes('is-invalid') ? 'is-invalid border-danger' : ''}`}
         style={{
           minHeight: '42px',
-          background: 'none', // Remove bootstrap default arrow since we render custom chevron
-          paddingRight: '12px'
+          paddingRight: '12px',
+          backgroundImage: 'none' // Remove bootstrap default arrow since we render custom chevron
         }}
         onClick={handleToggle}
       >
@@ -216,8 +217,8 @@ export default function Dropdown({
       {/* Dropdown Menu Popup List */}
       {isOpen && (
         <div
-          className="position-absolute start-0 w-100 mt-1 bg-body border rounded shadow-lg overflow-hidden"
-          style={{ zIndex: 1100, maxHeight: '320px', display: 'flex', flexDirection: 'column' , minWidth: 'fit-content'}}
+          className={`position-absolute mt-1 bg-body border rounded shadow-lg overflow-hidden ${align === 'right' ? 'end-0' : 'start-0'}`}
+          style={{ zIndex: 1100, maxHeight: '320px', display: 'flex', flexDirection: 'column', minWidth: '100%', maxWidth: 'calc(100vw - 32px)' }}
         >
           {/* Optional search input filter */}
           {searchable && !isLoading && (

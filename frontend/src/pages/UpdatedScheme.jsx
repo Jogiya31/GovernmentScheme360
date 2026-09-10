@@ -1046,16 +1046,25 @@ export default function UpdatedScheme() {
     }
   };
 
-  // Export full 23-tab scheme structure into a majestic PDF report
+  // Export scheme structure into a PDF report for selected forms only
   const handleExportPDFReport = () => {
     try {
+      const tabsToExport = SCHEME_TABS_CONFIG.filter((tab) =>
+        selectedTabIds.includes(tab.id),
+      );
+
+      if (tabsToExport.length === 0) {
+        showAlert('No forms selected to export. Please select at least one form.', 'warning');
+        return;
+      }
+
       const doc = new jsPDF();
       const schemeTitle = formData.SchemeMaster?.SchemeName || 'Government Scheme Register';
       const ministryName = formData.SchemeMaster?.MinistryID || 'Nodal Ministry Unspecified';
 
       // Title Cover banner
       doc.setFont('helvetica');
-      doc.setFillColor(95, 118, 232); // Primary Blue
+      doc.setFillColor(76, 99, 210); // Primary Blue
       doc.rect(0, 0, 210, 42, 'F');
 
       doc.setFontSize(18);
@@ -1065,12 +1074,12 @@ export default function UpdatedScheme() {
       doc.setFontSize(11);
       doc.setTextColor(220, 224, 250);
       doc.text(`${schemeTitle}`, 14, 26);
-      doc.text(`Ministry: ${ministryName} | Generated: ${new Date().toLocaleString()}`, 14, 32);
+      doc.text(`Ministry: ${ministryName} | Forms: ${tabsToExport.length} selected | Generated: ${new Date().toLocaleString()}`, 14, 32);
 
       let currentY = 50;
 
-      // Compile each of the 23 tabs data
-      SCHEME_TABS_CONFIG.forEach((tab, index) => {
+      // Compile each of the selected forms data
+      tabsToExport.forEach((tab, index) => {
         // Prepare rows
         const tableRows = [];
         tab.fields.forEach((field) => {
@@ -1084,7 +1093,7 @@ export default function UpdatedScheme() {
 
         // Add Section Header in PDF
         doc.setFontSize(12);
-        doc.setTextColor(28, 45, 65);
+        doc.setTextColor(15, 23, 42);
         doc.setFont('helvetica', 'bold');
         doc.text(`${index + 1}. ${tab.title}`, 14, currentY);
         doc.setFont('helvetica', 'normal');
@@ -1105,7 +1114,7 @@ export default function UpdatedScheme() {
         });
 
         // Check if we need to add a page break
-        if (currentY > 250 && index < SCHEME_TABS_CONFIG.length - 1) {
+        if (currentY > 250 && index < tabsToExport.length - 1) {
           doc.addPage();
           currentY = 20;
         }
@@ -1113,7 +1122,7 @@ export default function UpdatedScheme() {
 
       doc.save(`scheme-report-${formData.SchemeMaster?.SchemeID || 'registry'}.pdf`);
       showAlert(
-        'PDF report compiled and downloaded successfully with all 23 schema tables!',
+        `PDF report compiled and downloaded successfully with ${tabsToExport.length} selected form${tabsToExport.length > 1 ? 's' : ''}!`,
         'success',
       );
     } catch (err) {
@@ -1359,7 +1368,7 @@ export default function UpdatedScheme() {
         {/* Tab Controls Bar */}
         <div className="p-3 border-bottom d-flex flex-wrap align-items-center justify-content-between gap-3">
           {/* Quick tab keyword search filter */}
-          <div className="" >
+          <div className="flex-grow-1 w-100" style={{ maxWidth: '420px' }}>
             <Dropdown
               options={dropdownOptions}
               value={selectedDropdownValue}
@@ -1372,7 +1381,7 @@ export default function UpdatedScheme() {
           </div>
 
           {/* Quick Dropdown Picker of selected tabs */}
-          <div className="d-flex align-items-center gap-2">
+          <div className="d-flex align-items-center gap-2 flex-grow-1 w-100" style={{ maxWidth: '420px' }}>
             <span className="text-muted d-none d-sm-inline text-nowrap" style={{ fontSize: '0.8rem' }}>
               Jump to:
             </span>
@@ -1394,13 +1403,14 @@ export default function UpdatedScheme() {
               }}
               searchable={true}
               placeholder="Jump to active tab..."
+              align="right"
               style={{ width: '100%' }}
             />
           </div>
         </div>
 
-        <div className="p-2 border-bottom d-flex flex-wrap align-items-center justify-content-between gap-3">
-          <div className="w-100 d-flex flex-wrap align-items-center justify-content-between p-2 border-bottom bg-light-subtle gap-2">
+        <div className="p-3 border-bottom d-flex flex-wrap align-items-center justify-content-between gap-3">
+          <div className="w-100 d-flex flex-wrap align-items-center justify-content-between p-3 border-bottom bg-light-subtle gap-2">
             <div className="d-flex align-items-center gap-2">
               <i className="bi bi-ui-checks text-primary fs-5"></i>
               <div>
@@ -1452,7 +1462,7 @@ export default function UpdatedScheme() {
                             ? activeTabId === tab.id
                               ? 'bg-primary-subtle border-primary text-primary fw-medium'
                               : 'bg-light border-primary-subtle text-dark'
-                            : 'bg-white border-light-subtle text-muted opacity-75'
+                            : 'bg-white border-light-subtle text-muted'
                         }`}
                         style={{ cursor: 'pointer', fontSize: '0.82rem' }}
                         onClick={() => toggleTabSelection(tab.id)}
@@ -1485,6 +1495,7 @@ export default function UpdatedScheme() {
             </div>
           )}
         </div>
+
 
         {/* Horizontal Navigation Tabs with Scroll Chevrons */}
         <div className="position-relative border-bottom pl-2 pr-2 py-2 d-flex align-items-center bg-white">
@@ -1567,20 +1578,7 @@ export default function UpdatedScheme() {
 
         {/* Active Tab Form Body */}
         <div className="p-4 bg-transparent">
-          <div className="d-flex align-items-center gap-2 mb-3">
-            <div
-              className="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center"
-              style={{ width: '38px', height: '38px' }}
-            >
-              <i className={`${activeTabConfig.icon} fs-5`}></i>
-            </div>
-            <div>
-              <h5 className="mb-0 text-dark fw-bold" style={{ fontSize: '1.05rem' }}>
-                {' '}
-                {activeTabConfig.title}{' '}
-              </h5>
-            </div>
-          </div>
+
 
           <form onSubmit={handleSubmitScheme}>
             <div className="row g-3">
@@ -1810,11 +1808,13 @@ export default function UpdatedScheme() {
               <div className="d-flex gap-2 flex-wrap">
                 <button
                   type="button"
-                  className="btn btn-outline-danger btn-sm px-3 d-flex align-items-center gap-1.5 shadow rounded "
+                  className="btn btn-outline-danger btn-sm px-3 d-flex align-items-center gap-1.5 shadow rounded"
                   onClick={handleExportPDFReport}
+                  title="Export selected forms as PDF report"
+                  disabled={visibleTabs.length === 0}
                 >
                   <i className="bi bi-filetype-pdf me-1"></i>
-                  <span>Export Full PDF</span>
+                  <span>Export Selected PDF ({visibleTabs.length})</span>
                 </button>
                 <button
                   type="submit"

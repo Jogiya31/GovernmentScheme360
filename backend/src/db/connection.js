@@ -12,6 +12,7 @@ const connectDB = async () => {
     return pool;
   } catch (err) {
     console.error(err);
+    throw err;
   }
 };
 

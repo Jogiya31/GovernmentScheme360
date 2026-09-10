@@ -5,7 +5,7 @@ import { toggleTheme } from '../../features/theme/themeSlice';
 import { logout } from '../../features/auth/authSlice';
 import scheme360 from '../../assets/scheme360.png';
 
-export default function Header({ toggleSidebar, mobileSidebarOpen }) {
+export default function Header({ sidebarCollapsed, toggleSidebar, mobileSidebarOpen }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { theme } = useSelector((state) => state.theme);
@@ -53,11 +53,31 @@ export default function Header({ toggleSidebar, mobileSidebarOpen }) {
 
           {/* Logo brand */}
           <div className="navbar-brand py-0">
-            <Link to="/dashboard" className="d-flex align-items-center text-decoration-none">
-              <img src={scheme360} alt="Scheme360 Logo" className="me-2" style={{ height: '32px', width: 'auto', objectFit: 'contain' }} />
-              <span className="h4 mb-0 fw-bold text-dark-emphasis tracking-tight" style={{ letterSpacing: '-0.02em' }}>
-                Scheme<span className="text-primary"> 360</span>
-              </span>
+            <Link
+              to="/dashboard"
+              className="d-flex align-items-center text-decoration-none"
+              title="Scheme 360"
+            >
+              <img
+                src={scheme360}
+                alt="Scheme360 Logo"
+                className={`logo-icon ${sidebarCollapsed ? 'm-0' : 'me-2'}`}
+                style={{
+                  height: '32px',
+                  width: 'auto',
+                  maxWidth: '36px',
+                  objectFit: 'contain',
+                  transition: 'margin 0.2s ease-in-out'
+                }}
+              />
+              {!sidebarCollapsed && (
+                <span
+                  className="logo-text h4 mb-0 fw-bold text-dark-emphasis tracking-tight"
+                  style={{ letterSpacing: '-0.02em', whiteSpace: 'nowrap' }}
+                >
+                  Scheme<span className="text-primary"> 360</span>
+                </span>
+              )}
             </Link>
           </div>
 
