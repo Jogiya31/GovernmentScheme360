@@ -106,23 +106,6 @@ export default function Header({ sidebarCollapsed, toggleSidebar, mobileSidebarO
                 <i className="bi bi-list fs-3"></i>
               </button>
             </li>
-
-            {/* Global Search Bar */}
-            <li className="nav-item ms-lg-3 w-100 my-2 my-lg-0">
-              <form className="d-flex align-items-center" onSubmit={(e) => e.preventDefault()}>
-                <div className="input-group input-group-sm border bg-light-subtle rounded w-100 shadow-sm" style={{ maxWidth: '280px', borderColor: '#cbd5e1' }}>
-                  <span className="input-group-text bg-transparent border-0 text-secondary">
-                    <i className="bi bi-search"></i>
-                  </span>
-                  <input
-                    type="search"
-                    className="form-control bg-transparent border-0 ps-0 text-dark-emphasis"
-                    placeholder="Search assets..."
-                    style={{ fontSize: '0.85rem' }}
-                  />
-                </div>
-              </form>
-            </li>
           </ul>
 
           {/* Right section of topbar header */}
