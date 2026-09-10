@@ -1,6 +1,6 @@
 import React from 'react';
 import { useGetDashboardSummaryQuery } from '../app/api';
-import Spinner from '../components/Common/Spinner';
+import Spinner from '../components/common/Spinner';
 
 export default function Dashboard() {
   const { data: summary, isLoading, error } = useGetDashboardSummaryQuery();

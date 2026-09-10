@@ -5,13 +5,12 @@ import { store } from './app/store';
 
 // Layout & Route Guards
 import AdminLayout from './components/Layout/AdminLayout';
-import ProtectedRoute from './components/Common/ProtectedRoute';
-import PublicRoute from './components/Common/PublicRoute';
+import ProtectedRoute from './components/common/ProtectedRoute';
+import PublicRoute from './components/common/PublicRoute';
 
 // Pages
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
-import NewScheme from './pages/NewScheme';
 import Profile from './pages/Profile';
 import UpdatedScheme from './pages/UpdatedScheme';
 
@@ -44,7 +43,6 @@ export default function App() {
             
             {/* Application modules */}
             <Route path="dashboard" element={<Dashboard />} />
-            <Route path="scheme" element={<NewScheme />} />
             <Route path="updatedScheme" element={<UpdatedScheme />} />
             <Route path="profile" element={<Profile />} />
           </Route>

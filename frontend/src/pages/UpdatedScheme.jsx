@@ -6,6 +6,8 @@ import { SCHEME_TABS_CONFIG, getInitialSchemeState } from '../data/schemeFields'
 import Alert from '../components/common/Alert';
 import Card from '../components/common/Card';
 import Modal from '../components/common/Modal';
+import Dropdown from '../components/common/Dropdown';
+import Spinner from '../components/common/Spinner';
 import {
   useGetAgeGroupMutation,
   useGetBeneficiaryCategoryMutation,
@@ -92,8 +94,6 @@ import {
   useUpdateSchemeDistrictMutation,
 } from '../app/api';
 import { useSelector } from 'react-redux';
-import Dropdown from '../components/Common/Dropdown';
-import Spinner from '../components/Common/Spinner';
 
 const extractDataArray = (res) => {
   if (!res) return [];
@@ -735,7 +735,7 @@ export default function UpdatedScheme() {
       { key: 'beneficiaryCategories', fn: getBeneficiaryCategory },
       { key: 'beneficiaryTypes', fn: getBeneficiaryType },
       { key: 'benefitFrequencies', fn: getBenefitFrequency },
-      { key: 'benefitTypes', fn: getBenefitType },    
+      { key: 'benefitTypes', fn: getBenefitType },
       { key: 'deliveryMechanisms', fn: getDeliveryMechanism },
       { key: 'departments', fn: getDepartment },
       { key: 'districts', fn: getDistrict },
@@ -1449,7 +1449,7 @@ export default function UpdatedScheme() {
           </div>
 
           {showCheckboxPanel && (
-            <div className="bg-white">
+            <div className="w-100 p-2">
               <div className="row g-2">
                 {SCHEME_TABS_CONFIG.map((tab) => {
                   const isChecked = selectedTabIds.includes(tab.id);
@@ -1461,8 +1461,8 @@ export default function UpdatedScheme() {
                           isChecked
                             ? activeTabId === tab.id
                               ? 'bg-primary-subtle border-primary text-primary fw-medium'
-                              : 'bg-light border-primary-subtle text-dark'
-                            : 'bg-white border-light-subtle text-muted'
+                              : 'bg-body-secondary border-primary-subtle text-dark'
+                            : 'bg-body border-light-subtle text-muted'
                         }`}
                         style={{ cursor: 'pointer', fontSize: '0.82rem' }}
                         onClick={() => toggleTabSelection(tab.id)}
@@ -1498,10 +1498,10 @@ export default function UpdatedScheme() {
 
 
         {/* Horizontal Navigation Tabs with Scroll Chevrons */}
-        <div className="position-relative border-bottom pl-2 pr-2 py-2 d-flex align-items-center bg-white">
+        <div className="position-relative border-bottom pl-2 pr-2 py-2 d-flex align-items-center bg-body">
           {/* Scroll Left Button */}
           <button
-            className="btn btn-outline-secondary btn-sm p-0 d-flex align-items-center justify-content-center border-0 rounded-circle position-absolute start-0 ms-1 bg-white"
+            className="btn btn-outline-secondary btn-sm p-0 d-flex align-items-center justify-content-center border-0 rounded-circle position-absolute start-0 ms-1 bg-body"
             style={{ width: '26px', height: '26px', zIndex: 5 }}
             onClick={() => scrollTabs('left')}
             title="Scroll Left"
@@ -1532,7 +1532,7 @@ export default function UpdatedScheme() {
                           : 'bg-primary text-white border-primary fw-medium shadow-sm'
                         : tabErrors > 0
                           ? 'bg-danger-subtle text-danger border-danger-subtle fw-medium'
-                          : 'bg-light text-muted hover-bg'
+                          : 'bg-body-secondary text-muted hover-bg'
                     }`}
                     style={{ fontSize: '0.8rem' }}
                     onClick={() => setActiveTabId(tab.id)}
@@ -1549,7 +1549,7 @@ export default function UpdatedScheme() {
                       </span>
                     ) : (
                       <span
-                        className={`badge rounded-pill ${isActive ? 'bg-white text-primary' : 'bg-secondary text-white'}`}
+                        className={`badge rounded-pill ${isActive ? 'bg-light text-primary' : 'bg-secondary text-white'}`}
                         style={{ fontSize: '0.65rem' }}
                       >
                         {progress}%
@@ -1567,7 +1567,7 @@ export default function UpdatedScheme() {
           </ul>
           {/* Scroll right Button */}
           <button
-            className="btn btn-outline-secondary btn-sm p-0 d-flex align-items-center justify-content-center border-0 rounded-circle position-absolute end-0 me-1 bg-white"
+            className="btn btn-outline-secondary btn-sm p-0 d-flex align-items-center justify-content-center border-0 rounded-circle position-absolute end-0 me-1 bg-body"
             style={{ width: '26px', height: '26px', zIndex: 5 }}
             onClick={() => scrollTabs('right')}
             title="Scroll Right"

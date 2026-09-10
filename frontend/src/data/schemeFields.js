@@ -115,6 +115,7 @@ export const SCHEME_TABS_CONFIG = [
     title: 'Implementation Model',
     icon: 'bi-diagram-3-fill',
     fields: [
+      { key: 'SubSectorID', label: 'Sub-Sector', type: 'select', options: [], col: 4 },
       { key: 'ImplementingAgencyID', label: 'Implementing Agency', type: 'select', options: [], col: 4 },
       { key: 'StateAgencies', label: 'State-level Implementing Agencies', type: 'text', placeholder: 'e.g. State Housing Boards', col: 4 },
       { key: 'DistrictAgencies', label: 'District-level Nodal Agencies', type: 'text', placeholder: 'e.g. DRDA / District Collectorate', col: 4 },
@@ -131,6 +132,7 @@ export const SCHEME_TABS_CONFIG = [
     title: 'Geographic Coverage',
     icon: 'bi-geo-alt-fill',
     fields: [
+      { key: 'SubSectorID', label: 'Sub-Sector', type: 'select', options: [], col: 4 },
       { key: 'NationalWise', label: 'Is Nationally Applicable?', type: 'select', options: ['','Yes','No'], col: 4 },
       { key: 'NorthEast', label: 'North East',type: 'select', options: ['','Yes','No'], col: 4 }
     ]

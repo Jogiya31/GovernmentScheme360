@@ -1,316 +1,97 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react';
-import Spinner from './Spinner';
+import React, { useState, useEffect } from 'react';
+import { Outlet, useLocation } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { initTheme } from '../../features/theme/themeSlice';
+import Sidebar from '../Sidebar/Sidebar';
+import Header from '../Header/Header';
+import Footer from '../Footer/Footer';
 
-/**
- * Dropdown component - Supports both single-select (normal) and multi-select modes,
- * searchable lists, custom badge triggers, click-outside dismissal, and loading state.
- */
-export default function Dropdown({
-  options = [], // Array of strings or { value, label, icon }
-  value, // For single select: string/number. For multi-select: array of string/number.
-  onChange, // Callback on value change (value) => void
-  placeholder = 'Select option...',
-  label, // Optional title label above the dropdown
-  isMulti = false, // Set to true for multiselect dropdown
-  searchable = false, // Set to true to filter options with a search box
-  disabled = false,
-  isLoading = false, // Set to true when fetching options from API
-  maxSelectedDisplay = 3, // In multi mode, how many chip tags to show before collapsing to "+X more"
-  isInvalid = false, // Set to true to highlight dropdown trigger with error border
-  align = 'left', // Alignment of popup menu: 'left' or 'right'
-  className = '',
-  id,
-  style = {},
-  ...props
-}) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [searchTerm, setSearchFilter] = useState('');
-  const dropdownRef = useRef(null);
+export default function AdminLayout() {
+  const dispatch = useDispatch();
+  const location = useLocation();
+  const { theme } = useSelector((state) => state.theme);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
-  // Normalize options to a standard format [{ value, label, icon }]
-  const normalizedOptions = useMemo(() => {
-    return options.map((opt) => {
-      if (typeof opt === 'string' || typeof opt === 'number') {
-        return { value: opt, label: String(opt) };
-      }
-      const val = opt.value !== undefined && opt.value !== null ? opt.value : opt.label;
-      const lbl = opt.label ? String(opt.label) : String(val ?? '');
-      return {
-        value: val,
-        label: lbl,
-        icon: opt.icon
-      };
-    });
-  }, [options]);
-
-  // Click outside listener
+  // Initialize theme attribute on initial load
   useEffect(() => {
-    function handleClickOutside(event) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsOpen(false);
+    dispatch(initTheme());
+  }, [dispatch]);
+
+  // Close mobile sidebar on route changes
+  useEffect(() => {
+    setMobileSidebarOpen(false);
+  }, [location.pathname]);
+
+  // Auto handle resize
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 992) {
+        setMobileSidebarOpen(false);
       }
-    }
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isOpen]);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
-  // Filter options based on search term
-  const filteredOptions = useMemo(() => {
-    if (!searchable || !searchTerm) return normalizedOptions;
-    const lower = searchTerm.toLowerCase();
-    return normalizedOptions.filter((opt) =>
-      opt.label.toLowerCase().includes(lower)
-    );
-  }, [normalizedOptions, searchable, searchTerm]);
-
-  // Find label of currently selected option in single mode
-  const selectedSingleOption = useMemo(() => {
-    if (isMulti) return null;
-    if (value === undefined || value === null || value === '') return null;
-    const strVal = String(value);
-    return (
-      normalizedOptions.find((opt) => String(opt.value) === strVal) ||
-      normalizedOptions.find((opt) => String(opt.label) === strVal)
-    );
-  }, [normalizedOptions, value, isMulti]);
-
-  // Find labels of selected options in multi mode
-  const selectedMultiOptions = useMemo(() => {
-    if (!isMulti || !Array.isArray(value)) return [];
-    const strVals = value.map(String);
-    return normalizedOptions.filter(
-      (opt) => strVals.includes(String(opt.value)) || strVals.includes(String(opt.label))
-    );
-  }, [normalizedOptions, value, isMulti]);
-
-  const handleToggle = () => {
-    if (!disabled) {
-      setIsOpen(!isOpen);
-      setSearchFilter(''); // Reset search when opening/closing
-    }
-  };
-
-  // Option selection logic
-  const handleSelectOption = (optionValue) => {
-    if (isMulti) {
-      const currentValues = Array.isArray(value) ? value : [];
-      let newValues;
-      if (currentValues.includes(optionValue)) {
-        newValues = currentValues.filter((v) => v !== optionValue);
-      } else {
-        newValues = [...currentValues, optionValue];
-      }
-      if (onChange) onChange(newValues);
+  const toggleSidebar = () => {
+    if (window.innerWidth < 992) {
+      setMobileSidebarOpen((prev) => !prev);
     } else {
-      if (onChange) onChange(optionValue);
-      setIsOpen(false);
+      setSidebarCollapsed((prev) => !prev);
     }
   };
 
-  const removeMultiOption = (e, optionValue) => {
-    e.stopPropagation();
-    const currentValues = Array.isArray(value) ? value : [];
-    const newValues = currentValues.filter((v) => v !== optionValue);
-    if (onChange) onChange(newValues);
-  };
-
-  const handleSelectAll = (e) => {
-    e.stopPropagation();
-    const allValues = normalizedOptions.map((opt) => opt.value);
-    if (onChange) onChange(allValues);
-  };
-
-  const handleClearAll = (e) => {
-    e.stopPropagation();
-    if (onChange) onChange(isMulti ? [] : '');
+  const closeMobileSidebar = () => {
+    setMobileSidebarOpen(false);
   };
 
   return (
     <div
-      ref={dropdownRef}
-      className={`dropdown-container position-relative ${className}`}
-      style={{ minWidth: '200px', ...style }}
-      id={id}
-      {...props}
+      id="main-wrapper"
+      className={mobileSidebarOpen ? 'show-sidebar' : ''}
+      data-theme={theme}
+      data-bs-theme={theme}
+      data-layout="vertical"
+      data-navbarbg="skin6"
+      data-sidebartype={sidebarCollapsed ? 'mini-sidebar' : 'full'}
+      data-sidebar-position="fixed"
+      data-header-position="fixed"
+      data-boxed-layout="full"
     >
-      {/* Label above dropdown trigger */}
-      {label && (
-        <label className="form-label fw-medium mb-1" style={{ fontSize: '0.85rem' }}>
-          {label}
-        </label>
-      )}
+      {/* Top Header / Navbar */}
+      <Header
+        sidebarCollapsed={sidebarCollapsed}
+        toggleSidebar={toggleSidebar}
+        mobileSidebarOpen={mobileSidebarOpen}
+      />
 
-      {/* Select Box Trigger */}
-      <div
-        className={`form-select d-flex align-items-center justify-content-between cursor-pointer py-2 px-3 border rounded shadow-sm ${
-          disabled ? 'opacity-75' : ''
-        } ${isInvalid || className.includes('is-invalid') ? 'is-invalid border-danger' : ''}`}
-        style={{
-          minHeight: '42px',
-          paddingRight: '12px',
-          backgroundImage: 'none' // Remove bootstrap default arrow since we render custom chevron
-        }}
-        onClick={handleToggle}
-      >
-        <div className="d-flex flex-wrap align-items-center gap-1" style={{ maxWidth: '90%' }}>
-          {isMulti ? (
-            /* Multi select content area */
-            selectedMultiOptions.length === 0 ? (
-              <span className="text-muted">{placeholder}</span>
-            ) : selectedMultiOptions.length <= maxSelectedDisplay ? (
-              selectedMultiOptions.map((opt) => (
-                <span
-                  key={opt.value}
-                  className="badge bg-primary text-white d-inline-flex align-items-center gap-1 py-1 px-2 rounded"
-                  style={{ fontSize: '0.75rem', fontWeight: '400' }}
-                >
-                  {opt.label}
-                  <i
-                    className="bi bi-x fs-6 cursor-pointer hover-opacity-100"
-                    onClick={(e) => removeMultiOption(e, opt.value)}
-                    style={{ lineHeight: 0 }}
-                  ></i>
-                </span>
-              ))
-            ) : (
-              <span className="badge bg-primary text-white py-1 px-2 rounded" style={{ fontSize: '0.75rem', fontWeight: '400' }}>
-                {selectedMultiOptions.length} selected
-              </span>
-            )
-          ) : (
-            /* Single select content area */
-            selectedSingleOption ? (
-              <span className="d-flex align-items-center text-dark-emphasis">
-                {selectedSingleOption.icon && <i className={`${selectedSingleOption.icon} me-2 text-primary`}></i>}
-                {selectedSingleOption.label}
-              </span>
-            ) : (
-              <span className="text-muted">{placeholder}</span>
-            )
-          )}
-        </div>
-
-        {/* Clear and Chevron indicators / Loading Spinner */}
-        <div className="d-flex align-items-center gap-2">
-          {isLoading ? (
-            <Spinner size="xs" variant="primary" />
-          ) : (
-            <>
-              {((isMulti && selectedMultiOptions.length > 0) || (!isMulti && selectedSingleOption)) && !disabled && (
-                <i
-                  className="bi bi-x-lg text-muted cursor-pointer hover-text-danger"
-                  style={{ fontSize: '0.85rem' }}
-                  onClick={handleClearAll}
-                  title="Clear all"
-                ></i>
-              )}
-              <i className={`bi bi-chevron-${isOpen ? 'up' : 'down'} text-muted`} style={{ fontSize: '0.85rem' }}></i>
-            </>
-          )}
-        </div>
-      </div>
-
-      {/* Dropdown Menu Popup List */}
-      {isOpen && (
+      {/* Mobile Backdrop Overlay */}
+      {mobileSidebarOpen && (
         <div
-          className={`position-absolute mt-1 bg-body border rounded shadow-lg overflow-hidden ${align === 'right' ? 'end-0' : 'start-0'}`}
-          style={{ zIndex: 1100, maxHeight: '320px', display: 'flex', flexDirection: 'column', minWidth: '100%', maxWidth: 'calc(100vw - 32px)' }}
-        >
-          {/* Optional search input filter */}
-          {searchable && !isLoading && (
-            <div className="p-2 border-bottom ">
-              <div className="input-group input-group-sm">
-                <span className="input-group-text bg-transparent border-end-0">
-                  <i className="bi bi-search text-muted"></i>
-                </span>
-                <input
-                  type="text"
-                  className="form-control border-start-0"
-                  placeholder="Filter options..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchFilter(e.target.value)}
-                  style={{ fontSize: '0.85rem' }}
-                  onClick={(e) => e.stopPropagation()} // Prevent closing dropdown on input focus/clicks
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Quick toggle headers in multi mode */}
-          {isMulti && !isLoading && (
-            <div className="p-2 border-bottom bg-body-secondary d-flex justify-content-between align-items-center" style={{ fontSize: '0.75rem' }}>
-              <button
-                type="button"
-                className="btn btn-link btn-sm p-0 text-decoration-none text-primary"
-                onClick={handleSelectAll}
-              >
-                Select All
-              </button>
-              <span className="text-muted">|</span>
-              <button
-                type="button"
-                className="btn btn-link btn-sm p-0 text-decoration-none text-danger"
-                onClick={handleClearAll}
-              >
-                Clear All
-              </button>
-            </div>
-          )}
-
-          {/* Scrollable list options */}
-          <div className="overflow-auto flex-grow-1" style={{ maxHeight: '220px' }}>
-            {isLoading ? (
-              <div className="py-4 text-center">
-                <Spinner size="sm" center text="Fetching options..." />
-              </div>
-            ) : filteredOptions.length === 0 ? (
-              <div className="text-center py-3 text-muted" style={{ fontSize: '0.85rem' }}>
-                No matches found
-              </div>
-            ) : (
-              filteredOptions.map((opt) => {
-                const isSelected = isMulti
-                  ? (Array.isArray(value) && (value.map(String).includes(String(opt.value)) || value.map(String).includes(String(opt.label))))
-                  : (value !== undefined && value !== null && value !== '') && (String(value) === String(opt.value) || String(value) === String(opt.label));
-
-                return (
-                  <div
-                    key={opt.value}
-                    className={`dropdown-item py-2 px-3 d-flex align-items-center justify-content-between cursor-pointer ${
-                      isSelected ? 'bg-primary-subtle font-weight-medium' : ''
-                    }`}
-                    onClick={() => handleSelectOption(opt.value)}
-                    style={{ fontSize: '0.9rem' }}
-                  >
-                    <div className="d-flex align-items-center text-dark-emphasis">
-                      {isMulti && (
-                        <div className="form-check mb-0 me-2" style={{ pointerEvents: 'none' }}>
-                          <input
-                            type="checkbox"
-                            className="form-check-input"
-                            checked={isSelected}
-                            readOnly
-                          />
-                        </div>
-                      )}
-                      {opt.icon && <i className={`${opt.icon} me-2 text-primary`}></i>}
-                      <span>{opt.label}</span>
-                    </div>
-
-                    {isSelected && !isMulti && (
-                      <i className="bi bi-check text-primary fs-5"></i>
-                    )}
-                  </div>
-                );
-              })
-            )}
-          </div>
-        </div>
+          className="sidebar-backdrop d-lg-none"
+          onClick={closeMobileSidebar}
+          aria-label="Close Mobile Sidebar"
+        ></div>
       )}
+
+      {/* Sidebar Navigation */}
+      <Sidebar
+        sidebarCollapsed={sidebarCollapsed}
+        mobileSidebarOpen={mobileSidebarOpen}
+        closeMobileSidebar={closeMobileSidebar}
+      />
+
+      {/* Main page content wrapper */}
+      <div className="page-wrapper" style={{ display: 'block' }}>
+        {/* Dynamic page content container */}
+        <div className="container-fluid">
+          <Outlet />
+        </div>
+
+        {/* Global Footer */}
+        <Footer />
+      </div>
     </div>
   );
 }

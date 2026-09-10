@@ -110,13 +110,13 @@ export default function Header({ sidebarCollapsed, toggleSidebar, mobileSidebarO
             {/* Global Search Bar */}
             <li className="nav-item ms-lg-3 w-100 my-2 my-lg-0">
               <form className="d-flex align-items-center" onSubmit={(e) => e.preventDefault()}>
-                <div className="input-group input-group-sm border bg-light rounded w-100" style={{ maxWidth: '280px' }}>
-                  <span className="input-group-text bg-transparent border-0 text-muted">
+                <div className="input-group input-group-sm border bg-light-subtle rounded w-100 shadow-sm" style={{ maxWidth: '280px', borderColor: '#cbd5e1' }}>
+                  <span className="input-group-text bg-transparent border-0 text-secondary">
                     <i className="bi bi-search"></i>
                   </span>
                   <input
                     type="search"
-                    className="form-control bg-transparent border-0 ps-0 text-muted"
+                    className="form-control bg-transparent border-0 ps-0 text-dark-emphasis"
                     placeholder="Search assets..."
                     style={{ fontSize: '0.85rem' }}
                   />
@@ -131,12 +131,12 @@ export default function Header({ sidebarCollapsed, toggleSidebar, mobileSidebarO
             <li className="nav-item">
               <button
                 onClick={handleToggleTheme}
-                className="btn btn-sm border-0 d-flex align-items-center justify-content-center"
+                className="btn btn-sm border-0 d-flex align-items-center justify-content-center rounded-circle"
                 style={{ width: '38px', height: '38px' }}
                 title={theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
                 id="theme-toggle-btn"
               >
-                <i className={`bi ${theme === 'light' ? 'bi-moon-stars-fill' : 'bi-sun-fill'} fs-5 text-muted`}></i>
+                <i className={`bi ${theme === 'light' ? 'bi-moon-stars-fill' : 'bi-sun-fill'} fs-5 text-secondary`}></i>
               </button>
             </li>
 
@@ -144,40 +144,40 @@ export default function Header({ sidebarCollapsed, toggleSidebar, mobileSidebarO
             <li className="nav-item position-relative ms-2" ref={profileRef}>
               <button
                 onClick={() => setShowProfile(!showProfile)}
-                className="btn btn-link p-0 border-0 d-flex align-items-center text-decoration-none gap-2"
+                className="btn btn-link p-1 border-0 d-flex align-items-center text-decoration-none gap-2 rounded"
                 id="user-profile-dropdown-btn"
               >
                 <img
                   src={user?.avatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200"}
                   alt="Avatar"
-                  className="avatar-img border border-primary border-2"
+                  className="avatar-img border border-primary border-2 shadow-sm"
                   referrerPolicy="no-referrer"
                 />
                 <span className="d-inline text-dark-emphasis fw-medium" style={{ fontSize: '0.9rem' }}>
                   {user?.name || 'Administrator'}
                 </span>
-                <i className="bi bi-chevron-down text-muted fs-7"></i>
+                <i className="bi bi-chevron-down text-secondary fs-7"></i>
               </button>
 
               {showProfile && (
                 <div
                   className="position-absolute end-0 mt-2 bg-body border rounded shadow-lg p-3"
-                  style={{ width: '220px', zIndex: 1060 }}
+                  style={{ width: '230px', zIndex: 1060, borderColor: '#cbd5e1' }}
                   id="user-profile-dropdown-menu"
                 >
                   <div className="border-bottom pb-2 mb-2">
-                    <h6 className="mb-0 fw-bold">{user?.name || 'Jay Swar'}</h6>
+                    <h6 className="mb-0 fw-bold text-dark-emphasis">{user?.name || 'Jay Swar'}</h6>
                     <small className="text-muted text-truncate d-block">{user?.email || 'admin@gmail.com'}</small>
                   </div>
                   <Link
                     to="/profile"
-                    className="dropdown-item py-2 d-flex align-items-center gap-2"
+                    className="dropdown-item py-2 d-flex align-items-center gap-2 rounded text-dark-emphasis"
                     onClick={() => {
                       setShowProfile(false);
                       setMobileNavOpen(false);
                     }}
                   >
-                    <i className="bi bi-person text-muted"></i> My Profile
+                    <i className="bi bi-person text-secondary"></i> My Profile
                   </Link>
                   <hr className="my-2" />
                   <button
@@ -186,7 +186,7 @@ export default function Header({ sidebarCollapsed, toggleSidebar, mobileSidebarO
                       setMobileNavOpen(false);
                       handleLogout();
                     }}
-                    className="dropdown-item py-2 text-danger d-flex align-items-center gap-2 border-0 bg-transparent w-100 text-start"
+                    className="dropdown-item py-2 text-danger d-flex align-items-center gap-2 border-0 bg-transparent w-100 text-start rounded"
                   >
                     <i className="bi bi-box-arrow-right"></i> Log Out
                   </button>

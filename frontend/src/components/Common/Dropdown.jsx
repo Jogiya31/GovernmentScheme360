@@ -147,7 +147,7 @@ export default function Dropdown({
       {/* Select Box Trigger */}
       <div
         className={`form-select d-flex align-items-center justify-content-between cursor-pointer py-2 px-3 border rounded shadow-sm ${
-          disabled ? 'bg-secondary-bg opacity-75' : 'bg-white'
+          disabled ? 'opacity-75' : ''
         } ${isInvalid || className.includes('is-invalid') ? 'is-invalid border-danger' : ''}`}
         style={{
           minHeight: '42px',
@@ -242,7 +242,7 @@ export default function Dropdown({
 
           {/* Quick toggle headers in multi mode */}
           {isMulti && !isLoading && (
-            <div className="p-2 border-bottom bg-light d-flex justify-content-between align-items-center" style={{ fontSize: '0.75rem' }}>
+            <div className="p-2 border-bottom bg-body-secondary d-flex justify-content-between align-items-center" style={{ fontSize: '0.75rem' }}>
               <button
                 type="button"
                 className="btn btn-link btn-sm p-0 text-decoration-none text-primary"
@@ -314,4 +314,3 @@ export default function Dropdown({
     </div>
   );
 }
-  

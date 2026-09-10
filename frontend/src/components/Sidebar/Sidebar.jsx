@@ -14,7 +14,6 @@ export default function Sidebar({ closeMobileSidebar }) {
     {
       title: 'Workspace',
       items: [
-        // { path: '/scheme', label: 'View/Edit Scheme', icon: 'bi bi-file-earmark-plus' },
         { path: '/updatedScheme', label: 'Update Scheme', icon: 'bi bi-file-earmark-text' }
       ]
     },
