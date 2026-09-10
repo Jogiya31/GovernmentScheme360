@@ -1814,7 +1814,7 @@ export default function UpdatedScheme() {
                   disabled={visibleTabs.length === 0}
                 >
                   <i className="bi bi-filetype-pdf me-1"></i>
-                  <span>Export Selected PDF ({visibleTabs.length})</span>
+                  <span>Export Form PDF</span> 
                 </button>
                 <button
                   type="submit"
