@@ -139,7 +139,7 @@ export default function Dropdown({
     >
       {/* Label above dropdown trigger */}
       {label && (
-        <label className="form-label fw-medium text-dark-emphasis mb-1" style={{ fontSize: '0.85rem' }}>
+        <label className="form-label fw-medium mb-1" style={{ fontSize: '0.85rem' }}>
           {label}
         </label>
       )}
@@ -314,3 +314,4 @@ export default function Dropdown({
     </div>
   );
 }
+  

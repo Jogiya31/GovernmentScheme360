@@ -17,14 +17,23 @@ const themeSlice = createSlice({
       state.theme = nextTheme;
       localStorage.setItem('theme', nextTheme);
       document.documentElement.setAttribute('data-bs-theme', nextTheme);
+      document.documentElement.setAttribute('data-theme', nextTheme);
+      document.body.setAttribute('data-bs-theme', nextTheme);
+      document.body.setAttribute('data-theme', nextTheme);
     },
     setTheme: (state, action) => {
       state.theme = action.payload;
       localStorage.setItem('theme', action.payload);
       document.documentElement.setAttribute('data-bs-theme', action.payload);
+      document.documentElement.setAttribute('data-theme', action.payload);
+      document.body.setAttribute('data-bs-theme', action.payload);
+      document.body.setAttribute('data-theme', action.payload);
     },
     initTheme: (state) => {
       document.documentElement.setAttribute('data-bs-theme', state.theme);
+      document.documentElement.setAttribute('data-theme', state.theme);
+      document.body.setAttribute('data-bs-theme', state.theme);
+      document.body.setAttribute('data-theme', state.theme);
     },
   },
 });

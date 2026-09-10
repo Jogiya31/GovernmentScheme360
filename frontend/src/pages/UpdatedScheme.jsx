@@ -6,8 +6,6 @@ import { SCHEME_TABS_CONFIG, getInitialSchemeState } from '../data/schemeFields'
 import Alert from '../components/common/Alert';
 import Card from '../components/common/Card';
 import Modal from '../components/common/Modal';
-import Dropdown from '../components/common/Dropdown';
-import Spinner from '../components/common/Spinner';
 import {
   useGetAgeGroupMutation,
   useGetBeneficiaryCategoryMutation,
@@ -94,6 +92,8 @@ import {
   useUpdateSchemeDistrictMutation,
 } from '../app/api';
 import { useSelector } from 'react-redux';
+import Dropdown from '../components/Common/Dropdown';
+import Spinner from '../components/Common/Spinner';
 
 const extractDataArray = (res) => {
   if (!res) return [];
@@ -735,7 +735,7 @@ export default function UpdatedScheme() {
       { key: 'beneficiaryCategories', fn: getBeneficiaryCategory },
       { key: 'beneficiaryTypes', fn: getBeneficiaryType },
       { key: 'benefitFrequencies', fn: getBenefitFrequency },
-      { key: 'benefitTypes', fn: getBenefitType },
+      { key: 'benefitTypes', fn: getBenefitType },    
       { key: 'deliveryMechanisms', fn: getDeliveryMechanism },
       { key: 'departments', fn: getDepartment },
       { key: 'districts', fn: getDistrict },
@@ -1320,7 +1320,7 @@ export default function UpdatedScheme() {
       {/* Page Header */}
       <div className="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3  mt-2">
         <div>
-          <h4 className="mb-1 text-dark-emphasis fw-bold">Government Scheme 360° Portal</h4>
+          <h4 className="mb-1 fw-semibold text-dark">Government Scheme 360° Portal</h4>
           <span
             className="badge bg-primary-subtle text-primary border border-primary-subtle px-2.5 py-1 mt-1"
             style={{ fontSize: '0.75rem' }}
@@ -1414,7 +1414,7 @@ export default function UpdatedScheme() {
             <div className="d-flex align-items-center gap-2">
               <i className="bi bi-ui-checks text-primary fs-5"></i>
               <div>
-                <h6 className="mb-0 fw-bold text-dark">Form Tab Selection</h6>
+                <h6 className="mb-0 fw-semibold text-dark">Form Tab Selection</h6>
                 <small className="text-muted" style={{ fontSize: '0.78rem' }}>
                   Select checkboxes to enable/show tab forms.
                 </small>
@@ -1718,8 +1718,8 @@ export default function UpdatedScheme() {
                 return (
                   <div key={field.key} className={`col-12 col-md-${field.col || 6}`}>
                     <label
-                      className="form-label text-dark-emphasis fw-medium mb-1 d-flex align-items-center justify-content-between"
-                      style={{ fontSize: '0.8rem' }}
+                      className="form-label fw-medium mb-1 d-flex align-items-center justify-content-between"
+                      style={{ fontSize: '0.82rem' }}
                     >
                       <span>
                         {field.label}

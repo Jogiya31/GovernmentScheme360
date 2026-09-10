@@ -55,7 +55,7 @@ export default function Modal({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header Block */}
-        <div className="card-header bg-light border-bottom-0 py-3.5 px-4 d-flex align-items-center justify-content-between">
+        <div className="card-header bg-transparent border-bottom-0 py-3.5 px-4 d-flex align-items-center justify-content-between">
           <div className="d-flex align-items-center gap-2.5">
             {type !== 'custom' && (
               <div 
@@ -90,7 +90,7 @@ export default function Modal({
         </div>
 
         {/* Footer Actions Block */}
-        <div className="card-footer bg-light border-top-0 d-flex justify-content-end gap-2.5 py-3 px-4">
+        <div className="card-footer bg-transparent border-top-0 d-flex justify-content-end gap-2.5 py-3 px-4">
           {type === 'confirm' ? (
             <>
               <button 
