@@ -1,11 +1,12 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import Spinner from './Spinner';
 
 /**
  * DataTable component - A fully-featured dynamic data table.
  * Supports sorting, custom item rendering, pagination, global searches, responsive styling,
- * columns hide/show visibility toggling, and export functionality (CSV, Excel, PDF, Print).
+ * columns hide/show visibility toggling, export functionality (CSV, Excel, PDF, Print), and loading states.
  */
 export default function DataTable({
   columns = [], // Array of column configs: { key, label, sortable, render(row) }
@@ -17,6 +18,7 @@ export default function DataTable({
   striped = false,
   bordered = false,
   hover = true,
+  isLoading = false,
   className = '',
   id,
   style = {},
@@ -571,9 +573,15 @@ export default function DataTable({
 
           {/* Table Body Content Rows */}
           <tbody>
-            {paginatedData.length === 0 ? (
+            {isLoading ? (
               <tr>
-                <td colSpan={visibleColumns.length} className="text-center py-5 text-muted">
+                <td colSpan={visibleColumns.length || 1} className="text-center py-5">
+                  <Spinner center size="md" text="Loading table records..." />
+                </td>
+              </tr>
+            ) : paginatedData.length === 0 ? (
+              <tr>
+                <td colSpan={visibleColumns.length || 1} className="text-center py-5 text-muted">
                   No records match your request
                 </td>
               </tr>

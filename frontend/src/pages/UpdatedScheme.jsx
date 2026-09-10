@@ -428,6 +428,28 @@ const getLoadedTabState = (scheme) => {
   return loaded;
 };
 
+const getPopulatedTabIds = (schemePayload, nextForm) => {
+  const populated = new Set(['SchemeMaster']);
+  const loadedState = getLoadedTabState(schemePayload);
+
+  SCHEME_TABS_CONFIG.forEach((tab) => {
+    if (loadedState[tab.id]) {
+      populated.add(tab.id);
+    } else if (nextForm && nextForm[tab.id]) {
+      const tabValues = nextForm[tab.id];
+      const hasContent = Object.entries(tabValues).some(([key, val]) => {
+        if (['SchemeID', 'CreatedBy', 'UpdatedBy'].includes(key)) return false;
+        return val !== undefined && val !== null && String(val).trim() !== '';
+      });
+      if (hasContent) {
+        populated.add(tab.id);
+      }
+    }
+  });
+
+  return Array.from(populated);
+};
+
 const buildFormFromSchemeRecord = (scheme, selectedValue = '') => {
   const nextForm = getInitialSchemeState();
   const schemeId = getSchemeRecordId(scheme, selectedValue);
@@ -579,10 +601,13 @@ export const validateField = (field, value, tabId = '', tabValues = {}) => {
   return null;
 };
 
-export const validateSchemeForm = (formData) => {
+export const validateSchemeForm = (formData, selectedTabIds = null) => {
   const errors = {};
+  const tabsToValidate = selectedTabIds
+    ? SCHEME_TABS_CONFIG.filter((t) => selectedTabIds.includes(t.id))
+    : SCHEME_TABS_CONFIG;
 
-  SCHEME_TABS_CONFIG.forEach((tab) => {
+  tabsToValidate.forEach((tab) => {
     const tabErrors = {};
     const tabValues = formData[tab.id] || {};
 
@@ -602,7 +627,7 @@ export const validateSchemeForm = (formData) => {
   return errors;
 };
 
-export default function NewScheme() {
+export default function UpdatedScheme() {
   const { user } = useSelector((state) => state.auth);
 
   const [getSchemeById] = useGetSchemeByIdMutation();
@@ -823,7 +848,9 @@ export default function NewScheme() {
 
   // Page core states
   const [formData, setFormData] = useState(getInitialSchemeState());
-  const [currentTab, setCurrentTab] = useState(0);
+  const [selectedTabIds, setSelectedTabIds] = useState(['SchemeMaster']);
+  const [activeTabId, setActiveTabId] = useState('SchemeMaster');
+  const [showCheckboxPanel, setShowCheckboxPanel] = useState(false);
 
   // Persistence state
   const [alertInfo, setAlertInfo] = useState(null);
@@ -843,7 +870,41 @@ export default function NewScheme() {
 
   const tabsContainerRef = useRef(null);
 
-  // Scroll active tab into view when currentTab changes
+  const toggleTabSelection = (tabId) => {
+    setSelectedTabIds((prev) => {
+      if (prev.includes(tabId)) {
+        if (prev.length === 1) return prev;
+        return prev.filter((id) => id !== tabId);
+      } else {
+        return [...prev, tabId];
+      }
+    });
+  };
+
+  const handleSelectAllTabs = () => {
+    setSelectedTabIds(SCHEME_TABS_CONFIG.map((t) => t.id));
+  };
+
+  const handleSelectBasicInfoOnly = () => {
+    setSelectedTabIds(['SchemeMaster']);
+    setActiveTabId('SchemeMaster');
+  };
+
+  const visibleTabs = SCHEME_TABS_CONFIG.filter((tab) =>
+    selectedTabIds.includes(tab.id),
+  );
+
+  useEffect(() => {
+    if (!selectedTabIds.includes(activeTabId)) {
+      if (visibleTabs.length > 0) {
+        setActiveTabId(visibleTabs[0].id);
+      } else {
+        setActiveTabId('SchemeMaster');
+      }
+    }
+  }, [selectedTabIds, activeTabId]);
+
+  // Scroll active tab into view when activeTabId changes
   useEffect(() => {
     if (tabsContainerRef.current) {
       const activeEl = tabsContainerRef.current.querySelector('.bg-primary');
@@ -855,7 +916,7 @@ export default function NewScheme() {
         });
       }
     }
-  }, [currentTab]);
+  }, [activeTabId]);
 
   const showAlert = (message, type = 'success') => {
     setAlertInfo({ message, type });
@@ -873,7 +934,8 @@ export default function NewScheme() {
         setFormData(getInitialSchemeState());
         setLoadedRecordId(null);
         setFormErrors({});
-        setCurrentTab(0);
+        setSelectedTabIds(['SchemeMaster']);
+        setActiveTabId('SchemeMaster');
         showAlert('Scheme form has been fully reset.', 'info');
       },
     });
@@ -944,10 +1006,10 @@ export default function NewScheme() {
     if (!val) {
       setFormData(getInitialSchemeState());
       setLoadedRecordId(null);
-      setLoadedSchemeSource(null);
       setLoadedTabHasData({});
       setFormErrors({});
-      setCurrentTab(0);
+      setSelectedTabIds(['SchemeMaster']);
+      setActiveTabId('SchemeMaster');
       return;
     }
 
@@ -961,16 +1023,21 @@ export default function NewScheme() {
         setLoadedRecordId(String(val));
         setLoadedTabHasData({});
         setFormErrors({});
-        setCurrentTab(0);
+        setSelectedTabIds(['SchemeMaster']);
+        setActiveTabId('SchemeMaster');
         return;
       }
 
       const { nextForm, schemeId, schemeName } = buildFormFromSchemeRecord(payload, val);
+      const loadedTabState = getLoadedTabState(payload);
+      const activeTabs = getPopulatedTabIds(payload, nextForm);
+
       setFormData(nextForm);
       setLoadedRecordId(String(schemeId || val));
-      setLoadedTabHasData(getLoadedTabState(payload));
+      setLoadedTabHasData(loadedTabState);
       setFormErrors({});
-      setCurrentTab(0);
+      setSelectedTabIds(activeTabs);
+      setActiveTabId('SchemeMaster');
 
       showAlert(`Loaded scheme "${schemeName || 'Record'}" and auto-filled the form.`, 'success');
     } catch (error) {
@@ -979,16 +1046,25 @@ export default function NewScheme() {
     }
   };
 
-  // Export full 23-tab scheme structure into a majestic PDF report
+  // Export scheme structure into a PDF report for selected forms only
   const handleExportPDFReport = () => {
     try {
+      const tabsToExport = SCHEME_TABS_CONFIG.filter((tab) =>
+        selectedTabIds.includes(tab.id),
+      );
+
+      if (tabsToExport.length === 0) {
+        showAlert('No forms selected to export. Please select at least one form.', 'warning');
+        return;
+      }
+
       const doc = new jsPDF();
       const schemeTitle = formData.SchemeMaster?.SchemeName || 'Government Scheme Register';
       const ministryName = formData.SchemeMaster?.MinistryID || 'Nodal Ministry Unspecified';
 
       // Title Cover banner
       doc.setFont('helvetica');
-      doc.setFillColor(95, 118, 232); // Primary Blue
+      doc.setFillColor(76, 99, 210); // Primary Blue
       doc.rect(0, 0, 210, 42, 'F');
 
       doc.setFontSize(18);
@@ -998,12 +1074,12 @@ export default function NewScheme() {
       doc.setFontSize(11);
       doc.setTextColor(220, 224, 250);
       doc.text(`${schemeTitle}`, 14, 26);
-      doc.text(`Ministry: ${ministryName} | Generated: ${new Date().toLocaleString()}`, 14, 32);
+      doc.text(`Ministry: ${ministryName} | Forms: ${tabsToExport.length} selected | Generated: ${new Date().toLocaleString()}`, 14, 32);
 
       let currentY = 50;
 
-      // Compile each of the 23 tabs data
-      SCHEME_TABS_CONFIG.forEach((tab, index) => {
+      // Compile each of the selected forms data
+      tabsToExport.forEach((tab, index) => {
         // Prepare rows
         const tableRows = [];
         tab.fields.forEach((field) => {
@@ -1017,7 +1093,7 @@ export default function NewScheme() {
 
         // Add Section Header in PDF
         doc.setFontSize(12);
-        doc.setTextColor(28, 45, 65);
+        doc.setTextColor(15, 23, 42);
         doc.setFont('helvetica', 'bold');
         doc.text(`${index + 1}. ${tab.title}`, 14, currentY);
         doc.setFont('helvetica', 'normal');
@@ -1038,7 +1114,7 @@ export default function NewScheme() {
         });
 
         // Check if we need to add a page break
-        if (currentY > 250 && index < SCHEME_TABS_CONFIG.length - 1) {
+        if (currentY > 250 && index < tabsToExport.length - 1) {
           doc.addPage();
           currentY = 20;
         }
@@ -1046,7 +1122,7 @@ export default function NewScheme() {
 
       doc.save(`scheme-report-${formData.SchemeMaster?.SchemeID || 'registry'}.pdf`);
       showAlert(
-        'PDF report compiled and downloaded successfully with all 23 schema tables!',
+        `PDF report compiled and downloaded successfully with ${tabsToExport.length} selected form${tabsToExport.length > 1 ? 's' : ''}!`,
         'success',
       );
     } catch (err) {
@@ -1066,9 +1142,24 @@ export default function NewScheme() {
     }
   };
 
-  const filteredTabs = SCHEME_TABS_CONFIG.map((tab, idx) => ({ ...tab, originalIdx: idx }));
+  const filteredTabs = visibleTabs.map((tab, idx) => ({ ...tab, originalIdx: idx }));
 
-  const activeTabConfig = SCHEME_TABS_CONFIG[currentTab];
+  const activeTabConfig =
+    SCHEME_TABS_CONFIG.find((t) => t.id === activeTabId) || SCHEME_TABS_CONFIG[0];
+
+  const currentVisibleIndex = visibleTabs.findIndex((t) => t.id === activeTabId);
+
+  const handlePrevTab = () => {
+    if (currentVisibleIndex > 0) {
+      setActiveTabId(visibleTabs[currentVisibleIndex - 1].id);
+    }
+  };
+
+  const handleNextTab = () => {
+    if (currentVisibleIndex < visibleTabs.length - 1) {
+      setActiveTabId(visibleTabs[currentVisibleIndex + 1].id);
+    }
+  };
 
   const triggerConfirmation = ({
     title,
@@ -1153,6 +1244,7 @@ export default function NewScheme() {
 
     try {
       for (const [tabId, api] of Object.entries(schemeTabApiMap)) {
+        if (!selectedTabIds.includes(tabId)) continue;
         const isUpdate = tabId === 'SchemeMaster' || loadedTabHasData[tabId];
         const payload = {
           ...getTabPayload(tabId),
@@ -1186,16 +1278,16 @@ export default function NewScheme() {
   const handleSubmitScheme = async (e) => {
     if (e && e.preventDefault) e.preventDefault();
 
-    const errors = validateSchemeForm(formData);
+    const errors = validateSchemeForm(formData, selectedTabIds);
     setFormErrors(errors);
 
     const hasErrors = Object.keys(errors).length > 0;
     if (hasErrors) {
-      const firstTabIdx = SCHEME_TABS_CONFIG.findIndex(
+      const firstTabWithError = visibleTabs.find(
         (tab) => errors[tab.id] && Object.keys(errors[tab.id]).length > 0,
       );
-      if (firstTabIdx !== -1) {
-        setCurrentTab(firstTabIdx);
+      if (firstTabWithError) {
+        setActiveTabId(firstTabWithError.id);
       }
       showAlert(
         'Form validation failed. Please correct the highlighted errors before submitting.',
@@ -1276,7 +1368,7 @@ export default function NewScheme() {
         {/* Tab Controls Bar */}
         <div className="p-3 border-bottom d-flex flex-wrap align-items-center justify-content-between gap-3">
           {/* Quick tab keyword search filter */}
-          <div className="" style={{ maxWidth: '420px' }}>
+          <div className="flex-grow-1 w-100" style={{ maxWidth: '420px' }}>
             <Dropdown
               options={dropdownOptions}
               value={selectedDropdownValue}
@@ -1288,28 +1380,122 @@ export default function NewScheme() {
             />
           </div>
 
-          {/* Quick Dropdown Picker of 23 tabs */}
-          <div className="d-flex align-items-center gap-2" style={{ maxWidth: '420px' }}>
+          {/* Quick Dropdown Picker of selected tabs */}
+          <div className="d-flex align-items-center gap-2 flex-grow-1 w-100" style={{ maxWidth: '420px' }}>
             <span className="text-muted d-none d-sm-inline text-nowrap" style={{ fontSize: '0.8rem' }}>
               Jump to:
             </span>
             <Dropdown
-              options={SCHEME_TABS_CONFIG.map((tab, idx) => {
+              options={visibleTabs.map((tab) => {
                 const tabErrCount = formErrors[tab.id] ? Object.keys(formErrors[tab.id]).length : 0;
                 return {
-                  value: idx,
+                  value: tab.id,
                   label: `${tab.title} (${getTabProgress(tab.id)}% full)${tabErrCount > 0 ? ` ⚠️ (${tabErrCount} err)` : ''}`,
                 };
               })}
               className='shadow'
-              value={currentTab}
-              onChange={(val) => setCurrentTab(Number(val))}
+              value={activeTabId}
+              onChange={(val) => {
+                const targetTab = visibleTabs.find(t => t.id === val || String(SCHEME_TABS_CONFIG.indexOf(t)) === String(val));
+                if (targetTab) {
+                  setActiveTabId(targetTab.id);
+                }
+              }}
               searchable={true}
-              placeholder="Jump to tab..."
+              placeholder="Jump to active tab..."
+              align="right"
               style={{ width: '100%' }}
             />
           </div>
         </div>
+
+        <div className="p-3 border-bottom d-flex flex-wrap align-items-center justify-content-between gap-3">
+          <div className="w-100 d-flex flex-wrap align-items-center justify-content-between p-3 border-bottom bg-light-subtle gap-2">
+            <div className="d-flex align-items-center gap-2">
+              <i className="bi bi-ui-checks text-primary fs-5"></i>
+              <div>
+                <h6 className="mb-0 fw-bold text-dark">Form Tab Selection</h6>
+                <small className="text-muted" style={{ fontSize: '0.78rem' }}>
+                  Select checkboxes to enable/show tab forms.
+                </small>
+              </div>
+            </div>
+            <div className="d-flex align-items-center gap-2">
+              <button
+                type="button"
+                className="btn btn-sm btn-outline-primary py-1 px-2.5"
+                style={{ fontSize: '0.78rem' }}
+                onClick={handleSelectAllTabs}
+              >
+                <i className="bi bi-check-all me-1"></i> Select All
+              </button>
+              <button
+                type="button"
+                className="btn btn-sm btn-outline-secondary py-1 px-2.5"
+                style={{ fontSize: '0.78rem' }}
+                onClick={handleSelectBasicInfoOnly}
+              >
+                <i className="bi bi-eraser me-1"></i> Basic Info Only
+              </button>
+              <button
+                type="button"
+                className="btn btn-sm btn-light border py-1 px-2.5"
+                style={{ fontSize: '0.78rem' }}
+                onClick={() => setShowCheckboxPanel(!showCheckboxPanel)}
+              >
+                <i className={`bi bi-chevron-${showCheckboxPanel ? 'up' : 'down'}`}></i>
+              </button>
+            </div>
+          </div>
+
+          {showCheckboxPanel && (
+            <div className="bg-white">
+              <div className="row g-2">
+                {SCHEME_TABS_CONFIG.map((tab) => {
+                  const isChecked = selectedTabIds.includes(tab.id);
+                  const tabErrCount = formErrors[tab.id] ? Object.keys(formErrors[tab.id]).length : 0;
+                  return (
+                    <div key={tab.id} className="col-12 col-sm-6 col-md-4 col-lg-3">
+                      <div
+                        className={`form-check p-2 rounded border d-flex align-items-center transition-all ${
+                          isChecked
+                            ? activeTabId === tab.id
+                              ? 'bg-primary-subtle border-primary text-primary fw-medium'
+                              : 'bg-light border-primary-subtle text-dark'
+                            : 'bg-white border-light-subtle text-muted'
+                        }`}
+                        style={{ cursor: 'pointer', fontSize: '0.82rem' }}
+                        onClick={() => toggleTabSelection(tab.id)}
+                      >
+                        <input
+                          className="form-check-input ms-0 me-2 mt-0 cursor-pointer"
+                          type="checkbox"
+                          id={`chk-${tab.id}`}
+                          checked={isChecked}
+                          onChange={() => {}}
+                        />
+                        <label
+                          className="form-check-label flex-grow-1 text-truncate mb-0 cursor-pointer"
+                          htmlFor={`chk-${tab.id}`}
+                          title={tab.title}
+                        >
+                          <i className={`${tab.icon} me-2`}></i>
+                          {tab.title}
+                        </label>
+                        {tabErrCount > 0 && (
+                          <span className="badge bg-danger rounded-pill ms-1" style={{ fontSize: '0.65rem' }}>
+                            {tabErrCount}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+
 
         {/* Horizontal Navigation Tabs with Scroll Chevrons */}
         <div className="position-relative border-bottom pl-2 pr-2 py-2 d-flex align-items-center bg-white">
@@ -1333,7 +1519,7 @@ export default function NewScheme() {
             ref={tabsContainerRef}
           >
             {filteredTabs.map((tab) => {
-              const isActive = currentTab === tab.originalIdx;
+              const isActive = activeTabId === tab.id;
               const progress = getTabProgress(tab.id);
               const tabErrors = formErrors[tab.id] ? Object.keys(formErrors[tab.id]).length : 0;
               return (
@@ -1349,7 +1535,7 @@ export default function NewScheme() {
                           : 'bg-light text-muted hover-bg'
                     }`}
                     style={{ fontSize: '0.8rem' }}
-                    onClick={() => setCurrentTab(tab.originalIdx)}
+                    onClick={() => setActiveTabId(tab.id)}
                   >
                     <i className={tab.icon}></i>
                     <span className=" mx-2"> {tab.title} </span>
@@ -1375,7 +1561,7 @@ export default function NewScheme() {
             })}
             {filteredTabs.length === 0 && (
               <li className="text-muted p-2" style={{ fontSize: '0.8rem' }}>
-                No forms match search terms
+                No active tabs selected. Please select tabs above.
               </li>
             )}
           </ul>
@@ -1392,26 +1578,14 @@ export default function NewScheme() {
 
         {/* Active Tab Form Body */}
         <div className="p-4 bg-transparent">
-          <div className="d-flex align-items-center gap-2 mb-3">
-            <div
-              className="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center"
-              style={{ width: '38px', height: '38px' }}
-            >
-              <i className={`${activeTabConfig.icon} fs-5`}></i>
-            </div>
-            <div>
-              <h5 className="mb-0 text-dark fw-bold" style={{ fontSize: '1.05rem' }}>
-                {' '}
-                {activeTabConfig.title}{' '}
-              </h5>
-            </div>
-          </div>
+
 
           <form onSubmit={handleSubmitScheme}>
             <div className="row g-3">
               {activeTabConfig.fields.map((field) => {
                 const value = formData[activeTabConfig.id]?.[field.key] || '';
                 const errorText = formErrors[activeTabConfig.id]?.[field.key];
+                const disabled = field.disabled === true || field.disabled === 'true';
                 const isRequired =
                   field.validate === true ||
                   field.validate === 'true' ||
@@ -1563,6 +1737,7 @@ export default function NewScheme() {
                         searchable={true}
                         isLoading={isFetchingOptions}
                         isInvalid={!!errorText}
+                        disabled={disabled}
                         style={{ minWidth: '100%' }}
                       />
                     ) : /* TEXTAREAS */
@@ -1574,6 +1749,7 @@ export default function NewScheme() {
                         style={{ fontSize: '0.85rem' }}
                         placeholder={field.placeholder}
                         value={value}
+                        disabled={disabled}
                         onChange={(e) => handleFieldChange(e.target.value)}
                       />
                     ) : (
@@ -1585,6 +1761,7 @@ export default function NewScheme() {
                         style={{ height: '40px', fontSize: '0.85rem' }}
                         placeholder={field.placeholder}
                         value={value}
+                        disabled={disabled}
                         onChange={(e) => handleFieldChange(e.target.value)}
                       />
                     )}
@@ -1609,8 +1786,8 @@ export default function NewScheme() {
                 <button
                   type="button"
                   className="btn btn-outline-secondary shadow btn-sm px-3 d-flex align-items-center gap-1"
-                  onClick={() => setCurrentTab((prev) => Math.max(0, prev - 1))}
-                  disabled={currentTab === 0}
+                  onClick={handlePrevTab}
+                  disabled={currentVisibleIndex <= 0}
                 >
                   <i className="bi bi-arrow-left"></i>
                   <span>Previous Tab</span>
@@ -1619,10 +1796,8 @@ export default function NewScheme() {
                 <button
                   type="button"
                   className="btn btn-outline-secondary shadow btn-sm px-3 d-flex align-items-center gap-1"
-                  onClick={() =>
-                    setCurrentTab((prev) => Math.min(SCHEME_TABS_CONFIG.length - 1, prev + 1))
-                  }
-                  disabled={currentTab === SCHEME_TABS_CONFIG.length - 1}
+                  onClick={handleNextTab}
+                  disabled={currentVisibleIndex >= visibleTabs.length - 1}
                 >
                   <span>Next Tab</span>
                   <i className="bi bi-arrow-right"></i>
@@ -1633,11 +1808,13 @@ export default function NewScheme() {
               <div className="d-flex gap-2 flex-wrap">
                 <button
                   type="button"
-                  className="btn btn-outline-danger btn-sm px-3 d-flex align-items-center gap-1.5 shadow rounded "
+                  className="btn btn-outline-danger btn-sm px-3 d-flex align-items-center gap-1.5 shadow rounded"
                   onClick={handleExportPDFReport}
+                  title="Export selected forms as PDF report"
+                  disabled={visibleTabs.length === 0}
                 >
                   <i className="bi bi-filetype-pdf me-1"></i>
-                  <span>Export Full PDF</span>
+                  <span>Export Selected PDF ({visibleTabs.length})</span>
                 </button>
                 <button
                   type="submit"

@@ -1,28 +1,27 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
-export default function Sidebar() {
+export default function Sidebar({ closeMobileSidebar }) {
   const location = useLocation();
 
   const sections = [
-    {
-      title: 'Personal',
-      items: [
-        { path: '/dashboard', label: 'Dashboard', icon: 'bi bi-speedometer2' }
-      ]
-    },
+    // {
+    //   title: 'Personal',
+    //   items: [
+    //     { path: '/dashboard', label: 'Dashboard', icon: 'bi bi-speedometer2' }
+    //   ]
+    // },
     {
       title: 'Workspace',
       items: [
-        // { path: '/users', label: 'Users Database', icon: 'bi bi-people' },
-        { path: '/scheme', label: 'View/Edit Scheme', icon: 'bi bi-file-earmark-plus' }
+        // { path: '/scheme', label: 'View/Edit Scheme', icon: 'bi bi-file-earmark-plus' },
+        { path: '/updatedScheme', label: 'Update Scheme', icon: 'bi bi-file-earmark-text' }
       ]
     },
     {
       title: 'Account & Settings',
       items: [
-        { path: '/profile', label: 'My Profile', icon: 'bi bi-person-circle' },
-        // { path: '/settings', label: 'System Settings', icon: 'bi bi-gear' }
+        { path: '/profile', label: 'My Profile', icon: 'bi bi-person-circle' }
       ]
     }
   ];
@@ -38,7 +37,7 @@ export default function Sidebar() {
           <ul id="sidebarnav">
             {sections.map((section, idx) => (
               <React.Fragment key={idx}>
-                {/* Section title (Applications, Components, etc.) */}
+                {/* Section title */}
                 <li className="nav-small-cap">
                   <span className="hide-menu">{section.title}</span>
                 </li>
@@ -50,6 +49,9 @@ export default function Sidebar() {
                       to={item.path}
                       className="sidebar-link"
                       aria-expanded="false"
+                      onClick={() => {
+                        if (closeMobileSidebar) closeMobileSidebar();
+                      }}
                     >
                       <i className={item.icon}></i>
                       <span className="hide-menu">{item.label}</span>

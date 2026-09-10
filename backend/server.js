@@ -1,13 +1,18 @@
 require("dotenv").config();
 
 const app = require("./src/app");
-
 const { connectDB } = require("./src/db/connection");
 
 const PORT = process.env.PORT || 5000;
+const HOST = process.env.HOST || "0.0.0.0";
 
-connectDB().then(() => {
-  app.listen(PORT, () => {
-    console.log(`Server Running On ${PORT}`);
+connectDB()
+  .then(() => {
+    app.listen(PORT, HOST, () => {
+      console.log(`Server running at http://${HOST}:${PORT}`);
+    });
+  })
+  .catch(() => {
+    console.error("Server startup aborted because the database connection failed.");
+    process.exitCode = 1;
   });
-});

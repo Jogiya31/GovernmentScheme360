@@ -13,7 +13,7 @@ module.exports = {
 
   options: {
     encrypt: false,
-
-    trustServerCertificate: true,
+    trustedConnection: true,
+    trustServerCertificate: true
   },
 };

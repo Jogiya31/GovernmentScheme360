@@ -1,5 +1,6 @@
 import React from 'react';
 import { useGetDashboardSummaryQuery } from '../app/api';
+import Spinner from '../components/Common/Spinner';
 
 export default function Dashboard() {
   const { data: summary, isLoading, error } = useGetDashboardSummaryQuery();
@@ -24,13 +25,9 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Loading & Error triggers for testing */}
+      {/* Loading & Error triggers */}
       {isLoading && (
-        <div className="d-flex justify-content-center align-items-center py-5">
-          <div className="spinner-border text-primary" role="status">
-            <span className="visually-hidden">Loading dashboard assets...</span>
-          </div>
-        </div>
+        <Spinner center size="lg" text="Fetching dashboard summary from API..." className="py-5" />
       )}
 
       {error && (
