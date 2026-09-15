@@ -6,7 +6,7 @@ export default defineConfig(() => {
   return {
     plugins: [react()],
 
-    base: '/scheme360/',
+    base: '/',
 
     resolve: {
       alias: {
