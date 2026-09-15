@@ -249,6 +249,27 @@ body {
   border-bottom: 1px solid #1c2d41;
 }
 
+/* Settings cog icon button at topbar corner */
+.settings-cog-btn {
+  position: relative;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.settings-cog-btn:hover {
+  background-color: var(--bs-primary-bg-subtle, rgba(76, 99, 210, 0.12)) !important;
+}
+
+.settings-cog-btn:hover i {
+  color: var(--bs-primary, #4c63d2) !important;
+  transform: rotate(60deg);
+  transition: transform 0.35s ease, color 0.2s ease;
+}
+
+.settings-cog-btn i {
+  display: inline-block;
+  transition: transform 0.35s ease, color 0.2s ease;
+}
+
 .topbar .top-navbar {
   padding: 0;
   min-height: 80px;
@@ -265,6 +286,8 @@ body {
   justify-content: space-between;
   padding: 0 30px;
   background: #ffffff;
+  border-bottom: 1px solid #d5dde7;
+  border-right: 1px solid #d5dde7;
   transition: width 0.2s ease-in-out, padding 0.2s ease-in-out;
 }
 
@@ -423,31 +446,31 @@ body {
 }
 
 .sidebar-nav #sidebarnav .sidebar-item .sidebar-link:hover {
-  color: #4c63d2;
-  background-color: #f1f5f9;
+  color: var(--bs-primary, #4c63d2);
+  background-color: var(--bs-primary-bg-subtle, #f1f5f9);
   border-radius: 0 30px 30px 0;
   opacity: 1;
 }
 
 [data-bs-theme=dark] .sidebar-nav #sidebarnav .sidebar-item .sidebar-link:hover {
-  color: #818cf8;
-  background-color: #1e293b;
+  color: var(--bs-primary, #818cf8);
+  background-color: var(--bs-primary-bg-subtle, #1e293b);
 }
 
 .sidebar-nav #sidebarnav .sidebar-item .sidebar-link:hover i {
-  color: #4c63d2;
+  color: var(--bs-primary, #4c63d2);
 }
 
 [data-bs-theme=dark] .sidebar-nav #sidebarnav .sidebar-item .sidebar-link:hover i {
-  color: #818cf8;
+  color: var(--bs-primary, #818cf8);
 }
 
 /* Selected/Active Link */
 .sidebar-nav #sidebarnav .sidebar-item.selected > .sidebar-link {
   border-radius: 0 60px 60px 0;
   color: #fff !important;
-  background: linear-gradient(to right, #8971ea, #7f72ea, #7574ea, #6a75e9, #4c63d2);
-  box-shadow: 0 4px 12px 0 rgba(76, 99, 210, 0.3);
+  background: var(--theme-sidebar-gradient, linear-gradient(to right, #8971ea, #7f72ea, #7574ea, #6a75e9, #4c63d2));
+  box-shadow: 0 4px 12px 0 var(--theme-shadow-color, rgba(76, 99, 210, 0.3));
   opacity: 1;
 }
 
@@ -908,4 +931,203 @@ label,
 }
 .pr-2{
   padding-right: 2rem !important;
+}
+
+/* ============================================================== */
+/* Theme Templates & Presets */
+/* ============================================================== */
+
+/* 1. Indigo (Default) */
+[data-theme-preset="indigo"],
+:root {
+  --theme-sidebar-gradient: linear-gradient(to right, #8971ea, #7f72ea, #7574ea, #6a75e9, #4c63d2);
+  --theme-shadow-color: rgba(76, 99, 210, 0.35);
+}
+
+[data-theme-preset="indigo"][data-bs-theme="dark"],
+[data-theme-preset="indigo"][data-theme="dark"] {
+  --theme-sidebar-gradient: linear-gradient(to right, #818cf8, #6366f1, #4f46e5);
+  --theme-shadow-color: rgba(99, 102, 241, 0.4);
+}
+
+/* 2. Civic Emerald (Governance & Public Welfare) */
+[data-theme-preset="emerald"] {
+  --bs-primary: #0f766e;
+  --bs-primary-rgb: 15, 118, 110;
+  --bs-primary-text: #115e59;
+  --bs-primary-bg-subtle: #ccfbf1;
+  --bs-primary-border-subtle: #99f6e4;
+  --bs-link-color: #0f766e;
+  --bs-link-hover-color: #115e59;
+  --theme-sidebar-gradient: linear-gradient(to right, #14b8a6, #0d9488, #0f766e);
+  --theme-shadow-color: rgba(15, 118, 110, 0.35);
+}
+
+[data-theme-preset="emerald"][data-bs-theme="dark"],
+[data-theme-preset="emerald"][data-theme="dark"] {
+  --bs-primary: #14b8a6;
+  --bs-primary-rgb: 20, 184, 166;
+  --bs-primary-text: #5eead4;
+  --bs-primary-bg-subtle: #042f2e;
+  --bs-primary-border-subtle: #115e59;
+  --bs-link-color: #5eead4;
+  --bs-link-hover-color: #99f6e4;
+  --theme-sidebar-gradient: linear-gradient(to right, #2dd4bf, #14b8a6, #0f766e);
+  --theme-shadow-color: rgba(20, 184, 166, 0.4);
+}
+
+/* 3. Royal Sapphire (Treasury & Audit) */
+[data-theme-preset="sapphire"] {
+  --bs-primary: #1d4ed8;
+  --bs-primary-rgb: 29, 78, 216;
+  --bs-primary-text: #1e40af;
+  --bs-primary-bg-subtle: #dbeafe;
+  --bs-primary-border-subtle: #bfdbfe;
+  --bs-link-color: #1d4ed8;
+  --bs-link-hover-color: #1e40af;
+  --theme-sidebar-gradient: linear-gradient(to right, #3b82f6, #2563eb, #1d4ed8);
+  --theme-shadow-color: rgba(29, 78, 216, 0.35);
+}
+
+[data-theme-preset="sapphire"][data-bs-theme="dark"],
+[data-theme-preset="sapphire"][data-theme="dark"] {
+  --bs-primary: #3b82f6;
+  --bs-primary-rgb: 59, 130, 246;
+  --bs-primary-text: #93c5fd;
+  --bs-primary-bg-subtle: #172554;
+  --bs-primary-border-subtle: #1e40af;
+  --bs-link-color: #93c5fd;
+  --bs-link-hover-color: #bfdbfe;
+  --theme-sidebar-gradient: linear-gradient(to right, #60a5fa, #3b82f6, #1d4ed8);
+  --theme-shadow-color: rgba(59, 130, 246, 0.4);
+}
+
+/* 4. Civic Saffron / Sunset (National Heritage) */
+[data-theme-preset="sunset"] {
+  --bs-primary: #c2410c;
+  --bs-primary-rgb: 194, 65, 12;
+  --bs-primary-text: #9a3412;
+  --bs-primary-bg-subtle: #ffedd5;
+  --bs-primary-border-subtle: #fed7aa;
+  --bs-link-color: #c2410c;
+  --bs-link-hover-color: #9a3412;
+  --theme-sidebar-gradient: linear-gradient(to right, #f97316, #ea580c, #c2410c);
+  --theme-shadow-color: rgba(194, 65, 12, 0.35);
+}
+
+[data-theme-preset="sunset"][data-bs-theme="dark"],
+[data-theme-preset="sunset"][data-theme="dark"] {
+  --bs-primary: #ea580c;
+  --bs-primary-rgb: 234, 88, 12;
+  --bs-primary-text: #fdba74;
+  --bs-primary-bg-subtle: #431407;
+  --bs-primary-border-subtle: #9a3412;
+  --bs-link-color: #fdba74;
+  --bs-link-hover-color: #fed7aa;
+  --theme-sidebar-gradient: linear-gradient(to right, #fb923c, #ea580c, #c2410c);
+  --theme-shadow-color: rgba(234, 88, 12, 0.4);
+}
+
+/* 5. Executive Charcoal (Minimal Steel) */
+[data-theme-preset="charcoal"] {
+  --bs-primary: #334155;
+  --bs-primary-rgb: 51, 65, 85;
+  --bs-primary-text: #1e293b;
+  --bs-primary-bg-subtle: #f1f5f9;
+  --bs-primary-border-subtle: #cbd5e1;
+  --bs-link-color: #334155;
+  --bs-link-hover-color: #1e293b;
+  --theme-sidebar-gradient: linear-gradient(to right, #64748b, #475569, #334155);
+  --theme-shadow-color: rgba(51, 65, 85, 0.35);
+}
+
+[data-theme-preset="charcoal"][data-bs-theme="dark"],
+[data-theme-preset="charcoal"][data-theme="dark"] {
+  --bs-primary: #94a3b8;
+  --bs-primary-rgb: 148, 163, 184;
+  --bs-primary-text: #f1f5f9;
+  --bs-primary-bg-subtle: #0f172a;
+  --bs-primary-border-subtle: #334155;
+  --bs-link-color: #e2e8f0;
+  --bs-link-hover-color: #ffffff;
+  --theme-sidebar-gradient: linear-gradient(to right, #94a3b8, #64748b, #475569);
+  --theme-shadow-color: rgba(148, 163, 184, 0.4);
+}
+
+/* 6. Royal Amethyst (Innovation & Research) */
+[data-theme-preset="amethyst"] {
+  --bs-primary: #7c3aed;
+  --bs-primary-rgb: 124, 58, 237;
+  --bs-primary-text: #6d28d9;
+  --bs-primary-bg-subtle: #ede9fe;
+  --bs-primary-border-subtle: #ddd6fe;
+  --bs-link-color: #7c3aed;
+  --bs-link-hover-color: #6d28d9;
+  --theme-sidebar-gradient: linear-gradient(to right, #a855f7, #9333ea, #7c3aed);
+  --theme-shadow-color: rgba(124, 58, 237, 0.35);
+}
+
+[data-theme-preset="amethyst"][data-bs-theme="dark"],
+[data-theme-preset="amethyst"][data-theme="dark"] {
+  --bs-primary: #a855f7;
+  --bs-primary-rgb: 168, 85, 247;
+  --bs-primary-text: #d8b4fe;
+  --bs-primary-bg-subtle: #2e1065;
+  --bs-primary-border-subtle: #6b21a8;
+  --bs-link-color: #d8b4fe;
+  --bs-link-hover-color: #ede9fe;
+  --theme-sidebar-gradient: linear-gradient(to right, #c084fc, #a855f7, #7c3aed);
+  --theme-shadow-color: rgba(168, 85, 247, 0.4);
+}
+
+/* ============================================================== */
+/* Dark Executive Sidebar Skin (Even in Light Content Mode) */
+/* ============================================================== */
+[data-sidebar-skin="dark"] .left-sidebar {
+  background: #0f172a !important;
+  border-right: 1px solid #1e293b !important;
+  box-shadow: 2px 0 14px 0 rgba(0, 0, 0, 0.25) !important;
+}
+
+[data-sidebar-skin="dark"] .left-sidebar .nav-small-cap {
+  color: #64748b !important;
+}
+
+[data-sidebar-skin="dark"] .left-sidebar .sidebar-nav #sidebarnav .sidebar-item .sidebar-link {
+  color: #94a3b8 !important;
+}
+
+[data-sidebar-skin="dark"] .left-sidebar .sidebar-nav #sidebarnav .sidebar-item .sidebar-link i {
+  color: #64748b !important;
+}
+
+[data-sidebar-skin="dark"] .left-sidebar .sidebar-nav #sidebarnav .sidebar-item .sidebar-link:hover {
+  color: #ffffff !important;
+  background-color: #1e293b !important;
+}
+
+[data-sidebar-skin="dark"] .left-sidebar .sidebar-nav #sidebarnav .sidebar-item .sidebar-link:hover i {
+  color: var(--bs-primary, #38bdf8) !important;
+}
+
+[data-sidebar-skin="dark"] .left-sidebar .sidebar-nav #sidebarnav .list-divider {
+  background: #1e293b !important;
+}
+
+[data-sidebar-skin="dark"] .left-sidebar .sidebar-nav #sidebarnav .sidebar-item.selected > .sidebar-link {
+  color: #ffffff !important;
+}
+
+[data-sidebar-skin="dark"] .left-sidebar .sidebar-nav #sidebarnav .sidebar-item.selected > .sidebar-link i {
+  color: #ffffff !important;
+}
+
+[data-sidebar-skin="dark"] .topbar .top-navbar .navbar-header {
+  background: #0f172a !important;
+  border-right: 1px solid #1e293b !important;
+  border-bottom: 1px solid #1e293b !important;
+}
+
+[data-sidebar-skin="dark"] .topbar .top-navbar .navbar-header .logo-text {
+  color: #f8fafc !important;
 }

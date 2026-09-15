@@ -9,7 +9,7 @@ import Footer from '../Footer/Footer';
 export default function AdminLayout() {
   const dispatch = useDispatch();
   const location = useLocation();
-  const { theme } = useSelector((state) => state.theme);
+  const { theme, colorPreset, sidebarSkin } = useSelector((state) => state.theme);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
@@ -52,6 +52,8 @@ export default function AdminLayout() {
       className={mobileSidebarOpen ? 'show-sidebar' : ''}
       data-theme={theme}
       data-bs-theme={theme}
+      data-theme-preset={colorPreset}
+      data-sidebar-skin={sidebarSkin}
       data-layout="vertical"
       data-navbarbg="skin6"
       data-sidebartype={sidebarCollapsed ? 'mini-sidebar' : 'full'}

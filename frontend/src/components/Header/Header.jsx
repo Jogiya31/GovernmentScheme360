@@ -4,6 +4,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { toggleTheme } from '../../features/theme/themeSlice';
 import { logout } from '../../features/auth/authSlice';
 import scheme360 from '../../assets/scheme360.png';
+import ThemeCustomizerModal from '../common/ThemeCustomizerModal';
 
 export default function Header({ sidebarCollapsed, toggleSidebar, mobileSidebarOpen }) {
   const dispatch = useDispatch();
@@ -12,6 +13,7 @@ export default function Header({ sidebarCollapsed, toggleSidebar, mobileSidebarO
   const { user } = useSelector((state) => state.auth);
 
   const [showProfile, setShowProfile] = useState(false);
+  const [showThemeModal, setShowThemeModal] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   const profileRef = useRef(null);
@@ -106,11 +108,28 @@ export default function Header({ sidebarCollapsed, toggleSidebar, mobileSidebarO
                 <i className="bi bi-list fs-3"></i>
               </button>
             </li>
+
+            {/* Global Search Bar */}
+            <li className="nav-item ms-lg-3 w-100 my-2 my-lg-0">
+              <form className="d-flex align-items-center" onSubmit={(e) => e.preventDefault()}>
+                <div className="input-group input-group-sm border bg-light-subtle rounded w-100 shadow-sm" style={{ maxWidth: '280px', borderColor: '#cbd5e1' }}>
+                  <span className="input-group-text bg-transparent border-0 text-secondary">
+                    <i className="bi bi-search"></i>
+                  </span>
+                  <input
+                    type="search"
+                    className="form-control bg-transparent border-0 ps-0 text-dark-emphasis"
+                    placeholder="Search assets..."
+                    style={{ fontSize: '0.85rem' }}
+                  />
+                </div>
+              </form>
+            </li>
           </ul>
 
           {/* Right section of topbar header */}
           <ul className="navbar-nav float-end align-items-center gap-2 flex-row ms-auto justify-content-end py-2 py-lg-0">
-            {/* Theme Toggle Button */}
+            {/* Theme Toggle Button (Light/Dark Mode) */}
             <li className="nav-item">
               <button
                 onClick={handleToggleTheme}
@@ -176,9 +195,37 @@ export default function Header({ sidebarCollapsed, toggleSidebar, mobileSidebarO
                 </div>
               )}
             </li>
+
+            {/* Subtle Divider before Corner */}
+            <li className="nav-item d-none d-sm-block">
+              <div
+                className="vr mx-1"
+                style={{ height: '22px', opacity: 0.25 }}
+              ></div>
+            </li>
+
+            {/* Theme & Portal Settings Cog Icon placed at the Far Corner */}
+            <li className="nav-item me-1 me-lg-2">
+              <button
+                onClick={() => setShowThemeModal(true)}
+                className="btn btn-sm border-0 d-flex align-items-center justify-content-center rounded-circle settings-cog-btn"
+                style={{ width: '38px', height: '38px' }}
+                title="Theme Templates & Portal Settings"
+                id="theme-settings-cog-btn"
+                aria-label="Theme Settings"
+              >
+                <i className="bi bi-gear-fill fs-5 text-secondary"></i>
+              </button>
+            </li>
           </ul>
         </div>
       </nav>
+
+      {/* Theme Templates Customizer Modal */}
+      <ThemeCustomizerModal
+        show={showThemeModal}
+        onClose={() => setShowThemeModal(false)}
+      />
     </header>
   );
 }

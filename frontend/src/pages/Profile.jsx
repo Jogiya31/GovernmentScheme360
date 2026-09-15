@@ -2,7 +2,13 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { updateProfile } from '../features/auth/authSlice';
-import { toggleTheme } from '../features/theme/themeSlice';
+import {
+  toggleTheme,
+  setColorPreset,
+  setSidebarSkin,
+  resetThemeSettings,
+} from '../features/theme/themeSlice';
+import { THEME_TEMPLATES, SIDEBAR_SKINS } from '../features/theme/themePresets';
 import Alert from '../components/common/Alert';
 
 const AVATAR_PRESETS = [
@@ -41,7 +47,7 @@ const AVATAR_PRESETS = [
 export default function Profile() {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
-  const { theme } = useSelector((state) => state.theme);
+  const { theme, colorPreset, sidebarSkin } = useSelector((state) => state.theme);
 
   // Queries for roles and depts
   const dbRoles = [];
@@ -166,6 +172,22 @@ export default function Profile() {
       `System visual preference changed to ${theme === 'light' ? 'Dark' : 'Light'} Mode.`,
       'info',
     );
+  };
+
+  const handleSelectPresetTheme = (presetId) => {
+    dispatch(setColorPreset(presetId));
+    const tmpl = THEME_TEMPLATES.find((t) => t.id === presetId);
+    triggerAlert(`Applied "${tmpl?.name || presetId}" theme template successfully!`, 'success');
+  };
+
+  const handleSelectSidebarSkin = (skinId) => {
+    dispatch(setSidebarSkin(skinId));
+    triggerAlert(`Sidebar navigation skin switched to ${skinId === 'dark' ? 'Dark Executive' : 'Light Clean'}.`, 'info');
+  };
+
+  const handleResetAllTheme = () => {
+    dispatch(resetThemeSettings());
+    triggerAlert('Theme and layout styles reset to default Modern Indigo.', 'info');
   };
 
   // Presets avatar picker
@@ -743,12 +765,127 @@ export default function Profile() {
               {/* TAB 3: SYSTEM PREFERENCES */}
               {activeTab === 'preferences' && (
                 <div>
-                  <h5 className="fw-bold mb-1 text-dark-emphasis text-lg">System Preferences</h5>
-                  <p className="text-muted mb-4 text-sm">
-                    Configure system preferences, color profiles, and visual parameters.
-                  </p>
+                  <div className="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+                    <div>
+                      <h5 className="fw-bold mb-1 text-dark-emphasis text-lg">System Preferences & Themes</h5>
+                      <p className="text-muted mb-0 text-sm">
+                        Configure system color templates, navigation style, and visual parameters.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      className="btn btn-outline-secondary btn-sm d-flex align-items-center gap-1.5"
+                      onClick={handleResetAllTheme}
+                    >
+                      <i className="bi bi-arrow-counterclockwise"></i>
+                      <span>Reset Themes</span>
+                    </button>
+                  </div>
 
-                  <div className="list-group list-group-flush border rounded overflow-hidden">
+                  {/* SECTION 1: THEME TEMPLATES GALLERY */}
+                  <div className="card border rounded-3 p-3 mb-4 shadow-sm">
+                    <div className="d-flex align-items-center justify-content-between mb-3">
+                      <div>
+                        <h6 className="fw-bold mb-0 text-dark-emphasis d-flex align-items-center gap-2">
+                          <i className="bi bi-palette2 text-primary"></i>
+                          <span>Portal Theme Templates</span>
+                        </h6>
+                        <p className="text-muted mb-0 small" style={{ fontSize: '0.78rem' }}>
+                          Select a curated color palette for Scheme360. Changes take effect across the entire portal immediately.
+                        </p>
+                      </div>
+                      <span className="badge bg-primary-subtle text-primary border border-primary-subtle px-2.5 py-1 rounded-pill small fw-medium">
+                        Active: {THEME_TEMPLATES.find((t) => t.id === colorPreset)?.name || 'Modern Indigo'}
+                      </span>
+                    </div>
+
+                    <div className="row g-3">
+                      {THEME_TEMPLATES.map((tmpl) => {
+                        const isActive = colorPreset === tmpl.id;
+                        return (
+                          <div className="col-12 col-md-6 col-lg-4" key={tmpl.id}>
+                            <div
+                              className={`card h-100 border rounded-3 transition-all cursor-pointer shadow-xs ${
+                                isActive
+                                  ? 'border-primary shadow-sm bg-primary-subtle'
+                                  : 'border-light-subtle bg-body hover-shadow'
+                              }`}
+                              style={{ cursor: 'pointer' }}
+                              onClick={() => handleSelectPresetTheme(tmpl.id)}
+                            >
+                              {/* Header stripe / preview */}
+                              <div
+                                className="p-2.5 rounded-top-3 d-flex align-items-center justify-content-between"
+                                style={{
+                                  background: tmpl.previewGradient,
+                                  minHeight: '44px'
+                                }}
+                              >
+                                <span className="badge bg-white text-dark shadow-xs fw-semibold" style={{ fontSize: '0.68rem' }}>
+                                  {tmpl.category}
+                                </span>
+                                {isActive && (
+                                  <span className="badge bg-dark text-white shadow-xs rounded-pill" style={{ fontSize: '0.68rem' }}>
+                                    <i className="bi bi-check2-circle me-1"></i> Active
+                                  </span>
+                                )}
+                              </div>
+
+                              <div className="card-body p-3 d-flex flex-column">
+                                <div className="d-flex align-items-center justify-content-between mb-1">
+                                  <h6 className="fw-bold mb-0 text-dark-emphasis" style={{ fontSize: '0.9rem' }}>
+                                    {tmpl.name}
+                                  </h6>
+                                  <span className={`badge bg-${tmpl.badgeVariant}-subtle text-${tmpl.badgeVariant} border border-${tmpl.badgeVariant}-subtle rounded-pill`} style={{ fontSize: '0.66rem' }}>
+                                    {tmpl.badge}
+                                  </span>
+                                </div>
+                                <p className="text-muted small mb-3 flex-grow-1" style={{ fontSize: '0.75rem', lineHeight: '1.4' }}>
+                                  {tmpl.description}
+                                </p>
+
+                                <div className="d-flex align-items-center justify-content-between pt-2 border-top mt-auto">
+                                  <div className="d-flex align-items-center gap-1.5">
+                                    <span
+                                      className="rounded-circle d-inline-block border shadow-xs"
+                                      style={{ width: '16px', height: '16px', backgroundColor: tmpl.primaryColor }}
+                                      title={`Primary: ${tmpl.primaryColor}`}
+                                    ></span>
+                                    <span
+                                      className="rounded-circle d-inline-block border shadow-xs"
+                                      style={{ width: '16px', height: '16px', backgroundColor: tmpl.accentColor }}
+                                      title={`Accent: ${tmpl.accentColor}`}
+                                    ></span>
+                                    <span
+                                      className="rounded-circle d-inline-block border shadow-xs"
+                                      style={{ width: '16px', height: '16px', backgroundColor: theme === 'dark' ? tmpl.darkSubtleBg : tmpl.subtleBg }}
+                                      title="Subtle background"
+                                    ></span>
+                                  </div>
+                                  <button
+                                    type="button"
+                                    className={`btn btn-sm py-1 px-2.5 rounded-2 fw-medium ${
+                                      isActive ? 'btn-primary' : 'btn-outline-secondary'
+                                    }`}
+                                    style={{ fontSize: '0.74rem' }}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleSelectPresetTheme(tmpl.id);
+                                    }}
+                                  >
+                                    {isActive ? 'Active' : 'Apply'}
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* SECTION 2: SIDEBAR & DISPLAY PREFERENCES */}
+                  <div className="list-group list-group-flush border rounded overflow-hidden mb-4">
                     {/* Theme toggler row */}
                     <div className="list-group-item p-3 d-flex justify-content-between align-items-center">
                       <div>
@@ -779,6 +916,43 @@ export default function Profile() {
                         >
                           {theme === 'dark' ? 'Dark Mode' : 'Light Mode'}
                         </label>
+                      </div>
+                    </div>
+
+                    {/* Sidebar Navigation Style row */}
+                    <div className="list-group-item p-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                      <div>
+                        <h6
+                          className="mb-1 fw-bold text-dark-emphasis"
+                          style={{ fontSize: '0.85rem' }}
+                        >
+                          Sidebar Navigation Style
+                        </h6>
+                        <p className="text-muted mb-0" style={{ fontSize: '0.75rem' }}>
+                          Choose between a light matching sidebar or high-contrast dark executive navigation.
+                        </p>
+                      </div>
+                      <div className="btn-group" role="group">
+                        {SIDEBAR_SKINS.map((skin) => (
+                          <button
+                            key={skin.id}
+                            type="button"
+                            className={`btn btn-sm py-1.5 px-3 fw-medium ${
+                              sidebarSkin === skin.id
+                                ? 'btn-primary shadow-xs'
+                                : 'btn-outline-secondary'
+                            }`}
+                            style={{ fontSize: '0.8rem' }}
+                            onClick={() => handleSelectSidebarSkin(skin.id)}
+                          >
+                            <i
+                              className={`bi ${
+                                skin.id === 'dark' ? 'bi-moon-fill' : 'bi-sun-fill'
+                              } me-1.5`}
+                            ></i>
+                            {skin.name}
+                          </button>
+                        ))}
                       </div>
                     </div>
 
