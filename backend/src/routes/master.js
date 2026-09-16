@@ -57,9 +57,7 @@ async function executeStoredProcedure(req, res, procedure, routeName) {
         userId: row.UserID,
         email: row.Email,
         name: row.FullName,
-        role: row.RoleName,
-        departmentId: row.DepartmentID,
-        departmentName: row.DepartmentName,
+        phone: row.PhoneNumber,
       };
 
       const token = jwt.sign(tokenPayload, JWT_SECRET, { expiresIn: "2h" });
@@ -73,9 +71,8 @@ async function executeStoredProcedure(req, res, procedure, routeName) {
           id: row.UserID,
           name: row.FullName,
           email: row.Email,
-          role: row.RoleName,
-          department: row.DepartmentName,
-          departmentId: row.DepartmentID,
+          phone: row.PhoneNumber,
+          avatar: row.Avatar,
           theme: row.ThemeMode,
           colorPreset: row.ColorPreset,
         },
@@ -96,7 +93,8 @@ async function executeStoredProcedure(req, res, procedure, routeName) {
       const tokenPayload = {
         userId: row.UserID,
         email: row.Email,
-        name: row.FullName
+        name: row.FullName,
+        phone: row.PhoneNumber,
       };
 
       const token = jwt.sign(tokenPayload, JWT_SECRET, { expiresIn: "2h" });
@@ -109,6 +107,7 @@ async function executeStoredProcedure(req, res, procedure, routeName) {
           id: row.UserID,
           name: row.FullName,
           email: row.Email,
+          phone: row.PhoneNumber,
         },
       });
     }

@@ -38,7 +38,6 @@ export default function Register() {
         email: data.email.trim().toLowerCase(),
         password: DEFAULT_USER_PASSWORD,
         phone: data.phone?.trim() || '',
-        agreeTerms: data.agreeTerms,
       };
 
       const result = await registerUser(payload).unwrap();

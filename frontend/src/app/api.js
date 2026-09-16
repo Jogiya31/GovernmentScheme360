@@ -259,7 +259,7 @@ export const api = createApi({
     // Register User API (Calls Express /NewUser -> sp_CreateUser with exact SP parameters)
     registerUser: builder.mutation({
       async queryFn(userData, _queryApi, _extraOptions, fetchWithBQ) {
-        const { name, email, password, phone, agreeTerms } = userData;
+        const { name, email, password, phone } = userData;
         const cleanEmail = (email || '').trim().toLowerCase();
         const userPassword = password || 'Nic@12345';
 
@@ -274,7 +274,6 @@ export const api = createApi({
               Email: cleanEmail,
               PasswordHash: userPassword,
               PhoneNumber: (phone || '').trim() || null,
-              AgreeTerms: agreeTerms, 
             },
           });
 

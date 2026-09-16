@@ -24,7 +24,7 @@ function authenticateToken(req, res, next) {
       });
     }
 
-    // 3. Attach decoded user (userId, email, role, departmentId) to the request
+    // 3. Attach decoded user (userId, email, phone) to the request
     req.user = decodedUser;
     next();
   });
