@@ -1,4 +1,10 @@
 module.exports = {
+
+  // login users
+  Login: "User.sp_UserLogin",
+  ForgotPassword:"User.sp_ForgotPassword",
+  NewUser:"User.sp_CreateUser",
+
   // api for get scheme
   getSchemeById: "SchemeDetails.usp_GetSchemeDetailsByID",
   

@@ -1,18 +1,28 @@
+// src/routes/master.js
 const express = require("express");
 const router = express.Router();
+const jwt = require("jsonwebtoken");
 
 const { connectDB } = require("../db/connection");
 const spMap = require("../config/spMap");
+const { authenticateToken, JWT_SECRET } = require("../middleware/auth");
 
-async function executeStoredProcedure(req, res, procedure) {
+// Define which routes do NOT require a token (public routes)
+const PUBLIC_ROUTES = new Set([
+  "Login",
+  "ForgotPassword",
+  "NewUser",
+]);
+
+async function executeStoredProcedure(req, res, procedure, routeName) {
   try {
     const pool = await connectDB();
     const request = pool.request();
 
+    // Map req.body fields to SQL inputs
     Object.entries(req.body).forEach(([key, value]) => {
       let inputValue = value;
-
-      // Convert blank form fields to SQL NULL and Yes/No strings to boolean.
+      console.log(`Mapping request body field: ${key} = ${inputValue}`);
       if (typeof inputValue === "string") {
         const lower = inputValue.trim().toLowerCase();
 
@@ -29,8 +39,83 @@ async function executeStoredProcedure(req, res, procedure) {
     });
 
     const result = await request.execute(procedure);
+    const row = result.recordset?.[0];
 
-    // Handle GetSchemeDetailsByID (Multiple Result Sets)
+    // =========================================================================
+    // SPECIAL HANDLER 1: LOGIN (Mint JWT Token)
+    // =========================================================================
+    if (routeName === "Login") {
+      if (!row || row.StatusCode !== 200) {
+        return res.status(row?.StatusCode || 400).json({
+          success: false,
+          message: row?.StatusMessage || "Invalid email or password",
+        });
+      }
+
+      // Generate JWT Access Token (valid for 2 hours)
+      const tokenPayload = {
+        userId: row.UserID,
+        email: row.Email,
+        name: row.FullName,
+        role: row.RoleName,
+        departmentId: row.DepartmentID,
+        departmentName: row.DepartmentName,
+      };
+
+      const token = jwt.sign(tokenPayload, JWT_SECRET, { expiresIn: "2h" });
+
+      return res.status(200).json({
+        success: true,
+        message: "Login successful",
+        token,
+        refreshToken: row.RefreshToken,
+        user: {
+          id: row.UserID,
+          name: row.FullName,
+          email: row.Email,
+          role: row.RoleName,
+          department: row.DepartmentName,
+          departmentId: row.DepartmentID,
+          theme: row.ThemeMode,
+          colorPreset: row.ColorPreset,
+        },
+      });
+    }
+
+    // =========================================================================
+    // SPECIAL HANDLER 2: NEW USER REGISTRATION (Mint JWT Token on Signup)
+    // =========================================================================
+    if (routeName === "NewUser") {
+      if (!row || row.StatusCode !== 201) {
+        return res.status(row?.StatusCode || 400).json({
+          success: false,
+          message: row?.StatusMessage || "Registration failed",
+        });
+      }
+
+      const tokenPayload = {
+        userId: row.UserID,
+        email: row.Email,
+        name: row.FullName
+      };
+
+      const token = jwt.sign(tokenPayload, JWT_SECRET, { expiresIn: "2h" });
+
+      return res.status(201).json({
+        success: true,
+        message: "Registration successful",
+        token,
+        user: {
+          id: row.UserID,
+          name: row.FullName,
+          email: row.Email,
+        },
+      });
+    }
+
+    // =========================================================================
+    // SPECIAL HANDLER 3: SchemeDetails (Multiple Result Sets)
+    // =========================================================================
     if (procedure === "SchemeDetails.usp_GetSchemeDetailsByID") {
       const rs = result.recordsets;
 
@@ -63,7 +148,9 @@ async function executeStoredProcedure(req, res, procedure) {
       });
     }
 
-    // Default response for all other procedures
+    // =========================================================================
+    // DEFAULT HANDLER (Dropdowns, Inserts, Updates)
+    // =========================================================================
     return res.status(200).json({
       success: true,
       data: result.recordset,
@@ -78,10 +165,22 @@ async function executeStoredProcedure(req, res, procedure) {
   }
 }
 
+// Dynamically mount routes:
+// - If public (Login, ForgotPassword, NewUser), no token required.
+// - If private (setSchemeMaster, updateSchemeMaster, etc.), require authenticateToken.
 Object.entries(spMap).forEach(([routeName, procedure]) => {
-  router.post(`/${routeName}`, (req, res) => {
-    executeStoredProcedure(req, res, procedure);
-  });
+  const isPublic = PUBLIC_ROUTES.has(routeName) || routeName.endsWith("ForDropdown");
+
+  if (isPublic) {
+    router.post(`/${routeName}`, (req, res) => {
+      executeStoredProcedure(req, res, procedure, routeName);
+    });
+  } else {
+    // Protected with JWT middleware
+    router.post(`/${routeName}`, authenticateToken, (req, res) => {
+      executeStoredProcedure(req, res, procedure, routeName);
+    });
+  }
 });
 
 module.exports = router;

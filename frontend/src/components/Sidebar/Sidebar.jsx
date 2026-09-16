@@ -5,15 +5,10 @@ export default function Sidebar({ closeMobileSidebar }) {
   const location = useLocation();
 
   const sections = [
-    // {
-    //   title: 'Personal',
-    //   items: [
-    //     { path: '/dashboard', label: 'Dashboard', icon: 'bi bi-speedometer2' }
-    //   ]
-    // },
     {
       title: 'Workspace',
       items: [
+        { path: '/dashboard', label: 'Dashboard', icon: 'bi bi-speedometer2' },
         { path: '/updatedScheme', label: 'Update Scheme', icon: 'bi bi-file-earmark-text' }
       ]
     },

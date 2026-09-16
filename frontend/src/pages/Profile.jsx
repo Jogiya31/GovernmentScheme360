@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { updateProfile } from '../features/auth/authSlice';
@@ -11,47 +11,11 @@ import {
 import { THEME_TEMPLATES, SIDEBAR_SKINS } from '../features/theme/themePresets';
 import Alert from '../components/common/Alert';
 
-const AVATAR_PRESETS = [
-  {
-    id: 'p1',
-    name: 'Alisha (Preset)',
-    url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200',
-  },
-  {
-    id: 'p2',
-    name: 'Ryan (Preset)',
-    url: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&q=80&w=200',
-  },
-  {
-    id: 'p3',
-    name: 'Grace (Preset)',
-    url: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=200',
-  },
-  {
-    id: 'p4',
-    name: 'Miller (Preset)',
-    url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200',
-  },
-  {
-    id: 'p5',
-    name: 'Emma (Preset)',
-    url: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&q=80&w=200',
-  },
-  {
-    id: 'p6',
-    name: 'David (Preset)',
-    url: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=200',
-  },
-];
-
 export default function Profile() {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
   const { theme, colorPreset, sidebarSkin } = useSelector((state) => state.theme);
 
-  // Queries for roles and depts
-  const dbRoles = [];
-  const dbDepts = [];
 
   // Active tab state
   const [activeTab, setActiveTab] = useState('basic');
@@ -62,17 +26,6 @@ export default function Profile() {
   // Drag and drop uploading state
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef(null);
-
-  // Fallback lists if API data is loading or empty
-  const availableRoles =
-    dbRoles.length > 0
-      ? dbRoles.filter((r) => r.status).map((r) => r.title)
-      : ['Admin', 'Manager', 'Developer', 'Designer', 'Support'];
-
-  const availableDepts =
-    dbDepts.length > 0
-      ? dbDepts.filter((d) => d.status).map((d) => d.title)
-      : ['Technology', 'Marketing', 'Customer Success', 'Design', 'Human Resources', 'Finance'];
 
   // React Hook Form for Basic Info
   const {
@@ -85,9 +38,7 @@ export default function Profile() {
       name: user?.name || '',
       email: user?.email || '',
       phone: user?.phone || '',
-      role: user?.role || 'Admin',
-      department: user?.department || 'Technology',
-      bio: user?.bio || '',
+      avatar: user?.avatar || '',
     },
   });
 
@@ -99,7 +50,6 @@ export default function Profile() {
     formState: { errors: secErrors },
   } = useForm({
     defaultValues: {
-      currentPassword: '',
       newPassword: '',
       confirmPassword: '',
     },
@@ -112,9 +62,7 @@ export default function Profile() {
         name: user.name || '',
         email: user.email || '',
         phone: user.phone || '',
-        role: user.role || 'Admin',
-        department: user.department || 'Technology',
-        bio: user.bio || '',
+        avatar: user.avatar || '',
       });
     }
   }, [user, resetBasic]);
@@ -131,9 +79,6 @@ export default function Profile() {
     if (user?.name) score += 15;
     if (user?.email) score += 15;
     if (user?.phone) score += 15;
-    if (user?.bio) score += 15;
-    if (user?.department) score += 15;
-    if (user?.role) score += 15;
     if (user?.avatar) score += 10;
     return score;
   };
@@ -142,16 +87,17 @@ export default function Profile() {
 
   // Basic info form submit handler
   const onBasicSubmit = (data) => {
-    dispatch(updateProfile(data));
+    console.log('Basic Info Submitted:', data);
+    // dispatch(updateProfile(data));
     triggerAlert('Basic profile information updated successfully!', 'success');
   };
 
   // Password / Security submit handler
   const onSecSubmit = (data) => {
     // Simulated validation
-    if (data.currentPassword !== 'admin123') {
+    if (data.currentPassword !== 'Nice@12345') {
       triggerAlert(
-        'Incorrect current password! Standard user current password is "admin123".',
+        'Incorrect current password! Standard user current password is "Nice@12345".',
         'danger',
       );
       return;
@@ -297,7 +243,7 @@ export default function Profile() {
               >
                 <img
                   src={
-                    user?.avatar ||
+                    user?.avatar ||   
                     'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200'
                   }
                   alt="Profile"
@@ -477,7 +423,7 @@ export default function Profile() {
                       <input
                         type="email"
                         className={`form-control py-2 ${basicErrors.email ? 'is-invalid' : ''}`}
-                        placeholder="john.doe@government.in"
+                        placeholder="example@nic.in"
                         {...registerBasic('email', {
                           required: 'Email address is required',
                           pattern: {
@@ -507,101 +453,19 @@ export default function Profile() {
                       />
                     </div>
 
-                    {/* System Security Role */}
+                    {/* Avatar URL */}
                     <div className="col-12 col-md-6">
                       <label
                         className="form-label text-dark-emphasis fw-medium"
                         style={{ fontSize: '0.8rem' }}
                       >
-                        System Role
+                        Avatar URL
                       </label>
-                      <select className="form-select py-2" {...registerBasic('role')}>
-                        {availableRoles.map((roleOpt) => (
-                          <option key={roleOpt} value={roleOpt}>
-                            {roleOpt} Role
-                          </option>
-                        ))}
-                      </select>
-                      <small className="text-muted d-block mt-1" style={{ fontSize: '0.7rem' }}>
-                        Role changes update access controls globally.
-                      </small>
-                    </div>
-
-                    {/* Department */}
-                    <div className="col-12">
-                      <label
-                        className="form-label text-dark-emphasis fw-medium"
-                        style={{ fontSize: '0.8rem' }}
-                      >
-                        Assigned Department Directory
-                      </label>
-                      <select className="form-select py-2" {...registerBasic('department')}>
-                        {availableDepts.map((deptOpt) => (
-                          <option key={deptOpt} value={deptOpt}>
-                            {deptOpt}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    {/* Professional Description */}
-                    <div className="col-12">
-                      <label
-                        className="form-label text-dark-emphasis fw-medium"
-                        style={{ fontSize: '0.8rem' }}
-                      >
-                        Biography & Notes
-                      </label>
-                      <textarea
-                        rows="3"
-                        className={`form-control ${basicErrors.bio ? 'is-invalid' : ''}`}
-                        placeholder="Tell us about yourself and your professional roles..."
-                        {...registerBasic('bio', {
-                          maxLength: { value: 250, message: 'Bio cannot exceed 250 characters' },
-                        })}
-                      ></textarea>
-                      <div className="d-flex justify-content-between mt-1">
-                        <small className="text-muted" style={{ fontSize: '0.7rem' }}>
-                          Describe your organizational background.
-                        </small>
-                        {basicErrors.bio && (
-                          <div className="text-danger" style={{ fontSize: '0.75rem' }}>
-                            {basicErrors.bio.message}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Preset Avatar Gallery Selection */}
-                  <div className="mt-4 pt-3 border-top">
-                    <h6
-                      className="fw-semibold text-dark-emphasis mb-2"
-                      style={{ fontSize: '0.85rem' }}
-                    >
-                      Or choose a premium preset avatar:
-                    </h6>
-                    <div className="d-flex flex-wrap gap-2.5">
-                      {AVATAR_PRESETS.map((p) => {
-                        const isSelected = user?.avatar === p.url;
-                        return (
-                          <button
-                            key={p.id}
-                            type="button"
-                            className={`btn p-0.5 rounded-circle border-2 transition-all d-flex align-items-center justify-content-center ${isSelected ? 'border-primary bg-primary-subtle scale-105' : 'border-transparent hover:scale-105'}`}
-                            onClick={() => handleSelectPreset(p.url)}
-                            title={p.name}
-                          >
-                            <img
-                              src={p.url}
-                              alt={p.name}
-                              className="rounded-circle object-fit-cover"
-                              style={{ width: '42px', height: '42px' }}
-                              referrerPolicy="no-referrer"
-                            />
-                          </button>
-                        );
-                      })}
+                      <input
+                        type="file"
+                        className="form-control py-2"
+                        {...registerBasic('avatar')}
+                      />
                     </div>
                   </div>
 
@@ -639,35 +503,7 @@ export default function Profile() {
                   </p>
 
                   <div className="row g-3">
-                    {/* Current Password */}
-                    <div className="col-12">
-                      <label
-                        className="form-label text-dark-emphasis fw-medium"
-                        style={{ fontSize: '0.8rem' }}
-                      >
-                        Current Password <span className="text-danger">*</span>
-                      </label>
-                      <input
-                        type="password"
-                        className={`form-control py-2 ${secErrors.currentPassword ? 'is-invalid' : ''}`}
-                        placeholder="••••••••"
-                        {...registerSec('currentPassword', {
-                          required: 'Current security password is required',
-                        })}
-                      />
-                      {secErrors.currentPassword ? (
-                        <div className="invalid-feedback">{secErrors.currentPassword.message}</div>
-                      ) : (
-                        <small className="text-muted d-block mt-1" style={{ fontSize: '0.7rem' }}>
-                          Standard user current default login password is{' '}
-                          <code className="text-danger bg-light py-0.5 px-1.5 rounded border">
-                            admin123
-                          </code>
-                          .
-                        </small>
-                      )}
-                    </div>
-
+                
                     {/* New Password */}
                     <div className="col-12 col-md-6">
                       <label

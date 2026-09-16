@@ -1131,3 +1131,85 @@ label,
 [data-sidebar-skin="dark"] .topbar .top-navbar .navbar-header .logo-text {
   color: #f8fafc !important;
 }
+
+/* ==========================================================================
+   Modern DatePicker UI Styles
+   ========================================================================== */
+.modern-datepicker-container {
+  width: 100%;
+}
+
+.modern-datepicker-trigger {
+  background-color: var(--bs-body-bg, #ffffff);
+  border: 1px solid var(--bs-border-color, #cbd5e1);
+  border-radius: 8px;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, background-color 0.15s ease-in-out;
+}
+
+.modern-datepicker-trigger:hover:not(.disabled) {
+  border-color: var(--bs-primary, #4c63d2);
+}
+
+.modern-datepicker-trigger:focus,
+.modern-datepicker-trigger.focused {
+  border-color: var(--bs-primary, #4c63d2) !important;
+  box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb, 76, 99, 210), 0.2) !important;
+  outline: 0;
+}
+
+.modern-datepicker-popover {
+  animation: datepickerFadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: top left;
+}
+
+@keyframes datepickerFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modern-datepicker-day {
+  transition: all 0.15s ease;
+}
+
+.modern-datepicker-day:hover:not(.btn-primary) {
+  background-color: var(--bs-primary-bg-subtle, rgba(76, 99, 210, 0.12)) !important;
+  color: var(--bs-primary, #4c63d2) !important;
+  transform: scale(1.08);
+}
+
+.modern-datepicker-day:active:not(.btn-primary) {
+  transform: scale(0.95);
+}
+
+/* Dark Mode Overrides for DatePicker */
+[data-bs-theme="dark"] .modern-datepicker-trigger,
+[data-theme="dark"] .modern-datepicker-trigger {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+[data-bs-theme="dark"] .modern-datepicker-trigger:hover:not(.disabled),
+[data-theme="dark"] .modern-datepicker-trigger:hover:not(.disabled) {
+  border-color: var(--bs-primary, #38bdf8) !important;
+}
+
+[data-bs-theme="dark"] .modern-datepicker-popover,
+[data-theme="dark"] .modern-datepicker-popover {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+}
+
+[data-bs-theme="dark"] .modern-datepicker-popover .border-bottom,
+[data-bs-theme="dark"] .modern-datepicker-popover .border-top,
+[data-theme="dark"] .modern-datepicker-popover .border-bottom,
+[data-theme="dark"] .modern-datepicker-popover .border-top {
+  border-color: #334155 !important;
+}
+

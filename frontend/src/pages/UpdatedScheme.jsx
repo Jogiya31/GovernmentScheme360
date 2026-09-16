@@ -7,6 +7,7 @@ import Alert from '../components/common/Alert';
 import Card from '../components/common/Card';
 import Modal from '../components/common/Modal';
 import Dropdown from '../components/common/Dropdown';
+import DatePicker from '../components/common/DatePicker';
 import Spinner from '../components/common/Spinner';
 import {
   useGetAgeGroupMutation,
@@ -1739,6 +1740,18 @@ export default function UpdatedScheme() {
                         isInvalid={!!errorText}
                         disabled={disabled}
                         style={{ minWidth: '100%' }}
+                      />
+                    ) : field.type === 'date' ? (
+                      /* MODERN DATE PICKER */
+                      <DatePicker
+                        id={field.key}
+                        name={field.key}
+                        value={value || ''}
+                        onChange={(val) => handleFieldChange(val)}
+                        placeholder={field.placeholder || `Select ${field.label.toLowerCase()}...`}
+                        disabled={disabled}
+                        isInvalid={!!errorText}
+                        required={isRequired}
                       />
                     ) : /* TEXTAREAS */
                     field.type === 'textarea' ? (

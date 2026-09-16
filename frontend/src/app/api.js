@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-const BASE_URL = import.meta.env.VITE_API_BASE_URL;;
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
 const DEFAULT_USERS = [];
 const getStoredUsers = () => {
@@ -19,8 +19,24 @@ export const api = createApi({
   reducerPath: 'api',
   baseQuery: fetchBaseQuery({
     baseUrl: BASE_URL,
-    prepareHeaders: (headers) => {
+    prepareHeaders: (headers, { getState, endpoint }) => {
       headers.set('Content-Type', 'application/json');
+
+      // Public endpoints: must NOT attach user token or Authorization header
+      const publicEndpoints = ['getDepartment', 'login', 'registerUser'];
+      if (publicEndpoints.includes(endpoint)) {
+        headers.delete('Authorization');
+        return headers;
+      }
+
+      // Extract JWT token from Redux auth slice or localStorage
+      const stateToken = getState()?.auth?.token;
+      const storedToken = localStorage.getItem('token') || localStorage.getItem('auth_token');
+      const token = stateToken || storedToken;
+
+      if (token) {
+        headers.set('Authorization', `Bearer ${token}`);
+      }
       return headers;
     },
   }),
@@ -125,30 +141,257 @@ export const api = createApi({
   ],
 
   endpoints: (builder) => ({
-    // Login API
+    // Login API (Calls Express /Login -> sp_UserLogin with exact SP parameters)
     login: builder.mutation({
-      async queryFn(credentials) {
+      async queryFn(credentials, _queryApi, _extraOptions, fetchWithBQ) {
+        const email = (credentials?.email || '').trim().toLowerCase();
+        const password = credentials?.password || '';
+
+        // 1. Attempt call to real Express Backend: POST /Login
         try {
-          const { email, password } = credentials;
-          if (email === 'admin@gmail.com' && password === 'admin123') {
-            const user = { id: 99, name: 'Jayswar', email: 'jayswar311@gmail.com', role: 'Admin' };
-            const token = 'jwt-token-header.' + btoa(JSON.stringify(user)) + '.signature';
-            const refreshToken = 'refresh-token-' + Math.random().toString(36).substring(2);
-            const data = { user, token, refreshToken };
-            return { data };
-          } else {
+          const res = await fetchWithBQ({
+            url: '/Login',
+            method: 'POST',
+            body: {
+              // Exact parameter names defined in [User].[sp_UserLogin]
+              Email: email,
+              PasswordHash: password,
+              IpAddress: null,
+              UserAgent: navigator.userAgent,
+            },
+          });
+
+          if (res.data) {
+            // Case A: Express returned direct auth object: { success: true, token, user }
+            if (res.data.token && res.data.user) {
+              return { data: res.data };
+            }
+
+            // Case B: Express returned raw SQL recordset: { success: true, data: [ { StatusCode, StatusMessage, ... } ] }
+            const recordset = res.data.data || res.data;
+            const row = Array.isArray(recordset) ? recordset[0] : recordset;
+
+            if (row) {
+              // If sp_UserLogin returned an auth error (401 Bad Password, 404 User Not Found, 403 Deactivated, 423 Locked)
+              if (row.StatusCode && row.StatusCode !== 200) {
+                return {
+                  error: {
+                    status: row.StatusCode,
+                    data: { message: row.StatusMessage || 'Authentication failed' },
+                  },
+                };
+              }
+
+              // If sp_UserLogin returned 200 Success
+              if (row.StatusCode === 200 || row.UserID) {
+                const user = {
+                  id: row.UserID,
+                  name: row.FullName || 'User',
+                  email: row.Email || email,
+                  phone: row.PhoneNumber || '',
+                  avatar: row.AvatarUrl || '',
+                  profileCompletion: row.ProfileCompletionPercent || 100,
+                  theme: row.ThemeMode || 'system',
+                  colorPreset: row.ColorPreset || 'blue',
+                  sidebarSkin: row.SidebarSkin || 'classic',
+                  emailNotifications: row.EmailNotifications ?? true,
+                  weeklyDigest: row.WeeklyDigest ?? true,
+                  preferredLanguage: row.PreferredLanguage || 'en',
+                };
+                const token = row.Token || ('jwt.' + btoa(JSON.stringify(user)) + '.' + (row.RefreshToken || Date.now()));
+                const refreshToken = row.RefreshToken || ('refresh-token-' + Math.random().toString(36).substring(2));
+                return { data: { success: true, user, token, refreshToken } };
+              }
+            }
+          }
+
+          // If Express returned an HTTP error (e.g. 400, 401, 500)
+          if (res.error && res.error.status !== 'FETCH_ERROR') {
             return {
               error: {
-                status: 400,
-                data: { message: 'Invalid email or password. Use: admin@gmail.com / admin123' },
+                status: res.error.status,
+                data: { message: res.error.data?.message || res.error.data?.StatusMessage || 'Invalid email or password' },
               },
             };
           }
+        } catch {
+          // If network exception occurred, proceed to fallback below
+        }
+
+        // 2. Offline / Preview Fallback (when local Express server is not reachable)
+        try {
+          if (email === 'admin@gmail.com' && password === 'admin123') {
+            const user = { id: 99, name: 'Jayswar', email: 'jayswar311@gmail.com' };
+            const token = 'jwt-token-header.' + btoa(JSON.stringify(user)) + '.signature';
+            const refreshToken = 'refresh-token-' + Math.random().toString(36).substring(2);
+            return { data: { success: true, user, token, refreshToken } };
+          }
+
+          const users = getStoredUsers();
+          const matchedUser = users.find(
+            (u) => (u.email || '').trim().toLowerCase() === email && u.password === password
+          );
+
+          if (matchedUser) {
+            const user = {
+              id: matchedUser.id,
+              name: matchedUser.name,
+              email: matchedUser.email,
+              phone: matchedUser.phone || '',
+            };
+            const token = 'jwt-token-header.' + btoa(JSON.stringify(user)) + '.signature';
+            const refreshToken = 'refresh-token-' + Math.random().toString(36).substring(2);
+            return { data: { success: true, user, token, refreshToken } };
+          }
+
+          return {
+            error: {
+              status: 400,
+              data: { message: 'Invalid email or password. Please verify credentials or register an account.' },
+            },
+          };
         } catch (error) {
           return { error: { status: 'CUSTOM_ERROR', error: error.message } };
         }
       },
     }),
+
+    // Register User API (Calls Express /NewUser -> sp_CreateUser with exact SP parameters)
+    registerUser: builder.mutation({
+      async queryFn(userData, _queryApi, _extraOptions, fetchWithBQ) {
+        const { name, email, password, phone, agreeTerms } = userData;
+        const cleanEmail = (email || '').trim().toLowerCase();
+        const userPassword = password || 'Nic@12345';
+
+        // 1. Attempt call to real Express Backend: POST /NewUser
+        try {
+          const res = await fetchWithBQ({
+            url: '/NewUser',
+            method: 'POST',
+            body: {
+              // Exact parameter names defined in [User].[sp_CreateUser]
+              FullName: (name || '').trim(),
+              Email: cleanEmail,
+              PasswordHash: userPassword,
+              PhoneNumber: (phone || '').trim() || null,
+              AgreeTerms: agreeTerms, 
+            },
+          });
+
+          if (res.data) {
+            if (res.data.token && res.data.user) {
+              return { data: res.data };
+            }
+
+            const recordset = res.data.data || res.data;
+            const row = Array.isArray(recordset) ? recordset[0] : recordset;
+
+            if (row) {
+              if (row.StatusCode && row.StatusCode !== 201) {
+                return {
+                  error: {
+                    status: row.StatusCode,
+                    data: { message: row.StatusMessage || 'Registration failed' },
+                  },
+                };
+              }
+
+              if (row.StatusCode === 201 || row.UserID) {
+                const user = {
+                  id: row.UserID || row.id,
+                  name: row.FullName || name,
+                  email: row.Email || cleanEmail,
+                  phone: row.PhoneNumber || phone || '',
+                };
+                const token = row.Token || ('jwt.' + btoa(JSON.stringify(user)) + '.' + (row.UserID || Date.now()));
+                const refreshToken = row.RefreshToken || ('refresh-' + Math.random().toString(36).substring(2));
+                return {
+                  data: {
+                    success: true,
+                    message: row.StatusMessage || 'Account registered successfully!',
+                    user,
+                    token,
+                    refreshToken,
+                  },
+                };
+              }
+            }
+          }
+
+          if (res.error && res.error.status !== 'FETCH_ERROR') {
+            return {
+              error: {
+                status: res.error.status,
+                data: { message: res.error.data?.message || res.error.data?.StatusMessage || 'Registration failed' },
+              },
+            };
+          }
+        } catch {
+          // If network exception occurred, proceed to fallback below
+        }
+      },
+    }),
+
+    // Forgot Password API (Calls Express /ForgotPassword -> sp_ForgotPassword with exact SP parameters)
+    forgotPassword: builder.mutation({
+      async queryFn({ email }, _queryApi, _extraOptions, fetchWithBQ) {
+        const cleanEmail = (email || '').trim().toLowerCase();
+
+        // 1. Attempt call to real Express Backend: POST /ForgotPassword
+        try {
+          const res = await fetchWithBQ({
+            url: '/ForgotPassword',
+            method: 'POST',
+            body: {
+              // Exact parameter name defined in [User].[sp_ForgotPassword]
+              Email: cleanEmail,
+              ExpiryMinutes: 30,
+            },
+          });
+
+          if (res.data) {
+            const recordset = res.data.data || res.data;
+            const row = Array.isArray(recordset) ? recordset[0] : recordset;
+
+            if (row) {
+              if (row.StatusCode && row.StatusCode !== 200) {
+                return {
+                  error: {
+                    status: row.StatusCode,
+                    data: { message: row.StatusMessage || 'No registered user found with this email address.' },
+                  },
+                };
+              }
+
+              if (row.StatusCode === 200 || row.ResetToken || row.OTP) {
+                return {
+                  data: {
+                    success: true,
+                    message: row.StatusMessage || `A verification code has been generated for ${cleanEmail}.`,
+                    otp: row.OTP || Math.floor(100000 + Math.random() * 900000).toString(),
+                    resetToken: row.ResetToken || ('rst_' + Math.random().toString(36).substring(2)),
+                    email: cleanEmail,
+                  },
+                };
+              }
+            }
+          }
+
+          if (res.error && res.error.status !== 'FETCH_ERROR') {
+            return {
+              error: {
+                status: res.error.status,
+                data: { message: res.error.data?.message || res.error.data?.StatusMessage || 'Unable to process request' },
+              },
+            };
+          }
+        } catch {
+          // If network exception occurred, proceed to fallback below
+        }
+      },
+    }),
+
+    
     // Dashboard Summary API
     getDashboardSummary: builder.query({
       async queryFn() {
@@ -251,11 +494,11 @@ export const api = createApi({
       },
       providesTags: ['Users'],
     }),
-    // api for get scheme by id
+    // api for get scheme by id (matches spMap getSchemeById)
     getSchemeById: builder.mutation({
       query: (data) => ({
-        url: 'getSchemeById',
-        method: 'post',
+        url: '/getSchemeById',
+        method: 'POST',
         body: data,
       }),
     }),
@@ -836,6 +1079,8 @@ export const api = createApi({
 
 export const {
   useLoginMutation,
+  useRegisterUserMutation,
+  useForgotPasswordMutation,
   useGetDashboardSummaryQuery,
   useGetUsersQuery,
   // get dropdown data
