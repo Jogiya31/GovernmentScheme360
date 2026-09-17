@@ -45,7 +45,6 @@ export const api = createApi({
     'login',
     'getDashboardSummary',
     'Users',
-    'Roles',
 
     //-----------------//
     'getSchemeById',
@@ -164,7 +163,19 @@ export const api = createApi({
           if (res.data) {
             // Case A: Express returned direct auth object: { success: true, token, user }
             if (res.data.token && res.data.user) {
-              return { data: res.data };
+              const user = res.data.user;
+              return {
+                data: {
+                  ...res.data,
+                  user: {
+                    ...user,
+                    id: user.id ?? user.userId ?? res.data.userId,
+                    userId: user.userId ?? user.id ?? res.data.userId,
+                    phone: user.phone ?? user.phoneNumber ?? user.mobileNumber ?? '',
+                  },
+                  userId: res.data.userId ?? user.userId ?? user.id,
+                },
+              };
             }
 
             // Case B: Express returned raw SQL recordset: { success: true, data: [ { StatusCode, StatusMessage, ... } ] }
@@ -183,24 +194,27 @@ export const api = createApi({
               }
 
               // If sp_UserLogin returned 200 Success
-              if (row.StatusCode === 200 || row.UserID) {
+              const userId = row.UserID ?? row.UserId ?? row.userid;
+              const phone = row.PhoneNumber ?? row.Phone ?? row.MobileNumber ?? '';
+              if (row.StatusCode === 200 || row.Success === true || userId != null) {
                 const user = {
-                  id: row.UserID,
+                  id: userId,
+                  userId,
                   name: row.FullName || 'User',
                   email: row.Email || email,
-                  phone: row.PhoneNumber || '',
+                  phone,
                   avatar: row.AvatarUrl || '',
                   profileCompletion: row.ProfileCompletionPercent || 100,
-                  theme: row.ThemeMode || 'system',
-                  colorPreset: row.ColorPreset || 'blue',
-                  sidebarSkin: row.SidebarSkin || 'classic',
-                  emailNotifications: row.EmailNotifications ?? true,
-                  weeklyDigest: row.WeeklyDigest ?? true,
-                  preferredLanguage: row.PreferredLanguage || 'en',
+                  theme: row.ThemeMode || row.theme || 'light',
+                  colorPreset: row.ColorPreset || row.colorPreset || 'indigo',
+                  sidebarSkin: row.SidebarSkin || row.sidebarSkin || 'light',
+                  emailNotifications: row.EmailNotifications ?? row.emailNotifications ?? true,
+                  weeklyDigest: row.WeeklyDigest ?? row.weeklyDigest ?? true,
+                  preferredLanguage: row.PreferredLanguage || row.preferredLanguage || 'en',
                 };
                 const token = row.Token || ('jwt.' + btoa(JSON.stringify(user)) + '.' + (row.RefreshToken || Date.now()));
                 const refreshToken = row.RefreshToken || ('refresh-token-' + Math.random().toString(36).substring(2));
-                return { data: { success: true, user, token, refreshToken } };
+                return { data: { success: true, userId, user, token, refreshToken } };
               }
             }
           }
@@ -216,42 +230,6 @@ export const api = createApi({
           }
         } catch {
           // If network exception occurred, proceed to fallback below
-        }
-
-        // 2. Offline / Preview Fallback (when local Express server is not reachable)
-        try {
-          if (email === 'admin@gmail.com' && password === 'admin123') {
-            const user = { id: 99, name: 'Jayswar', email: 'jayswar311@gmail.com' };
-            const token = 'jwt-token-header.' + btoa(JSON.stringify(user)) + '.signature';
-            const refreshToken = 'refresh-token-' + Math.random().toString(36).substring(2);
-            return { data: { success: true, user, token, refreshToken } };
-          }
-
-          const users = getStoredUsers();
-          const matchedUser = users.find(
-            (u) => (u.email || '').trim().toLowerCase() === email && u.password === password
-          );
-
-          if (matchedUser) {
-            const user = {
-              id: matchedUser.id,
-              name: matchedUser.name,
-              email: matchedUser.email,
-              phone: matchedUser.phone || '',
-            };
-            const token = 'jwt-token-header.' + btoa(JSON.stringify(user)) + '.signature';
-            const refreshToken = 'refresh-token-' + Math.random().toString(36).substring(2);
-            return { data: { success: true, user, token, refreshToken } };
-          }
-
-          return {
-            error: {
-              status: 400,
-              data: { message: 'Invalid email or password. Please verify credentials or register an account.' },
-            },
-          };
-        } catch (error) {
-          return { error: { status: 'CUSTOM_ERROR', error: error.message } };
         }
       },
     }),
@@ -329,6 +307,44 @@ export const api = createApi({
           // If network exception occurred, proceed to fallback below
         }
       },
+    }),
+
+    updateProfile: builder.mutation({
+      query: ({ name, email, phone, avatar, userId }) => ({
+        url: '/UpdateProfile',
+        method: 'POST',
+        body: {
+          UserID: userId,
+          FullName: name,
+          Email: email,
+          PhoneNumber: phone,
+          AvatarUrl: avatar,
+          UpdatedBy: userId,
+        },
+      }),
+    }),
+
+    changePassword: builder.mutation({
+      query: ({ newPassword, userId }) => ({
+        url: '/ChangePassword',
+        method: 'POST',
+        body: { UserID: userId, PasswordHash: newPassword ,UpdatedBy: userId,},
+      }),
+    }),
+
+    updatePreferences: builder.mutation({
+      query: ({ theme, colorPreset, sidebarSkin, emailNotifications, weeklyDigest, preferredLanguage }) => ({
+        url: '/UpdatePreferences',
+        method: 'POST',
+        body: {
+          ThemeMode: theme,
+          ColorPreset: colorPreset,
+          SidebarSkin: sidebarSkin,
+          EmailNotifications: emailNotifications,
+          WeeklyDigest: weeklyDigest,
+          PreferredLanguage: preferredLanguage,
+        },
+      }),
     }),
 
     // Forgot Password API (Calls Express /ForgotPassword -> sp_ForgotPassword with exact SP parameters)
@@ -1079,7 +1095,11 @@ export const api = createApi({
 export const {
   useLoginMutation,
   useRegisterUserMutation,
+  useUpdateProfileMutation,
+  useChangePasswordMutation,
+  useUpdatePreferencesMutation,
   useForgotPasswordMutation,
+  
   useGetDashboardSummaryQuery,
   useGetUsersQuery,
   // get dropdown data

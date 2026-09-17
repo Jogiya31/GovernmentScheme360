@@ -3,7 +3,7 @@ const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
 
-const { connectDB } = require("../db/connection");
+const { connectDB, sql } = require("../db/connection");
 const spMap = require("../config/spMap");
 const { authenticateToken, JWT_SECRET } = require("../middleware/auth");
 
@@ -12,6 +12,12 @@ const PUBLIC_ROUTES = new Set([
   "Login",
   "ForgotPassword",
   "NewUser",
+]);
+
+const USER_SCOPED_ROUTES = new Set([
+  "UpdateProfile",
+  "ChangePassword",
+  "UpdatePreferences",
 ]);
 
 async function executeStoredProcedure(req, res, procedure, routeName) {
@@ -45,7 +51,11 @@ async function executeStoredProcedure(req, res, procedure, routeName) {
     // SPECIAL HANDLER 1: LOGIN (Mint JWT Token)
     // =========================================================================
     if (routeName === "Login") {
-      if (!row || row.StatusCode !== 200) {
+      const userId = row?.UserID ?? null;
+      const phone = row?.PhoneNumber ?? null;
+      const loginSucceeded = row && (row.StatusCode === 200 || row.Success === true || userId != null);
+
+      if (!loginSucceeded) {
         return res.status(row?.StatusCode || 400).json({
           success: false,
           message: row?.StatusMessage || "Invalid email or password",
@@ -54,10 +64,10 @@ async function executeStoredProcedure(req, res, procedure, routeName) {
 
       // Generate JWT Access Token (valid for 2 hours)
       const tokenPayload = {
-        userId: row.UserID,
+        userId,
         email: row.Email,
         name: row.FullName,
-        phone: row.PhoneNumber,
+        phone,
       };
 
       const token = jwt.sign(tokenPayload, JWT_SECRET, { expiresIn: "2h" });
@@ -68,13 +78,18 @@ async function executeStoredProcedure(req, res, procedure, routeName) {
         token,
         refreshToken: row.RefreshToken,
         user: {
-          id: row.UserID,
+          id: userId,
+          userId,
           name: row.FullName,
           email: row.Email,
-          phone: row.PhoneNumber,
-          avatar: row.Avatar,
+          phone,
+          avatar: row.Avatar ?? row.AvatarUrl ?? null,
           theme: row.ThemeMode,
-          colorPreset: row.ColorPreset,
+          colorPreset: row.ColorPreset,          
+          sidebarSkin: row.SidebarSkin,
+          emailNotifications: row.EmailNotifications,
+          weeklyDigest: row.WeeklyDigest,
+          preferredLanguage: row.PreferredLanguage,
         },
       });
     }
@@ -110,6 +125,15 @@ async function executeStoredProcedure(req, res, procedure, routeName) {
           phone: row.PhoneNumber,
         },
       });
+    }
+
+    if (USER_SCOPED_ROUTES.has(routeName)) {
+      if (!row || (row.StatusCode && row.StatusCode !== 200)) {
+        return res.status(row?.StatusCode || 400).json({
+          success: false,
+          message: row?.StatusMessage || `${routeName} failed`,
+        });
+      }
     }
 
     // =========================================================================
@@ -177,6 +201,10 @@ Object.entries(spMap).forEach(([routeName, procedure]) => {
   } else {
     // Protected with JWT middleware
     router.post(`/${routeName}`, authenticateToken, (req, res) => {
+      if (USER_SCOPED_ROUTES.has(routeName)) {
+        req.body.UserID = req.user.userId;
+        req.body.UpdatedBy = req.user.userId;
+      }
       executeStoredProcedure(req, res, procedure, routeName);
     });
   }

@@ -10,187 +10,108 @@ import {
 } from '../features/theme/themeSlice';
 import { THEME_TEMPLATES, SIDEBAR_SKINS } from '../features/theme/themePresets';
 import Alert from '../components/common/Alert';
+import { api } from '../app/api';
 
 export default function Profile() {
   const dispatch = useDispatch();
-  const { user } = useSelector((state) => state.auth);
+  const user = useSelector((state) => state.auth.user);
   const { theme, colorPreset, sidebarSkin } = useSelector((state) => state.theme);
-
-
-  // Active tab state
   const [activeTab, setActiveTab] = useState('basic');
-
-  // Alert message system
-  const [alertConfig, setAlertConfig] = useState({ show: false, message: '', type: 'success' });
-
-  // Drag and drop uploading state
   const [isDragging, setIsDragging] = useState(false);
+  const [alertConfig, setAlertConfig] = useState({ show: false, type: 'success', message: '' });
+  const [emailNotifications, setEmailNotifications] = useState(user?.emailNotifications ?? true);
+  const [weeklyDigest, setWeeklyDigest] = useState(user?.weeklyDigest ?? true);
+  const [preferredLanguage, setPreferredLanguage] = useState(user?.preferredLanguage || 'en');
+  const [avatar, setAvatar] = useState(user?.avatar || '');
   const fileInputRef = useRef(null);
 
-  // React Hook Form for Basic Info
+  const [updateProfileRequest, { isLoading: isSavingProfile }] = api.useUpdateProfileMutation();
+  const [changePasswordRequest] = api.useChangePasswordMutation();
+  const [updatePreferencesRequest] = api.useUpdatePreferencesMutation();
+
   const {
     register: registerBasic,
     handleSubmit: handleSubmitBasic,
     reset: resetBasic,
     formState: { errors: basicErrors, isDirty: isBasicDirty },
   } = useForm({
-    defaultValues: {
-      name: user?.name || '',
-      email: user?.email || '',
-      phone: user?.phone || '',
-      avatar: user?.avatar || '',
-    },
+    defaultValues: { name: user?.name || '', email: user?.email || '', phone: user?.phone || '' },
   });
 
-  // React Hook Form for Security / Password
   const {
     register: registerSec,
     handleSubmit: handleSubmitSec,
     reset: resetSec,
     formState: { errors: secErrors },
-  } = useForm({
-    defaultValues: {
-      newPassword: '',
-      confirmPassword: '',
-    },
-  });
+  } = useForm();
 
-  // Keep form in sync if Redux user updates
   useEffect(() => {
-    if (user) {
-      resetBasic({
-        name: user.name || '',
-        email: user.email || '',
-        phone: user.phone || '',
-        avatar: user.avatar || '',
-      });
-    }
+    resetBasic({ name: user?.name || '', email: user?.email || '', phone: user?.phone || '' });
+    setAvatar(user?.avatar || '');
+    setEmailNotifications(user?.emailNotifications ?? true);
+    setWeeklyDigest(user?.weeklyDigest ?? true);
+    setPreferredLanguage(user?.preferredLanguage || 'en');
   }, [user, resetBasic]);
 
-  // Helper helper to display alerts
-  const triggerAlert = (message, type = 'success') => {
-    setAlertConfig({ show: true, message, type });
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  // Profile completion meter calculation
-  const calculateCompletion = () => {
-    let score = 0;
-    if (user?.name) score += 15;
-    if (user?.email) score += 15;
-    if (user?.phone) score += 15;
-    if (user?.avatar) score += 10;
-    return score;
-  };
-
-  const completionPercent = calculateCompletion();
-
-  // Basic info form submit handler
-  const onBasicSubmit = (data) => {
-    console.log('Basic Info Submitted:', data);
-    // dispatch(updateProfile(data));
-    triggerAlert('Basic profile information updated successfully!', 'success');
-  };
-
-  // Password / Security submit handler
-  const onSecSubmit = (data) => {
-    // Simulated validation
-    if (data.currentPassword !== 'Nice@12345') {
-      triggerAlert(
-        'Incorrect current password! Standard user current password is "Nice@12345".',
-        'danger',
-      );
-      return;
-    }
-    if (data.newPassword !== data.confirmPassword) {
-      triggerAlert('New password and password confirmation do not match!', 'danger');
-      return;
-    }
-
-    triggerAlert('Security credentials and password updated successfully!', 'success');
-    resetSec({ currentPassword: '', newPassword: '', confirmPassword: '' });
-  };
-
-  // Theme preferences toggle
-  const handleToggleTheme = () => {
-    dispatch(toggleTheme());
-    triggerAlert(
-      `System visual preference changed to ${theme === 'light' ? 'Dark' : 'Light'} Mode.`,
-      'info',
-    );
-  };
-
-  const handleSelectPresetTheme = (presetId) => {
-    dispatch(setColorPreset(presetId));
-    const tmpl = THEME_TEMPLATES.find((t) => t.id === presetId);
-    triggerAlert(`Applied "${tmpl?.name || presetId}" theme template successfully!`, 'success');
-  };
-
-  const handleSelectSidebarSkin = (skinId) => {
-    dispatch(setSidebarSkin(skinId));
-    triggerAlert(`Sidebar navigation skin switched to ${skinId === 'dark' ? 'Dark Executive' : 'Light Clean'}.`, 'info');
-  };
-
-  const handleResetAllTheme = () => {
-    dispatch(resetThemeSettings());
-    triggerAlert('Theme and layout styles reset to default Modern Indigo.', 'info');
-  };
-
-  // Presets avatar picker
-  const handleSelectPreset = (url) => {
-    dispatch(updateProfile({ avatar: url }));
-    triggerAlert('Profile avatar changed to selected preset.', 'success');
-  };
-
-  // File loading function (base64 conversions)
-  const processImageFile = (file) => {
-    if (!file) return;
-    if (!file.type.startsWith('image/')) {
-      triggerAlert('Please drop or select a valid image file (PNG/JPEG/GIF).', 'danger');
-      return;
-    }
-    if (file.size > 2 * 1024 * 1024) {
-      triggerAlert('Image size exceeds 2MB limit. Please choose a smaller file.', 'warning');
-      return;
-    }
-
+  const showAlert = (type, message) => setAlertConfig({ show: true, type, message });
+  const getErrorMessage = (error, fallback) => error?.data?.message || error?.data?.StatusMessage || fallback;
+  const readAvatar = (file) => {
+    if (!file || !file.type.startsWith('image/')) return showAlert('danger', 'Please select a valid image file.');
+    if (file.size > 2 * 1024 * 1024) return showAlert('danger', 'Profile images must be smaller than 2 MB.');
     const reader = new FileReader();
-    reader.onload = (e) => {
-      const base64Url = e.target.result;
-      dispatch(updateProfile({ avatar: base64Url }));
-      triggerAlert('Custom profile photo uploaded and configured successfully!', 'success');
-    };
+    reader.onload = () => setAvatar(reader.result);
     reader.readAsDataURL(file);
   };
+  const handleFileInputChange = (event) => readAvatar(event.target.files?.[0]);
+  const handleDragOver = (event) => { event.preventDefault(); setIsDragging(true); };
+  const handleDragLeave = () => setIsDragging(false);
+  const handleDrop = (event) => { event.preventDefault(); setIsDragging(false); readAvatar(event.dataTransfer.files?.[0]); };
+  const triggerFileInput = () => fileInputRef.current?.click();
 
-  // Drag and drop event handling
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = () => {
-    setIsDragging(false);
-  };
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    setIsDragging(false);
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      processImageFile(e.dataTransfer.files[0]);
+  const onBasicSubmit = async (values) => {
+    const userId = user?.id ?? user?.userId;
+    try {
+      const result = await updateProfileRequest({ ...values, avatar, userId }).unwrap();
+      dispatch(updateProfile({ ...values, avatar }));
+      showAlert('success', result.message || 'Profile updated successfully.');
+      resetBasic(values);
+    } catch (error) {
+      showAlert('danger', getErrorMessage(error, 'Unable to update your profile.'));
     }
   };
 
-  const handleFileInputChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      processImageFile(e.target.files[0]);
+  const onSecSubmit = async (values) => {
+    console.log('Submitting password change:', values);
+    const userId = user?.id ?? user?.userId;
+    if (values.newPassword !== values.confirmPassword) return showAlert('danger', 'New password and confirmation do not match.');
+    try {
+      const result = await changePasswordRequest({ ...values, userId}).unwrap();
+      showAlert('success', result.message || 'Password updated successfully.');
+      resetSec();
+    } catch (error) {
+      showAlert('danger', getErrorMessage(error, 'Unable to update your password.'));
     }
   };
 
-  const triggerFileInput = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
+  const savePreferences = async (changes) => {
+    const preferences = { theme, colorPreset, sidebarSkin, emailNotifications, weeklyDigest, preferredLanguage, ...changes };
+    try {
+      await updatePreferencesRequest(preferences).unwrap();
+      dispatch(updateProfile(preferences));
+      showAlert('success', 'Preferences saved successfully.');
+    } catch (error) {
+      showAlert('danger', getErrorMessage(error, 'Unable to save preferences.'));
     }
+  };
+  
+  const handleToggleTheme = () => { const nextTheme = theme === 'light' ? 'dark' : 'light'; dispatch(toggleTheme()); savePreferences({ theme: nextTheme }); };
+  const handleSelectPresetTheme = (preset) => { dispatch(setColorPreset(preset)); savePreferences({ colorPreset: preset }); };
+  const handleSelectSidebarSkin = (skin) => { dispatch(setSidebarSkin(skin)); savePreferences({ sidebarSkin: skin }); };
+  const handleResetAllTheme = () => { dispatch(resetThemeSettings()); savePreferences({ theme: 'light', colorPreset: 'indigo', sidebarSkin: 'light' }); };
+  const handleNotificationChange = (field, value) => {
+    if (field === 'emailNotifications') setEmailNotifications(value);
+    if (field === 'weeklyDigest') setWeeklyDigest(value);
+    savePreferences({ [field]: value });
   };
 
   return (
@@ -240,10 +161,10 @@ export default function Profile() {
                 onDrop={handleDrop}
                 onClick={triggerFileInput}
                 title="Click or drag an image to change profile photo"
-              >
+              > 
                 <img
                   src={
-                    user?.avatar ||   
+                    avatar || user?.avatar ||
                     'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200'
                   }
                   alt="Profile"
@@ -304,32 +225,6 @@ export default function Profile() {
                   {user?.bio ||
                     'No professional biography specified yet. Click on edit details to add standard bio notes.'}
                 </p>
-              </div>
-
-              {/* Progress Completion Bar */}
-              <div className="w-100 text-start mt-auto pt-3 border-top">
-                <div className="d-flex justify-content-between align-items-center mb-1">
-                  <span className="text-muted fw-medium" style={{ fontSize: '0.75rem' }}>
-                    Profile Completeness
-                  </span>
-                  <span className="fw-bold text-primary" style={{ fontSize: '0.75rem' }}>
-                    {completionPercent}%
-                  </span>
-                </div>
-                <div className="progress" style={{ height: '8px' }}>
-                  <div
-                    className="progress-bar progress-bar-striped progress-bar-animated bg-success"
-                    role="progressbar"
-                    style={{ width: `${completionPercent}%` }}
-                    aria-valuenow={completionPercent}
-                    aria-valuemin="0"
-                    aria-valuemax="100"
-                  ></div>
-                </div>
-                <small className="text-muted d-block mt-1.5" style={{ fontSize: '0.7rem' }}>
-                  Fill out all details, custom bios, and avatars to reach 100% database standard
-                  completion.
-                </small>
               </div>
             </div>
           </div>
@@ -464,7 +359,8 @@ export default function Profile() {
                       <input
                         type="file"
                         className="form-control py-2"
-                        {...registerBasic('avatar')}
+                        onChange={handleFileInputChange}
+                        accept="image/*"
                       />
                     </div>
                   </div>
@@ -483,6 +379,7 @@ export default function Profile() {
                     <button
                       type="submit"
                       className="btn btn-primary px-4 fw-medium d-flex align-items-center gap-1.5"
+                      disabled={isSavingProfile}
                       style={{ fontSize: '0.85rem' }}
                     >
                       <i className="bi bi-save me-1"></i>
@@ -657,11 +554,11 @@ export default function Profile() {
                                   minHeight: '44px'
                                 }}
                               >
-                                <span className="badge bg-white text-dark shadow-xs fw-semibold" style={{ fontSize: '0.68rem' }}>
-                                  {tmpl.category}
+                                <span className="d-flex badge bg-white text-dark shadow-xs fw-semibold" style={{ fontSize: '0.68rem', marginLeft: '1rem' }}>
+                                  {tmpl.category} 
                                 </span>
                                 {isActive && (
-                                  <span className="badge bg-dark text-white shadow-xs rounded-pill" style={{ fontSize: '0.68rem' }}>
+                                  <span className="badge bg-dark text-white shadow-xs rounded-pill " style={{ fontSize: '0.68rem', marginRight: '1rem' }}>
                                     <i className="bi bi-check2-circle me-1"></i> Active
                                   </span>
                                 )}
@@ -811,7 +708,8 @@ export default function Profile() {
                           type="checkbox"
                           role="switch"
                           id="notifSwitch"
-                          defaultChecked
+                          checked={emailNotifications}
+                          onChange={(event) => handleNotificationChange('emailNotifications', event.target.checked)}
                           style={{ width: '46px', height: '24px', cursor: 'pointer' }}
                         />
                       </div>
@@ -837,6 +735,8 @@ export default function Profile() {
                           type="checkbox"
                           role="switch"
                           id="digestSwitch"
+                          checked={weeklyDigest}
+                          onChange={(event) => handleNotificationChange('weeklyDigest', event.target.checked)}
                           style={{ width: '46px', height: '24px', cursor: 'pointer' }}
                         />
                       </div>
@@ -858,7 +758,14 @@ export default function Profile() {
                           </p>
                         </div>
                         <div className="col-12 col-md-4">
-                          <select className="form-select form-select-sm" defaultValue="en">
+                          <select
+                            className="form-select form-select-sm"
+                            value={preferredLanguage}
+                            onChange={(event) => {
+                              setPreferredLanguage(event.target.value);
+                              savePreferences({ preferredLanguage: event.target.value });
+                            }}
+                          >
                             <option value="en">English (India)</option>
                             <option value="hi">Hindi (हिन्दी)</option>
                             <option value="mr">Marathi (मराठी)</option>

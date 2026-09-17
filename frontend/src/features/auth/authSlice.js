@@ -34,11 +34,8 @@ const authSlice = createSlice({
       state.user = null;
       state.token = null;
       state.refreshToken = null;
-      state.isAuthenticated = false;
-      
-      localStorage.removeItem('user');
-      localStorage.removeItem('token');
-      localStorage.removeItem('refreshToken');
+      state.isAuthenticated = false;      
+      localStorage.clear();
     },
     updateProfile: (state, action) => {
       if (state.user) {

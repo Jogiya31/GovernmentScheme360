@@ -74,6 +74,22 @@ const themeSlice = createSlice({
       localStorage.setItem('theme_sidebar_skin', action.payload);
       applyAllThemeAttributes(state.theme, state.colorPreset, action.payload);
     },
+    setThemePreferences: (state, action) => {
+      const { theme, colorPreset, sidebarSkin } = action.payload || {};
+      if (theme) {
+        state.theme = theme;
+        localStorage.setItem('theme', theme);
+      }
+      if (colorPreset) {
+        state.colorPreset = colorPreset;
+        localStorage.setItem('theme_preset', colorPreset);
+      }
+      if (sidebarSkin) {
+        state.sidebarSkin = sidebarSkin;
+        localStorage.setItem('theme_sidebar_skin', sidebarSkin);
+      }
+      applyAllThemeAttributes(state.theme, state.colorPreset, state.sidebarSkin);
+    },
     resetThemeSettings: (state) => {
       state.theme = 'light';
       state.colorPreset = 'indigo';
@@ -94,6 +110,7 @@ export const {
   setTheme,
   setColorPreset,
   setSidebarSkin,
+  setThemePreferences,
   resetThemeSettings,
   initTheme,
 } = themeSlice.actions;

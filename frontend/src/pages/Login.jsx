@@ -4,6 +4,7 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { useLoginMutation, useForgotPasswordMutation } from '../app/api';
 import { setCredentials } from '../features/auth/authSlice';
+import { setThemePreferences } from '../features/theme/themeSlice';
 import scheme360 from '../assets/scheme360.png';
 
 export default function Login() {
@@ -36,6 +37,7 @@ export default function Login() {
       setApiError(null);
       const result = await login(data).unwrap();
       dispatch(setCredentials(result));
+      dispatch(setThemePreferences(result.user));
       navigate(from, { replace: true });
     } catch (err) {
       const msg = err?.data?.message || err?.data?.StatusMessage || err?.error || err?.message || 'Login failed. Please check your credentials.';
