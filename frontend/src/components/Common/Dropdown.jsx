@@ -150,6 +150,7 @@ export default function Dropdown({
           disabled ? 'opacity-75' : ''
         } ${isInvalid || className.includes('is-invalid') ? 'is-invalid border-danger' : ''}`}
         style={{
+          fontSize: '0.85rem',
           minHeight: '42px',
           paddingRight: '12px',
           backgroundImage: 'none' // Remove bootstrap default arrow since we render custom chevron

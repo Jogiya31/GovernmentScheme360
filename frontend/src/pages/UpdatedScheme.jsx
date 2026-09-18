@@ -1317,7 +1317,7 @@ export default function UpdatedScheme() {
   };
 
   return (
-    <div className="fade-in pb-5">
+    <div className="fade-in">
       {/* Page Header */}
       <div className="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3  mt-2">
         <div>

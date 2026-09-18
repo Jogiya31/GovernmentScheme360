@@ -23,7 +23,7 @@ export const api = createApi({
       headers.set('Content-Type', 'application/json');
 
       // Public endpoints: must NOT attach user token or Authorization header
-      const publicEndpoints = ['getDepartment', 'login', 'registerUser'];
+      const publicEndpoints = ['login', 'registerUser'];
       if (publicEndpoints.includes(endpoint)) {
         headers.delete('Authorization');
         return headers;
