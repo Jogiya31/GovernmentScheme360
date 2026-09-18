@@ -108,11 +108,6 @@ export default function Profile() {
   const handleSelectPresetTheme = (preset) => { dispatch(setColorPreset(preset)); savePreferences({ colorPreset: preset }); };
   const handleSelectSidebarSkin = (skin) => { dispatch(setSidebarSkin(skin)); savePreferences({ sidebarSkin: skin }); };
   const handleResetAllTheme = () => { dispatch(resetThemeSettings()); savePreferences({ theme: 'light', colorPreset: 'indigo', sidebarSkin: 'light' }); };
-  const handleNotificationChange = (field, value) => {
-    if (field === 'emailNotifications') setEmailNotifications(value);
-    if (field === 'weeklyDigest') setWeeklyDigest(value);
-    savePreferences({ [field]: value });
-  };
 
   return (
     <div className="fade-in pb-5">
@@ -686,59 +681,6 @@ export default function Profile() {
                             {skin.name}
                           </button>
                         ))}
-                      </div>
-                    </div>
-
-                    {/* Email alert alerts row */}
-                    <div className="list-group-item p-3 d-flex justify-content-between align-items-center">
-                      <div>
-                        <h6
-                          className="mb-1 fw-bold text-dark-emphasis"
-                          style={{ fontSize: '0.85rem' }}
-                        >
-                          Email Notifications
-                        </h6>
-                        <p className="text-muted mb-0" style={{ fontSize: '0.75rem' }}>
-                          Receive automated alerts upon scheme submission or roles modifications.
-                        </p>
-                      </div>
-                      <div className="form-check form-switch">
-                        <input
-                          className="form-check-input"
-                          type="checkbox"
-                          role="switch"
-                          id="notifSwitch"
-                          checked={emailNotifications}
-                          onChange={(event) => handleNotificationChange('emailNotifications', event.target.checked)}
-                          style={{ width: '46px', height: '24px', cursor: 'pointer' }}
-                        />
-                      </div>
-                    </div>
-
-                    {/* Daily reports digest toggler row */}
-                    <div className="list-group-item p-3 d-flex justify-content-between align-items-center">
-                      <div>
-                        <h6
-                          className="mb-1 fw-bold text-dark-emphasis"
-                          style={{ fontSize: '0.85rem' }}
-                        >
-                          Weekly Digest Summaries
-                        </h6>
-                        <p className="text-muted mb-0" style={{ fontSize: '0.75rem' }}>
-                          Receive aggregated analytics on registered nodal ministries data
-                          activities.
-                        </p>
-                      </div>
-                      <div className="form-check form-switch">
-                        <input
-                          className="form-check-input"
-                          type="checkbox"
-                          role="switch"
-                          id="digestSwitch"
-                          checked={weeklyDigest}
-                          onChange={(event) => handleNotificationChange('weeklyDigest', event.target.checked)}
-                          style={{ width: '46px', height: '24px', cursor: 'pointer' }}
-                        />
                       </div>
                     </div>
 

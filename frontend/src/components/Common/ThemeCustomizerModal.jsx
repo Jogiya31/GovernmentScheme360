@@ -1,5 +1,6 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { updateProfile } from '../../features/auth/authSlice';
 import {
   setTheme,
   setColorPreset,
@@ -7,10 +8,13 @@ import {
   resetThemeSettings,
 } from '../../features/theme/themeSlice';
 import { THEME_TEMPLATES, SIDEBAR_SKINS } from '../../features/theme/themePresets';
+import { api } from '../../app/api';
 
 export default function ThemeCustomizerModal({ show, onClose }) {
   const dispatch = useDispatch();
+  const user = useSelector((state) => state.auth.user);
   const { theme, colorPreset, sidebarSkin } = useSelector((state) => state.theme);
+  const [updatePreferencesRequest, { isLoading: isSavingPreferences }] = api.useUpdatePreferencesMutation();
 
   if (!show) return null;
 
@@ -19,18 +23,41 @@ export default function ThemeCustomizerModal({ show, onClose }) {
 
   const handleApplyPreset = (presetId) => {
     dispatch(setColorPreset(presetId));
+    savePreferences({ colorPreset: presetId });
   };
 
   const handleModeChange = (mode) => {
     dispatch(setTheme(mode));
+    savePreferences({ theme: mode });
   };
 
   const handleSidebarSkinChange = (skin) => {
     dispatch(setSidebarSkin(skin));
+    savePreferences({ sidebarSkin: skin });
   };
 
   const handleReset = () => {
     dispatch(resetThemeSettings());
+    savePreferences({ theme: 'light', colorPreset: 'indigo', sidebarSkin: 'light' });
+  };
+
+  const savePreferences = async (changes) => {
+    const preferences = {
+      theme,
+      colorPreset,
+      sidebarSkin,
+      emailNotifications: user?.emailNotifications ?? true,
+      weeklyDigest: user?.weeklyDigest ?? true,
+      preferredLanguage: user?.preferredLanguage || 'en',
+      ...changes,
+    };
+
+    try {
+      await updatePreferencesRequest(preferences).unwrap();
+      dispatch(updateProfile(preferences));
+    } catch (error) {
+      console.error('Unable to save theme preferences:', error);
+    }
   };
 
   return (

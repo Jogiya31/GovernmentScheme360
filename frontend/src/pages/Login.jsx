@@ -91,7 +91,7 @@ export default function Login() {
                   type="email"
                   className={`form-control border-start-0 ps-0 ${errors.email ? 'is-invalid' : ''}`}
                   placeholder="admin@gmail.com"
-                  {...register('email', { 
+                  {...register('email', {
                     required: 'Email address is required',
                     pattern: {
                       value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
@@ -138,17 +138,17 @@ export default function Login() {
                 <input type="checkbox" className="form-check-input" id="rememberMe" />
                 <label className="form-check-label text-muted" htmlFor="rememberMe">Remember me</label>
               </div>
-              <button
-                type="button"
-                className="btn btn-link p-0 text-primary text-decoration-none small border-0"
-                onClick={() => {
-                  setShowForgotModal(true);
-                  setForgotResult(null);
-                  setForgotError(null);
-                }}
-              >
-                Forgot Password?
-              </button>
+                {/* <button
+                  type="button"
+                  className="btn btn-link p-0 text-primary text-decoration-none small border-0"
+                  onClick={() => {
+                    setShowForgotModal(true);
+                    setForgotResult(null);
+                    setForgotError(null);
+                  }}
+                >
+                  Forgot Password?
+                </button> */}
             </div>
 
             {/* Sign In Button */}
@@ -182,7 +182,7 @@ export default function Login() {
           <div className="mt-4 p-3 bg-light rounded-3 text-center" style={{ fontSize: '0.8rem', border: '1px dashed #cbd5e1' }}>
             <span className="fw-semibold text-secondary d-block mb-1">Access Credentials:</span>
             <div>
-              <code className="text-primary fw-medium">admin@gmail.com</code> / <code className="text-primary fw-medium">admin123</code>
+              <code className="text-primary fw-medium">officer@nic.in</code> / <code className="text-primary fw-medium">Nic@12345</code>
             </div>
             <div className="text-muted small mt-1" style={{ fontSize: '0.74rem' }}>
               Official <code>@nic.in</code> accounts default password: <code className="text-primary fw-medium">Nic@12345</code>
@@ -192,7 +192,7 @@ export default function Login() {
       </div>
 
       {/* FORGOT PASSWORD MODAL */}
-      {showForgotModal && (
+      {/* {showForgotModal && (
         <div
           className="modal fade show d-block"
           tabIndex="-1"
@@ -263,7 +263,7 @@ export default function Login() {
                           required
                           value={forgotEmail}
                           onChange={(e) => setForgotEmail(e.target.value)}
-                          placeholder="e.g. admin@gmail.com"
+                          placeholder="e.g. officer@nic.in"
                           className="form-control border-start-0 ps-0"
                         />
                       </div>
@@ -298,7 +298,7 @@ export default function Login() {
             </div>
           </div>
         </div>
-      )}
+      )} */}
     </div>
   );
 }
