@@ -217,7 +217,7 @@ export default function Dropdown({
       {/* Dropdown Menu Popup List */}
       {isOpen && (
         <div
-          className={`position-absolute mt-1 bg-body border rounded shadow-lg overflow-hidden ${align === 'right' ? 'end-0' : 'start-0'}`}
+          className={`position-absolute mt-1 bg-white border rounded shadow-lg overflow-hidden ${align === 'right' ? 'end-0' : 'start-0'}`}
           style={{ zIndex: 1100, maxHeight: '320px', display: 'flex', flexDirection: 'column', minWidth: '100%', maxWidth: 'calc(100vw - 32px)' }}
         >
           {/* Optional search input filter */}

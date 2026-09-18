@@ -316,18 +316,20 @@ export default function DatePicker({
           {/* Formatted Date or Placeholder */}
           {parsedDate ? (
             <div className="d-flex align-items-center gap-1.5 overflow-hidden">
-              <span className="fw-semibold text-dark-emphasis text-truncate">
+              <span className="text-dark-emphasis text-truncate">
                 {formattedDisplay.full}
               </span>
               <span
                 className="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill py-0.5 px-1.5"
-                style={{ fontSize: '0.68rem', fontWeight: 500 }}
+                style={{ marginLeft: '0.6rem', fontSize: '0.68rem', fontWeight: 500 }}
               >
                 {formattedDisplay.weekday}
               </span>
             </div>
           ) : (
-            <span className="text-muted">{placeholder}</span>
+            <span className="text-muted" style={{ fontSize: '0.85rem' }}>
+              {placeholder}
+            </span>
           )}
         </div>
 
@@ -622,7 +624,7 @@ export default function DatePicker({
 
           {/* FOOTER SHORTCUTS & ACTION BAR */}
           <div
-            className="p-2.5 border-top d-flex align-items-center justify-content-between flex-wrap gap-1"
+            className="p-2 border-top d-flex align-items-center justify-content-between flex-wrap gap-1"
             style={{
               backgroundColor: 'var(--bs-tertiary-bg, rgba(0,0,0,0.02))',
               borderBottomLeftRadius: '12px',

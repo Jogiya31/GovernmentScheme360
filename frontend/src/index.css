@@ -1080,6 +1080,15 @@ label,
   --theme-shadow-color: rgba(168, 85, 247, 0.4);
 }
 
+/* Theme-colored dropdown hover states */
+[data-theme-preset][data-bs-theme] .dropdown-item:hover,
+[data-theme-preset][data-bs-theme] .dropdown-item:focus,
+[data-theme-preset][data-theme] .dropdown-item:hover,
+[data-theme-preset][data-theme] .dropdown-item:focus {
+  background-color: rgba(var(--bs-primary-rgb), 0.14) !important;
+  color: var(--bs-primary-text) !important;
+}
+
 /* ============================================================== */
 /* Dark Executive Sidebar Skin (Even in Light Content Mode) */
 /* ============================================================== */
@@ -1140,7 +1149,7 @@ label,
 }
 
 .modern-datepicker-trigger {
-  background-color: var(--bs-body-bg, #ffffff);
+  background-color: var(#ffffff);
   border: 1px solid var(--bs-border-color, #cbd5e1);
   border-radius: 8px;
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, background-color 0.15s ease-in-out;
