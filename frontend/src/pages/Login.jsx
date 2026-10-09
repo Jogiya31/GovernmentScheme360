@@ -12,16 +12,10 @@ export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
   const [login, { isLoading }] = useLoginMutation();
-  const [forgotPassword, { isLoading: isForgotLoading }] = useForgotPasswordMutation();
 
   const [apiError, setApiError] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
 
-  // Forgot password modal states
-  const [showForgotModal, setShowForgotModal] = useState(false);
-  const [forgotEmail, setForgotEmail] = useState('');
-  const [forgotResult, setForgotResult] = useState(null);
-  const [forgotError, setForgotError] = useState(null);
 
   const { register, handleSubmit, formState: { errors } } = useForm({
     defaultValues: {
@@ -42,23 +36,6 @@ export default function Login() {
     } catch (err) {
       const msg = err?.data?.message || err?.data?.StatusMessage || err?.error || err?.message || 'Login failed. Please check your credentials.';
       setApiError(msg);
-    }
-  };
-
-  const handleForgotPasswordSubmit = async (e) => {
-    e.preventDefault();
-    if (!forgotEmail.trim()) {
-      setForgotError('Please enter your registered email address.');
-      return;
-    }
-    try {
-      setForgotError(null);
-      setForgotResult(null);
-      const res = await forgotPassword({ email: forgotEmail.trim() }).unwrap();
-      setForgotResult(res);
-    } catch (err) {
-      const msg = err?.data?.message || err?.data?.StatusMessage || err?.error || err?.message || 'Unable to generate password reset request.';
-      setForgotError(msg);
     }
   };
 
