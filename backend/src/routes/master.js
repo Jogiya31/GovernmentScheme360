@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken");
 
 const { connectDB, sql } = require("../db/connection");
 const spMap = require("../config/spMap");
-const { authenticateToken, JWT_SECRET } = require("../middleware/auth");
+const { authenticateToken, JWT_SECRET, JWT_EXPIRES_IN } = require("../middleware/auth");
 
 // Define which routes do NOT require a token (public routes)
 const PUBLIC_ROUTES = new Set([
@@ -62,7 +62,7 @@ async function executeStoredProcedure(req, res, procedure, routeName) {
         });
       }
 
-      // Generate JWT Access Token (valid for 2 hours)
+      // Generate a short-lived access token.
       const tokenPayload = {
         userId,
         email: row.Email,
@@ -70,7 +70,7 @@ async function executeStoredProcedure(req, res, procedure, routeName) {
         phone,
       };
 
-      const token = jwt.sign(tokenPayload, JWT_SECRET, { expiresIn: "2h" });
+      const token = jwt.sign(tokenPayload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
 
       return res.status(200).json({
         success: true,
@@ -112,7 +112,7 @@ async function executeStoredProcedure(req, res, procedure, routeName) {
         phone: row.PhoneNumber,
       };
 
-      const token = jwt.sign(tokenPayload, JWT_SECRET, { expiresIn: "2h" });
+      const token = jwt.sign(tokenPayload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
 
       return res.status(201).json({
         success: true,

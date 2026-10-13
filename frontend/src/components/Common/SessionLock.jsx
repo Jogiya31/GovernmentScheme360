@@ -27,13 +27,9 @@ export default function SessionLock() {
     if (!isAuthenticated || isLocked) return undefined;
 
     const expiresAt = getTokenExpiry(token || '');
-    const timeoutMinutes = Number(import.meta.env.VITE_SESSION_TIMEOUT_MINUTES);
-    const configuredTimeout = Number.isFinite(timeoutMinutes) && timeoutMinutes > 0
-      ? timeoutMinutes * 60 * 1000
-      : Infinity;
-    const tokenTimeout = expiresAt ? expiresAt - Date.now() : Infinity;
-    const delay = Math.min(configuredTimeout, tokenTimeout);
-    if (!Number.isFinite(delay)) return undefined;
+    if (!expiresAt) return undefined;
+
+    const delay = expiresAt - Date.now();
 
     if (delay <= 0) {
       dispatch(lockSession());

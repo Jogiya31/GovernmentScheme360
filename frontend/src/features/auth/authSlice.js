@@ -10,7 +10,7 @@ const getInitialAuth = () => {
     token: token || null,
     refreshToken: refreshToken || null,
     isAuthenticated: !!token,
-    isLocked: localStorage.getItem('sessionLocked') === 'true',
+    isLocked: false,
   };
 };
 
@@ -28,7 +28,6 @@ const authSlice = createSlice({
       
       localStorage.setItem('user', JSON.stringify(user));
       localStorage.setItem('token', token);
-      localStorage.removeItem('sessionLocked');
       if (refreshToken) {
         localStorage.setItem('refreshToken', refreshToken);
       }
@@ -36,7 +35,6 @@ const authSlice = createSlice({
     lockSession: (state) => {
       if (state.isAuthenticated) {
         state.isLocked = true;
-        localStorage.setItem('sessionLocked', 'true');
       }
     },
     logout: (state) => {
