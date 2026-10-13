@@ -7,6 +7,7 @@ import { store } from './app/store';
 import AdminLayout from './components/Layout/AdminLayout';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import PublicRoute from './components/common/PublicRoute';
+import SessionLock from './components/common/SessionLock';
 
 // Pages
 import Login from './pages/Login';
@@ -59,6 +60,7 @@ export default function App() {
           {/* Fallback Catch */}
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
+        <SessionLock />
       </BrowserRouter>
     </Provider>
   );

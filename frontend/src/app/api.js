@@ -1,4 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { lockSession } from '../features/auth/authSlice';
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
 const DEFAULT_USERS = [];
@@ -15,9 +16,7 @@ const getStoredUsers = () => {
   return DEFAULT_USERS;
 };
 
-export const api = createApi({
-  reducerPath: 'api',
-  baseQuery: fetchBaseQuery({
+const rawBaseQuery = fetchBaseQuery({
     baseUrl: BASE_URL,
     prepareHeaders: (headers, { getState, endpoint }) => {
       headers.set('Content-Type', 'application/json');
@@ -39,7 +38,23 @@ export const api = createApi({
       }
       return headers;
     },
-  }),
+  });
+
+const baseQuery = async (args, api, extraOptions) => {
+  const result = await rawBaseQuery(args, api, extraOptions);
+  if (
+    result.error?.status === 403 &&
+    api.endpoint !== 'login' &&
+    api.getState()?.auth?.isAuthenticated
+  ) {
+    api.dispatch(lockSession());
+  }
+  return result;
+};
+
+export const api = createApi({
+  reducerPath: 'api',
+  baseQuery,
 
   tagTypes: [
     'login',

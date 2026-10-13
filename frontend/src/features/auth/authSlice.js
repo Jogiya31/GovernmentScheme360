@@ -10,6 +10,7 @@ const getInitialAuth = () => {
     token: token || null,
     refreshToken: refreshToken || null,
     isAuthenticated: !!token,
+    isLocked: localStorage.getItem('sessionLocked') === 'true',
   };
 };
 
@@ -23,11 +24,19 @@ const authSlice = createSlice({
       state.token = token;
       state.refreshToken = refreshToken;
       state.isAuthenticated = !!token;
+      state.isLocked = false;
       
       localStorage.setItem('user', JSON.stringify(user));
       localStorage.setItem('token', token);
+      localStorage.removeItem('sessionLocked');
       if (refreshToken) {
         localStorage.setItem('refreshToken', refreshToken);
+      }
+    },
+    lockSession: (state) => {
+      if (state.isAuthenticated) {
+        state.isLocked = true;
+        localStorage.setItem('sessionLocked', 'true');
       }
     },
     logout: (state) => {
@@ -35,6 +44,7 @@ const authSlice = createSlice({
       state.token = null;
       state.refreshToken = null;
       state.isAuthenticated = false;      
+      state.isLocked = false;
       localStorage.clear();
     },
     updateProfile: (state, action) => {
@@ -46,5 +56,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { setCredentials, logout, updateProfile } = authSlice.actions;
+export const { setCredentials, lockSession, logout, updateProfile } = authSlice.actions;
 export default authSlice.reducer;
