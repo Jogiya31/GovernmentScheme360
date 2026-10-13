@@ -89,14 +89,14 @@ export default function Register() {
           {/* Alert Messages */}
           {apiError && (
             <div className="alert alert-danger py-2 px-3 mb-4 rounded-3 d-flex align-items-center gap-2" style={{ fontSize: '0.85rem' }}>
-              <i className="bi bi-exclamation-triangle-fill flex-shrink-0 fs-6"></i>
+              <i className="bi bi-exclamation-triangle-fill shrink-0 fs-6"></i>
               <div>{apiError}</div>
             </div>
           )}
 
           {apiSuccess && (
             <div className="alert alert-success py-2 px-3 mb-4 rounded-3 d-flex align-items-center gap-2" style={{ fontSize: '0.85rem' }}>
-              <i className="bi bi-check-circle-fill flex-shrink-0 fs-6"></i>
+              <i className="bi bi-check-circle-fill shrink-0 fs-6"></i>
               <div>{apiSuccess} Redirecting to your dashboard...</div>
             </div>
           )}
@@ -190,7 +190,7 @@ export default function Register() {
               <div className="col-12">
                 <div className="p-3 bg-primary-subtle border border-primary-subtle rounded-3">
                   <div className="d-flex align-items-start gap-2">
-                    <i className="bi bi-shield-lock-fill text-primary fs-5 mt-0.5 flex-shrink-0"></i>
+                    <i className="bi bi-shield-lock-fill text-primary fs-5 mt-0.5 shrink-0"></i>
                     <div>
                       <div className="fw-semibold text-primary-emphasis small">Standard Default Password Policy</div>
                       <div className="text-muted small mt-0.5" style={{ fontSize: '0.8rem', lineHeight: '1.4' }}>

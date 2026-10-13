@@ -106,7 +106,7 @@ export default function Alert({
         )}
 
         {/* Message content */}
-        <div className="flex-grow-1" style={{ fontSize: '0.9rem' }}>
+        <div className="grow" style={{ fontSize: '0.9rem' }}>
           {message || children}
         </div>
 

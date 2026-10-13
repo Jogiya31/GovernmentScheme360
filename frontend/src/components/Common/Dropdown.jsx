@@ -263,7 +263,7 @@ export default function Dropdown({
           )}
 
           {/* Scrollable list options */}
-          <div className="overflow-auto flex-grow-1" style={{ maxHeight: '220px' }}>
+          <div className="overflow-auto grow" style={{ maxHeight: '220px' }}>
             {isLoading ? (
               <div className="py-4 text-center">
                 <Spinner size="sm" center text="Fetching options..." />

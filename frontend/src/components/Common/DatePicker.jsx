@@ -300,7 +300,7 @@ export default function DatePicker({
         <div className="d-flex align-items-center gap-2 overflow-hidden text-truncate">
           {/* Calendar Accent Icon */}
           <div
-            className="d-flex align-items-center justify-content-center rounded-2 flex-shrink-0"
+            className="d-flex align-items-center justify-content-center rounded-2 shrink-0"
             style={{
               width: '24px',
               height: '24px',
@@ -334,7 +334,7 @@ export default function DatePicker({
         </div>
 
         {/* Right action icons */}
-        <div className="d-flex align-items-center gap-1 ms-2 flex-shrink-0">
+        <div className="d-flex align-items-center gap-1 ms-2 shrink-0">
           {parsedDate && !disabled && (
             <button
               type="button"

@@ -1369,7 +1369,7 @@ export default function UpdatedScheme() {
         {/* Tab Controls Bar */}
         <div className="p-3 border-bottom d-flex flex-wrap align-items-center justify-content-between gap-3">
           {/* Quick tab keyword search filter */}
-          <div className="flex-grow-1 w-100" style={{ maxWidth: '420px' }}>
+          <div className="grow w-100" style={{ maxWidth: '420px' }}>
             <Dropdown
               options={dropdownOptions}
               value={selectedDropdownValue}
@@ -1382,7 +1382,7 @@ export default function UpdatedScheme() {
           </div>
 
           {/* Quick Dropdown Picker of selected tabs */}
-          <div className="d-flex align-items-center gap-2 flex-grow-1 w-100" style={{ maxWidth: '420px' }}>
+          <div className="d-flex align-items-center gap-2 grow w-100" style={{ maxWidth: '420px' }}>
             <span className="text-muted d-none d-sm-inline text-nowrap" style={{ fontSize: '0.8rem' }}>
               Jump to:
             </span>
@@ -1476,7 +1476,7 @@ export default function UpdatedScheme() {
                           onChange={() => {}}
                         />
                         <label
-                          className="form-check-label flex-grow-1 text-truncate mb-0 cursor-pointer"
+                          className="form-check-label grow text-truncate mb-0 cursor-pointer"
                           htmlFor={`chk-${tab.id}`}
                           title={tab.title}
                         >

@@ -285,7 +285,7 @@ export default function ThemeCustomizerModal({ show, onClose }) {
 
                           {/* Mini Content Area */}
                           <div
-                            className="flex-grow-1 p-2 d-flex flex-column gap-1.5"
+                            className="grow p-2 d-flex flex-column gap-1.5"
                             style={{
                               backgroundColor:
                                 theme === 'dark' ? '#141f2e' : '#f8fafc',
@@ -373,7 +373,7 @@ export default function ThemeCustomizerModal({ show, onClose }) {
                         </div>
 
                         <p
-                          className="text-muted small mb-3 flex-grow-1"
+                          className="text-muted small mb-3 grow"
                           style={{ fontSize: '0.78rem', lineHeight: '1.4' }}
                         >
                           {tmpl.description}

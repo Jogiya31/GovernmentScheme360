@@ -51,7 +51,7 @@ export default function Login() {
 
           {apiError && (
             <div className="alert alert-danger py-2 px-3 mb-4 rounded-3 d-flex align-items-center gap-2" style={{ fontSize: '0.85rem' }}>
-              <i className="bi bi-exclamation-triangle-fill flex-shrink-0"></i>
+              <i className="bi bi-exclamation-triangle-fill shrink-0"></i>
               <div>{apiError}</div>
             </div>
           )}

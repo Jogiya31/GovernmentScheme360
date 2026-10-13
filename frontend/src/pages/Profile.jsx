@@ -149,7 +149,7 @@ export default function Profile() {
             <div className="card-body p-4 d-flex flex-column align-items-center text-center">
               {/* Profile Avatar Frame with interactive hover/upload layer */}
               <div
-                className={`position-relative mb-3 rounded-circle border border-3 border-primary p-1 cursor-pointer transition-all ${isDragging ? 'bg-primary-subtle scale-105 border-dashed' : ''}`}
+                className={`position-relative mb-3 rounded-circle border-3 border-primary p-1 cursor-pointer transition-all ${isDragging ? 'bg-primary-subtle scale-105 border-dashed' : ''}`}
                 style={{ width: '130px', height: '130px', transition: 'all 0.2s' }}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
@@ -233,7 +233,7 @@ export default function Profile() {
               <ul className="nav nav-tabs border-0 flex-nowrap overflow-x-auto" id="profileTab" role="tablist" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
                 <li className="nav-item flex-fill text-center" role="presentation">
                   <button
-                    className={`nav-link border-0 border-bottom border-3 py-3 w-100 fw-bold d-flex align-items-center justify-content-center gap-2 ${activeTab === 'basic' ? 'border-primary text-primary bg-light-subtle' : 'border-transparent text-muted bg-white'}`}
+                    className={`nav-link border-bottom border-3 py-3 w-100 fw-bold d-flex align-items-center justify-content-center gap-2 ${activeTab === 'basic' ? 'border-primary text-primary bg-light-subtle' : 'border-transparent text-muted bg-white'}`}
                     onClick={() => setActiveTab('basic')}
                     style={{ fontSize: '0.9rem' }}
                     type="button"
@@ -244,7 +244,7 @@ export default function Profile() {
                 </li>
                 <li className="nav-item flex-fill text-center" role="presentation">
                   <button
-                    className={`nav-link border-0 border-bottom border-3 py-3 w-100 fw-bold d-flex align-items-center justify-content-center gap-2 ${activeTab === 'security' ? 'border-primary text-primary bg-light-subtle' : 'border-transparent text-muted bg-white'}`}
+                    className={`nav-link border-bottom border-3 py-3 w-100 fw-bold d-flex align-items-center justify-content-center gap-2 ${activeTab === 'security' ? 'border-primary text-primary bg-light-subtle' : 'border-transparent text-muted bg-white'}`}
                     onClick={() => setActiveTab('security')}
                     style={{ fontSize: '0.9rem' }}
                     type="button"
@@ -255,7 +255,7 @@ export default function Profile() {
                 </li>
                 <li className="nav-item flex-fill text-center" role="presentation">
                   <button
-                    className={`nav-link border-0 border-bottom border-3 py-3 w-100 fw-bold d-flex align-items-center justify-content-center gap-2 ${activeTab === 'preferences' ? 'border-primary text-primary bg-light-subtle' : 'border-transparent text-muted bg-white'}`}
+                    className={`nav-link border-bottom border-3 py-3 w-100 fw-bold d-flex align-items-center justify-content-center gap-2 ${activeTab === 'preferences' ? 'border-primary text-primary bg-light-subtle' : 'border-transparent text-muted bg-white'}`}
                     onClick={() => setActiveTab('preferences')}
                     style={{ fontSize: '0.9rem' }}
                     type="button"
@@ -568,7 +568,7 @@ export default function Profile() {
                                     {tmpl.badge}
                                   </span>
                                 </div>
-                                <p className="text-muted small mb-3 flex-grow-1" style={{ fontSize: '0.75rem', lineHeight: '1.4' }}>
+                                <p className="text-muted small mb-3 grow" style={{ fontSize: '0.75rem', lineHeight: '1.4' }}>
                                   {tmpl.description}
                                 </p>
 
